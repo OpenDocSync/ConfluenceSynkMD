@@ -25,11 +25,11 @@ jobs:
           dotnet-version: ${{ matrix.dotnet-version }}
 
       - name: Restore
-        run: dotnet restore ConfluentSynkMD.slnx
+        run: dotnet restore ConfluenceSynkMD.slnx
 
       - name: Build
         run: |
-          dotnet build ConfluentSynkMD.slnx \
+          dotnet build ConfluenceSynkMD.slnx \
             --no-restore \
             --configuration Release \
             -p:TreatWarningsAsErrors=${{ env.TREAT_WARNINGS_AS_ERRORS }} \
@@ -44,7 +44,7 @@ jobs:
           if-no-files-found: warn
 
       - name: Test with coverage
-        run: dotnet test ConfluentSynkMD.slnx --no-build --configuration Release --collect:"XPlat Code Coverage" --results-directory ./TestResults
+        run: dotnet test ConfluenceSynkMD.slnx --no-build --configuration Release --collect:"XPlat Code Coverage" --results-directory ./TestResults
 
       - name: Upload coverage artifact
         uses: actions/upload-artifact@v6

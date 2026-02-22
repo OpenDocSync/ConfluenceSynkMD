@@ -9,19 +9,19 @@ Das Docker-Image enthält .NET, Node.js und mermaid-cli — eine konsistente, po
 === "Bash"
 
     ```bash
-    docker build -t confluentsynkmd .
+    docker build -t confluencesynkmd .
     ```
 
 === "PowerShell"
 
     ```powershell
-    docker build -t confluentsynkmd .
+    docker build -t confluencesynkmd .
     ```
 
 === "CMD"
 
     ```cmd
-    docker build -t confluentsynkmd .
+    docker build -t confluencesynkmd .
     ```
 
 ---
@@ -38,7 +38,7 @@ Das Docker-Image enthält .NET, Node.js und mermaid-cli — eine konsistente, po
       -e CONFLUENCE__USEREMAIL \
       -e CONFLUENCE__APITOKEN \
       -v $(pwd)/docs:/workspace/docs:ro \
-      confluentsynkmd \
+      confluencesynkmd \
       --mode Upload \
       --path /workspace/docs \
       --conf-space IHR_SPACE_KEY \
@@ -51,7 +51,7 @@ Das Docker-Image enthält .NET, Node.js und mermaid-cli — eine konsistente, po
       -e CONFLUENCE__USEREMAIL \
       -e CONFLUENCE__APITOKEN \
       -v $(pwd)/output:/workspace/output \
-      confluentsynkmd \
+      confluencesynkmd \
       --mode Download \
       --path /workspace/output \
       --conf-space IHR_SPACE_KEY \
@@ -64,7 +64,7 @@ Das Docker-Image enthält .NET, Node.js und mermaid-cli — eine konsistente, po
       -e CONFLUENCE__USEREMAIL \
       -e CONFLUENCE__APITOKEN \
       -v $(pwd)/docs:/workspace/docs:ro \
-      confluentsynkmd \
+      confluencesynkmd \
       --mode Upload \
       --path /workspace/docs \
       --conf-space IHR_SPACE_KEY \
@@ -77,7 +77,7 @@ Das Docker-Image enthält .NET, Node.js und mermaid-cli — eine konsistente, po
       -e CONFLUENCE__USEREMAIL \
       -e CONFLUENCE__APITOKEN \
       -v $(pwd)/output:/workspace/output \
-      confluentsynkmd \
+      confluencesynkmd \
       --mode Download \
       --path /workspace/output \
       --conf-space IHR_SPACE_KEY \
@@ -94,7 +94,7 @@ Das Docker-Image enthält .NET, Node.js und mermaid-cli — eine konsistente, po
       -e CONFLUENCE__USEREMAIL `
       -e CONFLUENCE__APITOKEN `
       -v ${PWD}/docs:/workspace/docs:ro `
-      confluentsynkmd `
+      confluencesynkmd `
       --mode Upload `
       --path /workspace/docs `
       --conf-space IHR_SPACE_KEY `
@@ -107,7 +107,7 @@ Das Docker-Image enthält .NET, Node.js und mermaid-cli — eine konsistente, po
       -e CONFLUENCE__USEREMAIL `
       -e CONFLUENCE__APITOKEN `
       -v ${PWD}/output:/workspace/output `
-      confluentsynkmd `
+      confluencesynkmd `
       --mode Download `
       --path /workspace/output `
       --conf-space IHR_SPACE_KEY `
@@ -120,7 +120,7 @@ Das Docker-Image enthält .NET, Node.js und mermaid-cli — eine konsistente, po
       -e CONFLUENCE__USEREMAIL `
       -e CONFLUENCE__APITOKEN `
       -v ${PWD}/docs:/workspace/docs:ro `
-      confluentsynkmd `
+      confluencesynkmd `
       --mode Upload `
       --path /workspace/docs `
       --conf-space IHR_SPACE_KEY `
@@ -133,7 +133,7 @@ Das Docker-Image enthält .NET, Node.js und mermaid-cli — eine konsistente, po
       -e CONFLUENCE__USEREMAIL `
       -e CONFLUENCE__APITOKEN `
       -v ${PWD}/output:/workspace/output `
-      confluentsynkmd `
+      confluencesynkmd `
       --mode Download `
       --path /workspace/output `
       --conf-space IHR_SPACE_KEY `
@@ -150,7 +150,7 @@ Das Docker-Image enthält .NET, Node.js und mermaid-cli — eine konsistente, po
       -e CONFLUENCE__USEREMAIL ^
       -e CONFLUENCE__APITOKEN ^
       -v %cd%/docs:/workspace/docs:ro ^
-      confluentsynkmd ^
+      confluencesynkmd ^
       --mode Upload ^
       --path /workspace/docs ^
       --conf-space IHR_SPACE_KEY ^
@@ -163,7 +163,7 @@ Das Docker-Image enthält .NET, Node.js und mermaid-cli — eine konsistente, po
       -e CONFLUENCE__USEREMAIL ^
       -e CONFLUENCE__APITOKEN ^
       -v %cd%/output:/workspace/output ^
-      confluentsynkmd ^
+      confluencesynkmd ^
       --mode Download ^
       --path /workspace/output ^
       --conf-space IHR_SPACE_KEY ^
@@ -176,7 +176,7 @@ Das Docker-Image enthält .NET, Node.js und mermaid-cli — eine konsistente, po
       -e CONFLUENCE__USEREMAIL ^
       -e CONFLUENCE__APITOKEN ^
       -v %cd%/docs:/workspace/docs:ro ^
-      confluentsynkmd ^
+      confluencesynkmd ^
       --mode Upload ^
       --path /workspace/docs ^
       --conf-space IHR_SPACE_KEY ^
@@ -189,7 +189,7 @@ Das Docker-Image enthält .NET, Node.js und mermaid-cli — eine konsistente, po
       -e CONFLUENCE__USEREMAIL ^
       -e CONFLUENCE__APITOKEN ^
       -v %cd%/output:/workspace/output ^
-      confluentsynkmd ^
+      confluencesynkmd ^
       --mode Download ^
       --path /workspace/output ^
       --conf-space IHR_SPACE_KEY ^
@@ -237,7 +237,7 @@ Das Docker-Image enthält .NET, Node.js und mermaid-cli — eine konsistente, po
           - uses: actions/checkout@v4
 
           - name: Docker Image bauen
-            run: docker build -t confluentsynkmd .
+            run: docker build -t confluencesynkmd .
 
           - name: Upload ausführen
             env:
@@ -252,7 +252,7 @@ Das Docker-Image enthält .NET, Node.js und mermaid-cli — eine konsistente, po
                 -e CONFLUENCE__USEREMAIL \
                 -e CONFLUENCE__APITOKEN \
                 -v "$PWD/docs:/workspace/docs:ro" \
-                confluentsynkmd \
+                confluencesynkmd \
                 --mode Upload \
                 --path /workspace/docs \
                 --conf-space "${{ vars.CONFLUENCE_SPACE }}" \
@@ -273,7 +273,7 @@ Das Docker-Image enthält .NET, Node.js und mermaid-cli — eine konsistente, po
         DOCKER_HOST: tcp://docker:2375
         DOCKER_TLS_CERTDIR: ""
       script:
-        - docker build -t confluentsynkmd .
+        - docker build -t confluencesynkmd .
         - |
           docker run --rm \
             -e CONFLUENCE__BASEURL \
@@ -281,7 +281,7 @@ Das Docker-Image enthält .NET, Node.js und mermaid-cli — eine konsistente, po
             -e CONFLUENCE__USEREMAIL \
             -e CONFLUENCE__APITOKEN \
             -v "$CI_PROJECT_DIR/docs:/workspace/docs:ro" \
-            confluentsynkmd \
+            confluencesynkmd \
             --mode Upload \
             --path /workspace/docs \
             --conf-space "$CONFLUENCE_SPACE" \
@@ -300,7 +300,7 @@ Das Docker-Image enthält .NET, Node.js und mermaid-cli — eine konsistente, po
 Um zusätzliche Diagramm-Renderer hinzuzufügen:
 
 ```dockerfile
-FROM confluentsynkmd AS base
+FROM confluencesynkmd AS base
 
 # PlantUML hinzufügen
 RUN apt-get update && apt-get install -y plantuml

@@ -9,7 +9,7 @@ Local Export converts Markdown to Confluence Storage Format (XHTML) on your loca
 === "Bash"
 
     ```bash
-    dotnet run --project src/ConfluentSynkMD -- \
+    dotnet run --project src/ConfluenceSynkMD -- \
       --mode Upload \
       --path ./docs \
       --conf-space DEV \
@@ -19,7 +19,7 @@ Local Export converts Markdown to Confluence Storage Format (XHTML) on your loca
 === "PowerShell"
 
     ```powershell
-    dotnet run --project src/ConfluentSynkMD -- `
+    dotnet run --project src/ConfluenceSynkMD -- `
       --mode Upload `
       --path ./docs `
       --conf-space DEV `
@@ -29,7 +29,7 @@ Local Export converts Markdown to Confluence Storage Format (XHTML) on your loca
 === "CMD"
 
     ```cmd
-    dotnet run --project src/ConfluentSynkMD -- ^
+    dotnet run --project src/ConfluenceSynkMD -- ^
       --mode Upload ^
       --path .\docs ^
       --conf-space DEV ^
@@ -56,21 +56,21 @@ Run a local export to inspect the generated XHTML before pushing to Confluence:
 === "Bash"
 
     ```bash
-    dotnet run --project src/ConfluentSynkMD -- \
+    dotnet run --project src/ConfluenceSynkMD -- \
       --mode Upload --path ./docs --conf-space DEV --local
     ```
 
 === "PowerShell"
 
     ```powershell
-    dotnet run --project src/ConfluentSynkMD -- `
+    dotnet run --project src/ConfluenceSynkMD -- `
       --mode Upload --path ./docs --conf-space DEV --local
     ```
 
 === "CMD"
 
     ```cmd
-    dotnet run --project src/ConfluentSynkMD -- ^
+    dotnet run --project src/ConfluenceSynkMD -- ^
       --mode Upload --path .\docs --conf-space DEV --local
     ```
 
@@ -81,7 +81,7 @@ Add a local export step to your CI pipeline to verify that all Markdown files co
 ```yaml
 - name: Validate Confluence conversion
   run: |
-    dotnet run --project src/ConfluentSynkMD -- \
+    dotnet run --project src/ConfluenceSynkMD -- \
       --mode Upload --path ./docs --conf-space DEV --local
 ```
 
@@ -92,7 +92,7 @@ Combine with `--debug-line-markers` and `--loglevel debug` for detailed output:
 === "Bash"
 
     ```bash
-    dotnet run --project src/ConfluentSynkMD -- \
+    dotnet run --project src/ConfluenceSynkMD -- \
       --mode Upload --path ./docs --conf-space DEV \
       --local --debug-line-markers --loglevel debug
     ```
@@ -100,7 +100,7 @@ Combine with `--debug-line-markers` and `--loglevel debug` for detailed output:
 === "PowerShell"
 
     ```powershell
-    dotnet run --project src/ConfluentSynkMD -- `
+    dotnet run --project src/ConfluenceSynkMD -- `
       --mode Upload --path ./docs --conf-space DEV `
       --local --debug-line-markers --loglevel debug
     ```
@@ -108,7 +108,7 @@ Combine with `--debug-line-markers` and `--loglevel debug` for detailed output:
 === "CMD"
 
     ```cmd
-    dotnet run --project src/ConfluentSynkMD -- ^
+    dotnet run --project src/ConfluenceSynkMD -- ^
       --mode Upload --path .\docs --conf-space DEV ^
       --local --debug-line-markers --loglevel debug
     ```

@@ -1,6 +1,6 @@
 # Frontmatter & Metadaten
 
-ConfluentSynkMD unterstützt YAML-Frontmatter und Inline-HTML-Kommentare zur Steuerung von Seiten-Metadaten auf Dokumentebene.
+ConfluenceSynkMD unterstützt YAML-Frontmatter und Inline-HTML-Kommentare zur Steuerung von Seiten-Metadaten auf Dokumentebene.
 
 ---
 

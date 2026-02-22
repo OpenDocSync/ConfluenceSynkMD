@@ -37,7 +37,7 @@ jobs:
       - name: mermaid-cli installieren
         run: npm install -g @mermaid-js/mermaid-cli
 
-      - name: ConfluentSynkMD bauen
+      - name: ConfluenceSynkMD bauen
         run: dotnet build
 
       - name: Nach Confluence hochladen
@@ -47,7 +47,7 @@ jobs:
           CONFLUENCE__USEREMAIL: ${{ secrets.CONFLUENCE_EMAIL }}
           CONFLUENCE__APITOKEN: ${{ secrets.CONFLUENCE_TOKEN }}
         run: |
-          dotnet run --project src/ConfluentSynkMD -- \
+          dotnet run --project src/ConfluenceSynkMD -- \
             --mode Upload \
             --path ./docs \
             --conf-space ${{ vars.CONFLUENCE_SPACE }} \
@@ -73,7 +73,7 @@ Verwenden Sie `--local` in PR-Checks zur Validierung ohne API-Aufrufe:
 ```yaml
 - name: Konvertierung validieren
   run: |
-    dotnet run --project src/ConfluentSynkMD -- \
+    dotnet run --project src/ConfluenceSynkMD -- \
       --mode Upload --path ./docs --conf-space DUMMY --local
 ```
 

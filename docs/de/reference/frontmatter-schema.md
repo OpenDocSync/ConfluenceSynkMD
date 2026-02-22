@@ -1,6 +1,6 @@
 # Frontmatter-Schema
 
-Vollständige Spezifikation der von ConfluentSynkMD unterstützten YAML-Frontmatter-Felder.
+Vollständige Spezifikation der von ConfluenceSynkMD unterstützten YAML-Frontmatter-Felder.
 
 ---
 

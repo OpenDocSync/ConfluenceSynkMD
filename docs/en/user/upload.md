@@ -9,7 +9,7 @@ Upload converts your local Markdown files into Confluence Storage Format (XHTML)
 === "Bash"
 
     ```bash
-    dotnet run --project src/ConfluentSynkMD -- \
+    dotnet run --project src/ConfluenceSynkMD -- \
       --mode Upload \
       --path ./docs \
       --conf-space DEV \
@@ -19,7 +19,7 @@ Upload converts your local Markdown files into Confluence Storage Format (XHTML)
 === "PowerShell"
 
     ```powershell
-    dotnet run --project src/ConfluentSynkMD -- `
+    dotnet run --project src/ConfluenceSynkMD -- `
       --mode Upload `
       --path ./docs `
       --conf-space DEV `
@@ -29,7 +29,7 @@ Upload converts your local Markdown files into Confluence Storage Format (XHTML)
 === "CMD"
 
     ```cmd
-    dotnet run --project src/ConfluentSynkMD -- ^
+    dotnet run --project src/ConfluenceSynkMD -- ^
       --mode Upload ^
       --path .\docs ^
       --conf-space DEV ^
@@ -42,7 +42,7 @@ This uploads all `.md` files from `./docs` as child pages under page `12345` in 
 
 ## Hierarchical Upload
 
-By default, ConfluentSynkMD preserves your local directory structure as a parent–child page tree in Confluence (`--keep-hierarchy` is `true` by default).
+By default, ConfluenceSynkMD preserves your local directory structure as a parent–child page tree in Confluence (`--keep-hierarchy` is `true` by default).
 
 ```
 docs/
@@ -83,7 +83,7 @@ Instead of `--conf-parent-id`, you can specify a root page by title. If the page
 === "Bash"
 
     ```bash
-    dotnet run --project src/ConfluentSynkMD -- \
+    dotnet run --project src/ConfluenceSynkMD -- \
       --mode Upload \
       --path ./docs \
       --conf-space DEV \
@@ -93,7 +93,7 @@ Instead of `--conf-parent-id`, you can specify a root page by title. If the page
 === "PowerShell"
 
     ```powershell
-    dotnet run --project src/ConfluentSynkMD -- `
+    dotnet run --project src/ConfluenceSynkMD -- `
       --mode Upload `
       --path ./docs `
       --conf-space DEV `
@@ -103,7 +103,7 @@ Instead of `--conf-parent-id`, you can specify a root page by title. If the page
 === "CMD"
 
     ```cmd
-    dotnet run --project src/ConfluentSynkMD -- ^
+    dotnet run --project src/ConfluenceSynkMD -- ^
       --mode Upload ^
       --path .\docs ^
       --conf-space DEV ^
@@ -114,7 +114,7 @@ Instead of `--conf-parent-id`, you can specify a root page by title. If the page
 
 ## Skip Unchanged Pages
 
-Use `--skip-update` to avoid re-uploading pages whose content hasn't changed. ConfluentSynkMD computes content hashes to detect changes:
+Use `--skip-update` to avoid re-uploading pages whose content hasn't changed. ConfluenceSynkMD computes content hashes to detect changes:
 
 === "Bash"
 
@@ -166,7 +166,7 @@ This produces page titles like `[AUTO] Getting Started`, `[AUTO] Setup Guide`, e
 
 ## Generated-By Marker
 
-By default, ConfluentSynkMD adds a generated-by info macro at the top of each page. You can customize or disable this:
+By default, ConfluenceSynkMD adds a generated-by info macro at the top of each page. You can customize or disable this:
 
 === "Bash"
 
@@ -204,7 +204,7 @@ Supported placeholders: `%{filepath}`, `%{filename}`, `%{filedir}`, `%{filestem}
 
 ## Page-ID Write-Back
 
-After upload, ConfluentSynkMD writes Confluence Page IDs back into your Markdown source files as HTML comments:
+After upload, ConfluenceSynkMD writes Confluence Page IDs back into your Markdown source files as HTML comments:
 
 ```html
 <!-- confluence-page-id: 12345 -->

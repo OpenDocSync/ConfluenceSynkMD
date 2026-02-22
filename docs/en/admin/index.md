@@ -1,6 +1,6 @@
 # Admin Guide
 
-Welcome to the ConfluentSynkMD Admin Guide. This section covers installation, deployment, configuration, and operational topics.
+Welcome to the ConfluenceSynkMD Admin Guide. This section covers installation, deployment, configuration, and operational topics.
 
 ---
 

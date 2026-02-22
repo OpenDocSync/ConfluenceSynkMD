@@ -1,6 +1,6 @@
 # Environment Variables
 
-Complete reference of all environment variables used by ConfluentSynkMD.
+Complete reference of all environment variables used by ConfluenceSynkMD.
 
 !!! tip "CLI Override"
     All credential variables can also be set via CLI flags (e.g. `--conf-base-url`). CLI flags take priority over environment variables. See the [CLI Reference](cli.md) for details.

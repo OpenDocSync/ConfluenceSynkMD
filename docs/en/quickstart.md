@@ -1,6 +1,6 @@
 # Quick Start
 
-Get ConfluentSynkMD up and running in under 5 minutes.
+Get ConfluenceSynkMD up and running in under 5 minutes.
 
 ---
 
@@ -20,8 +20,8 @@ Get ConfluentSynkMD up and running in under 5 minutes.
 
     ```bash
     # Clone the repository
-    git clone https://github.com/OpenDocSync/ConfluentSynkMD.git
-    cd ConfluentSynkMD
+    git clone https://github.com/OpenDocSync/ConfluenceSynkMD.git
+    cd ConfluenceSynkMD
 
     # Build
     dotnet build
@@ -31,8 +31,8 @@ Get ConfluentSynkMD up and running in under 5 minutes.
 
     ```powershell
     # Clone the repository
-    git clone https://github.com/OpenDocSync/ConfluentSynkMD.git
-    Set-Location ConfluentSynkMD
+    git clone https://github.com/OpenDocSync/ConfluenceSynkMD.git
+    Set-Location ConfluenceSynkMD
 
     # Build
     dotnet build
@@ -42,8 +42,8 @@ Get ConfluentSynkMD up and running in under 5 minutes.
 
     ```cmd
     REM Clone the repository
-    git clone https://github.com/OpenDocSync/ConfluentSynkMD.git
-    cd ConfluentSynkMD
+    git clone https://github.com/OpenDocSync/ConfluenceSynkMD.git
+    cd ConfluenceSynkMD
 
     REM Build
     dotnet build
@@ -54,19 +54,19 @@ Get ConfluentSynkMD up and running in under 5 minutes.
 === "Bash"
 
     ```bash
-    docker build -t confluentsynkmd .
+    docker build -t confluencesynkmd .
     ```
 
 === "PowerShell"
 
     ```powershell
-    docker build -t confluentsynkmd .
+    docker build -t confluencesynkmd .
     ```
 
 === "CMD"
 
     ```cmd
-    docker build -t confluentsynkmd .
+    docker build -t confluencesynkmd .
     ```
 
 ---
@@ -151,7 +151,7 @@ Upload a folder of Markdown files to Confluence:
 === "Bash"
 
     ```bash
-    dotnet run --project src/ConfluentSynkMD -- \
+    dotnet run --project src/ConfluenceSynkMD -- \
       --mode Upload \
       --path ./my-docs \
       --conf-space YOUR_SPACE_KEY \
@@ -161,7 +161,7 @@ Upload a folder of Markdown files to Confluence:
 === "PowerShell"
 
     ```powershell
-    dotnet run --project src/ConfluentSynkMD -- `
+    dotnet run --project src/ConfluenceSynkMD -- `
       --mode Upload `
       --path ./my-docs `
       --conf-space YOUR_SPACE_KEY `
@@ -171,7 +171,7 @@ Upload a folder of Markdown files to Confluence:
 === "CMD"
 
     ```cmd
-    dotnet run --project src/ConfluentSynkMD -- ^
+    dotnet run --project src/ConfluenceSynkMD -- ^
       --mode Upload ^
       --path .\my-docs ^
       --conf-space YOUR_SPACE_KEY ^
@@ -189,7 +189,7 @@ Upload a folder of Markdown files to Confluence:
       -e CONFLUENCE__USEREMAIL=user@example.com \
       -e CONFLUENCE__APITOKEN=your-token \
       -v ${PWD}:/workspace \
-      confluentsynkmd \
+      confluencesynkmd \
       --mode Upload \
       --path /workspace/my-docs \
       --conf-space YOUR_SPACE_KEY \
@@ -205,7 +205,7 @@ Upload a folder of Markdown files to Confluence:
       -e CONFLUENCE__USEREMAIL=user@example.com `
       -e CONFLUENCE__APITOKEN=your-token `
       -v ${PWD}:/workspace `
-      confluentsynkmd `
+      confluencesynkmd `
       --mode Upload `
       --path /workspace/my-docs `
       --conf-space YOUR_SPACE_KEY `
@@ -221,7 +221,7 @@ Upload a folder of Markdown files to Confluence:
       -e CONFLUENCE__USEREMAIL=user@example.com ^
       -e CONFLUENCE__APITOKEN=your-token ^
       -v %cd%:/workspace ^
-      confluentsynkmd ^
+      confluencesynkmd ^
       --mode Upload ^
       --path /workspace/my-docs ^
       --conf-space YOUR_SPACE_KEY ^
@@ -239,7 +239,7 @@ Download Confluence pages back to Markdown:
 === "Bash"
 
     ```bash
-    dotnet run --project src/ConfluentSynkMD -- \
+    dotnet run --project src/ConfluenceSynkMD -- \
       --mode Download \
       --path ./output \
       --conf-space YOUR_SPACE_KEY \
@@ -249,7 +249,7 @@ Download Confluence pages back to Markdown:
 === "PowerShell"
 
     ```powershell
-    dotnet run --project src/ConfluentSynkMD -- `
+    dotnet run --project src/ConfluenceSynkMD -- `
       --mode Download `
       --path ./output `
       --conf-space YOUR_SPACE_KEY `
@@ -259,7 +259,7 @@ Download Confluence pages back to Markdown:
 === "CMD"
 
     ```cmd
-    dotnet run --project src/ConfluentSynkMD -- ^
+    dotnet run --project src/ConfluenceSynkMD -- ^
       --mode Download ^
       --path .\output ^
       --conf-space YOUR_SPACE_KEY ^
@@ -277,7 +277,7 @@ Download Confluence pages back to Markdown:
       -e CONFLUENCE__USEREMAIL=user@example.com \
       -e CONFLUENCE__APITOKEN=your-token \
       -v ${PWD}:/workspace \
-      confluentsynkmd \
+      confluencesynkmd \
       --mode Download \
       --path /workspace/output \
       --conf-space YOUR_SPACE_KEY \
@@ -293,7 +293,7 @@ Download Confluence pages back to Markdown:
       -e CONFLUENCE__USEREMAIL=user@example.com `
       -e CONFLUENCE__APITOKEN=your-token `
       -v ${PWD}:/workspace `
-      confluentsynkmd `
+      confluencesynkmd `
       --mode Download `
       --path /workspace/output `
       --conf-space YOUR_SPACE_KEY `
@@ -309,7 +309,7 @@ Download Confluence pages back to Markdown:
       -e CONFLUENCE__USEREMAIL=user@example.com ^
       -e CONFLUENCE__APITOKEN=your-token ^
       -v %cd%:/workspace ^
-      confluentsynkmd ^
+      confluencesynkmd ^
       --mode Download ^
       --path /workspace/output ^
       --conf-space YOUR_SPACE_KEY ^

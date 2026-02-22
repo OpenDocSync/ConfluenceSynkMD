@@ -9,7 +9,7 @@ Upload konvertiert Ihre lokalen Markdown-Dateien in das Confluence Storage Forma
 === "Bash"
 
     ```bash
-    dotnet run --project src/ConfluentSynkMD -- \
+    dotnet run --project src/ConfluenceSynkMD -- \
       --mode Upload \
       --path ./docs \
       --conf-space DEV \
@@ -19,7 +19,7 @@ Upload konvertiert Ihre lokalen Markdown-Dateien in das Confluence Storage Forma
 === "PowerShell"
 
     ```powershell
-    dotnet run --project src/ConfluentSynkMD -- `
+    dotnet run --project src/ConfluenceSynkMD -- `
       --mode Upload `
       --path ./docs `
       --conf-space DEV `
@@ -29,7 +29,7 @@ Upload konvertiert Ihre lokalen Markdown-Dateien in das Confluence Storage Forma
 === "CMD"
 
     ```cmd
-    dotnet run --project src/ConfluentSynkMD -- ^
+    dotnet run --project src/ConfluenceSynkMD -- ^
       --mode Upload ^
       --path .\docs ^
       --conf-space DEV ^
@@ -42,7 +42,7 @@ Dies lädt alle `.md`-Dateien aus `./docs` als Unterseiten der Seite `12345` im 
 
 ## Hierarchischer Upload
 
-Standardmäßig erhält ConfluentSynkMD Ihre lokale Verzeichnisstruktur als Eltern-Kind-Seitenbaum (`--keep-hierarchy` ist standardmäßig `true`).
+Standardmäßig erhält ConfluenceSynkMD Ihre lokale Verzeichnisstruktur als Eltern-Kind-Seitenbaum (`--keep-hierarchy` ist standardmäßig `true`).
 
 ```
 docs/
@@ -150,7 +150,7 @@ Fügen Sie allen hochgeladenen Seitentiteln ein Prefix hinzu:
 
 ## Generated-By-Marker
 
-Standardmäßig fügt ConfluentSynkMD einen Generated-By-Info-Makro oben auf jeder Seite ein. Anpassen oder deaktivieren:
+Standardmäßig fügt ConfluenceSynkMD einen Generated-By-Info-Makro oben auf jeder Seite ein. Anpassen oder deaktivieren:
 
 === "Bash"
 
@@ -188,7 +188,7 @@ Platzhalter: `%{filepath}`, `%{filename}`, `%{filedir}`, `%{filestem}`.
 
 ## Page-ID Write-Back
 
-Nach dem Upload schreibt ConfluentSynkMD Confluence Page-IDs als HTML-Kommentare zurück in Ihre Markdown-Dateien:
+Nach dem Upload schreibt ConfluenceSynkMD Confluence Page-IDs als HTML-Kommentare zurück in Ihre Markdown-Dateien:
 
 ```html
 <!-- confluence-page-id: 12345 -->

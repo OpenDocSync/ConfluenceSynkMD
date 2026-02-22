@@ -1,8 +1,8 @@
-site_name: ConfluentSynkMD
+site_name: ConfluenceSynkMD
 site_description: Bidirectional Markdown ↔ Confluence synchronization tool
-site_url: https://opendocsync.github.io/ConfluentSynkMD/
-repo_url: https://github.com/OpenDocSync/ConfluentSynkMD
-repo_name: ConfluentSynkMD
+site_url: https://opendocsync.github.io/ConfluenceSynkMD/
+repo_url: https://github.com/OpenDocSync/ConfluenceSynkMD
+repo_name: ConfluenceSynkMD
 edit_uri: edit/main/docs/
 
 theme:
@@ -82,7 +82,7 @@ markdown_extensions:
 extra:
   social:
     - icon: fontawesome/brands/github
-      link: https://github.com/OpenDocSync/ConfluentSynkMD
+      link: https://github.com/OpenDocSync/ConfluenceSynkMD
 
 nav:
   - Home: index.md

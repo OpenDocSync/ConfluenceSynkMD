@@ -1,6 +1,6 @@
 # Fehlerbehebung
 
-Häufige Probleme und Lösungen bei der Verwendung von ConfluentSynkMD.
+Häufige Probleme und Lösungen bei der Verwendung von ConfluenceSynkMD.
 
 ---
 

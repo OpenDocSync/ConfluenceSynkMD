@@ -1,6 +1,6 @@
 # Installation
 
-ConfluentSynkMD can be installed by building from source with the .NET SDK.
+ConfluenceSynkMD can be installed by building from source with the .NET SDK.
 
 ---
 
@@ -20,8 +20,8 @@ ConfluentSynkMD can be installed by building from source with the .NET SDK.
 
     ```bash
     # Clone the repository
-    git clone https://github.com/OpenDocSync/ConfluentSynkMD.git
-    cd ConfluentSynkMD
+    git clone https://github.com/OpenDocSync/ConfluenceSynkMD.git
+    cd ConfluenceSynkMD
 
     # Restore dependencies
     dotnet restore
@@ -34,8 +34,8 @@ ConfluentSynkMD can be installed by building from source with the .NET SDK.
 
     ```powershell
     # Clone the repository
-    git clone https://github.com/OpenDocSync/ConfluentSynkMD.git
-    Set-Location ConfluentSynkMD
+    git clone https://github.com/OpenDocSync/ConfluenceSynkMD.git
+    Set-Location ConfluenceSynkMD
 
     # Restore dependencies
     dotnet restore
@@ -48,8 +48,8 @@ ConfluentSynkMD can be installed by building from source with the .NET SDK.
 
     ```cmd
     REM Clone the repository
-    git clone https://github.com/OpenDocSync/ConfluentSynkMD.git
-    cd ConfluentSynkMD
+    git clone https://github.com/OpenDocSync/ConfluenceSynkMD.git
+    cd ConfluenceSynkMD
 
     REM Restore dependencies
     dotnet restore
@@ -63,19 +63,19 @@ ConfluentSynkMD can be installed by building from source with the .NET SDK.
 === "Bash"
 
     ```bash
-    dotnet run --project src/ConfluentSynkMD -- --help
+    dotnet run --project src/ConfluenceSynkMD -- --help
     ```
 
 === "PowerShell"
 
     ```powershell
-    dotnet run --project src/ConfluentSynkMD -- --help
+    dotnet run --project src/ConfluenceSynkMD -- --help
     ```
 
 === "CMD"
 
     ```cmd
-    dotnet run --project src/ConfluentSynkMD -- --help
+    dotnet run --project src/ConfluenceSynkMD -- --help
     ```
 
 ### Publish Standalone Binary
@@ -85,7 +85,7 @@ Create a self-contained executable:
 === "Bash"
 
     ```bash
-    dotnet publish src/ConfluentSynkMD/ConfluentSynkMD.csproj \
+    dotnet publish src/ConfluenceSynkMD/ConfluenceSynkMD.csproj \
       -c Release \
       -o ./publish \
       --self-contained true \
@@ -95,7 +95,7 @@ Create a self-contained executable:
 === "PowerShell"
 
     ```powershell
-    dotnet publish src/ConfluentSynkMD/ConfluentSynkMD.csproj `
+    dotnet publish src/ConfluenceSynkMD/ConfluenceSynkMD.csproj `
       -c Release `
       -o ./publish `
       --self-contained true `
@@ -105,14 +105,14 @@ Create a self-contained executable:
 === "CMD"
 
     ```cmd
-    dotnet publish src/ConfluentSynkMD/ConfluentSynkMD.csproj ^
+    dotnet publish src/ConfluenceSynkMD/ConfluenceSynkMD.csproj ^
       -c Release ^
       -o .\publish ^
       --self-contained true ^
       -r linux-x64
     ```
 
-The `./publish/ConfluentSynkMD` binary can be copied to any machine without requiring .NET to be installed.
+The `./publish/ConfluenceSynkMD` binary can be copied to any machine without requiring .NET to be installed.
 
 ---
 

@@ -1,6 +1,6 @@
 # Architektur
 
-ConfluentSynkMD folgt einem **ETL (Extract-Transform-Load)** Pipeline-Muster. Jede Sync-Operation durchläuft die gleiche dreistufige Pipeline.
+ConfluenceSynkMD folgt einem **ETL (Extract-Transform-Load)** Pipeline-Muster. Jede Sync-Operation durchläuft die gleiche dreistufige Pipeline.
 
 ---
 

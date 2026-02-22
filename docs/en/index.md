@@ -1,8 +1,8 @@
-# ConfluentSynkMD
+# ConfluenceSynkMD
 
 **Bidirectional Markdown ↔ Confluence synchronization for teams.**
 
-ConfluentSynkMD is a .NET 10 CLI tool that syncs Markdown documentation with Atlassian Confluence Cloud. Write in Markdown, publish to Confluence, download changes back — fully automated and round-trip safe.
+ConfluenceSynkMD is a .NET 10 CLI tool that syncs Markdown documentation with Atlassian Confluence Cloud. Write in Markdown, publish to Confluence, download changes back — fully automated and round-trip safe.
 
 ---
 
@@ -50,7 +50,7 @@ ConfluentSynkMD is a .NET 10 CLI tool that syncs Markdown documentation with Atl
 
     ---
 
-    Deploy, configure, and maintain ConfluentSynkMD.
+    Deploy, configure, and maintain ConfluenceSynkMD.
 
     [:octicons-arrow-right-24: Admin Guide](admin/index.md)
 
@@ -68,4 +68,4 @@ ConfluentSynkMD is a .NET 10 CLI tool that syncs Markdown documentation with Atl
 
 ## License
 
-ConfluentSynkMD is licensed under the [MIT License](https://github.com/OpenDocSync/ConfluentSynkMD/blob/main/LICENSE).
+ConfluenceSynkMD is licensed under the [MIT License](https://github.com/OpenDocSync/ConfluenceSynkMD/blob/main/LICENSE).

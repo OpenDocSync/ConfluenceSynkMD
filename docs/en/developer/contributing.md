@@ -1,6 +1,6 @@
 # Contributing
 
-Thank you for your interest in contributing to ConfluentSynkMD! This guide will help you get started.
+Thank you for your interest in contributing to ConfluenceSynkMD! This guide will help you get started.
 
 ---
 
@@ -10,8 +10,8 @@ Thank you for your interest in contributing to ConfluentSynkMD! This guide will 
 2. **Clone** your fork locally:
 
     ```bash
-    git clone https://github.com/OpenDocSync/ConfluentSynkMD.git
-    cd ConfluentSynkMD
+    git clone https://github.com/OpenDocSync/ConfluenceSynkMD.git
+    cd ConfluenceSynkMD
     ```
 
 3. **Create a branch** for your change:
@@ -91,11 +91,11 @@ Formatting defaults from `.editorconfig`:
 
 ## Reporting Bugs
 
-Use [GitHub Issues](https://github.com/OpenDocSync/ConfluentSynkMD/issues) with the **Bug Report** template. Include:
+Use [GitHub Issues](https://github.com/OpenDocSync/ConfluenceSynkMD/issues) with the **Bug Report** template. Include:
 
 - Steps to reproduce
 - Expected vs. actual behavior
-- OS, .NET version, ConfluentSynkMD version
+- OS, .NET version, ConfluenceSynkMD version
 
 ---
 
@@ -111,8 +111,8 @@ Open an issue using the **Feature Request** template. Describe:
 
 ## Code of Conduct
 
-By participating, you agree to abide by our [Code of Conduct](https://github.com/OpenDocSync/ConfluentSynkMD/blob/main/CODE_OF_CONDUCT.md).
+By participating, you agree to abide by our [Code of Conduct](https://github.com/OpenDocSync/ConfluenceSynkMD/blob/main/CODE_OF_CONDUCT.md).
 
 ## Questions?
 
-See [SUPPORT.md](https://github.com/OpenDocSync/ConfluentSynkMD/blob/main/SUPPORT.md) for ways to get help.
+See [SUPPORT.md](https://github.com/OpenDocSync/ConfluenceSynkMD/blob/main/SUPPORT.md) for ways to get help.

@@ -1,6 +1,6 @@
 # Authentication
 
-ConfluentSynkMD supports two authentication methods for connecting to Confluence Cloud. Credentials can be provided via **environment variables** or **CLI flags**.
+ConfluenceSynkMD supports two authentication methods for connecting to Confluence Cloud. Credentials can be provided via **environment variables** or **CLI flags**.
 
 ---
 
@@ -12,7 +12,7 @@ This is the default and recommended method for most users.
 
 1. Go to [Atlassian API Token Management](https://id.atlassian.com/manage-profile/security/api-tokens)
 2. Click **Create API Token**
-3. Give it a descriptive name (e.g. "ConfluentSynkMD")
+3. Give it a descriptive name (e.g. "ConfluenceSynkMD")
 4. Copy the token
 
 ### Configuration

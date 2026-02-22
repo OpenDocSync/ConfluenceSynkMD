@@ -9,7 +9,7 @@ Download ruft Confluence-Seiten ab und konvertiert sie zurück in Markdown-Datei
 === "Bash"
 
     ```bash
-    dotnet run --project src/ConfluentSynkMD -- \
+    dotnet run --project src/ConfluenceSynkMD -- \
       --mode Download \
       --path ./output \
       --conf-space DEV \
@@ -19,7 +19,7 @@ Download ruft Confluence-Seiten ab und konvertiert sie zurück in Markdown-Datei
 === "PowerShell"
 
     ```powershell
-    dotnet run --project src/ConfluentSynkMD -- `
+    dotnet run --project src/ConfluenceSynkMD -- `
       --mode Download `
       --path ./output `
       --conf-space DEV `
@@ -29,7 +29,7 @@ Download ruft Confluence-Seiten ab und konvertiert sie zurück in Markdown-Datei
 === "CMD"
 
     ```cmd
-    dotnet run --project src/ConfluentSynkMD -- ^
+    dotnet run --project src/ConfluenceSynkMD -- ^
       --mode Download ^
       --path .\output ^
       --conf-space DEV ^
@@ -43,7 +43,7 @@ Download ruft Confluence-Seiten ab und konvertiert sie zurück in Markdown-Datei
 === "Bash"
 
     ```bash
-    dotnet run --project src/ConfluentSynkMD -- \
+    dotnet run --project src/ConfluenceSynkMD -- \
       --mode Download \
       --path ./output \
       --conf-space DEV \
@@ -53,7 +53,7 @@ Download ruft Confluence-Seiten ab und konvertiert sie zurück in Markdown-Datei
 === "PowerShell"
 
     ```powershell
-    dotnet run --project src/ConfluentSynkMD -- `
+    dotnet run --project src/ConfluenceSynkMD -- `
       --mode Download `
       --path ./output `
       --conf-space DEV `
@@ -63,7 +63,7 @@ Download ruft Confluence-Seiten ab und konvertiert sie zurück in Markdown-Datei
 === "CMD"
 
     ```cmd
-    dotnet run --project src/ConfluentSynkMD -- ^
+    dotnet run --project src/ConfluenceSynkMD -- ^
       --mode Download ^
       --path .\output ^
       --conf-space DEV ^
@@ -74,7 +74,7 @@ Download ruft Confluence-Seiten ab und konvertiert sie zurück in Markdown-Datei
 
 ## Verzeichnisstruktur-Rekonstruktion
 
-Wenn Seiten ursprünglich mit `--keep-hierarchy` hochgeladen wurden, stellt ConfluentSynkMD die exakte Verzeichnisstruktur beim Download wieder her.
+Wenn Seiten ursprünglich mit `--keep-hierarchy` hochgeladen wurden, stellt ConfluenceSynkMD die exakte Verzeichnisstruktur beim Download wieder her.
 
 ---
 
@@ -94,7 +94,7 @@ Wenn Seiten ursprünglich mit `--keep-hierarchy` hochgeladen wurden, stellt Conf
 === "Bash"
 
     ```bash
-    dotnet run --project src/ConfluentSynkMD -- \
+    dotnet run --project src/ConfluenceSynkMD -- \
       --mode Download \
       --path ./migrated-docs \
       --conf-space TEAM \
@@ -104,7 +104,7 @@ Wenn Seiten ursprünglich mit `--keep-hierarchy` hochgeladen wurden, stellt Conf
 === "PowerShell"
 
     ```powershell
-    dotnet run --project src/ConfluentSynkMD -- `
+    dotnet run --project src/ConfluenceSynkMD -- `
       --mode Download `
       --path ./migrated-docs `
       --conf-space TEAM `
@@ -114,7 +114,7 @@ Wenn Seiten ursprünglich mit `--keep-hierarchy` hochgeladen wurden, stellt Conf
 === "CMD"
 
     ```cmd
-    dotnet run --project src/ConfluentSynkMD -- ^
+    dotnet run --project src/ConfluenceSynkMD -- ^
       --mode Download ^
       --path .\migrated-docs ^
       --conf-space TEAM ^
@@ -126,7 +126,7 @@ Wenn Seiten ursprünglich mit `--keep-hierarchy` hochgeladen wurden, stellt Conf
 === "Bash"
 
     ```bash
-    dotnet run --project src/ConfluentSynkMD -- \
+    dotnet run --project src/ConfluenceSynkMD -- \
       --mode Download \
       --path ./docs \
       --conf-space DEV \
@@ -136,7 +136,7 @@ Wenn Seiten ursprünglich mit `--keep-hierarchy` hochgeladen wurden, stellt Conf
 === "PowerShell"
 
     ```powershell
-    dotnet run --project src/ConfluentSynkMD -- `
+    dotnet run --project src/ConfluenceSynkMD -- `
       --mode Download `
       --path ./docs `
       --conf-space DEV `
@@ -146,7 +146,7 @@ Wenn Seiten ursprünglich mit `--keep-hierarchy` hochgeladen wurden, stellt Conf
 === "CMD"
 
     ```cmd
-    dotnet run --project src/ConfluentSynkMD -- ^
+    dotnet run --project src/ConfluenceSynkMD -- ^
       --mode Download ^
       --path .\docs ^
       --conf-space DEV ^

@@ -1,6 +1,6 @@
 # Diagramm-Rendering
 
-ConfluentSynkMD kann Code-Blöcke verschiedener Diagramm-Sprachen in Bild-Anhänge rendern, die in Ihre Confluence-Seiten eingebettet werden.
+ConfluenceSynkMD kann Code-Blöcke verschiedener Diagramm-Sprachen in Bild-Anhänge rendern, die in Ihre Confluence-Seiten eingebettet werden.
 
 ---
 

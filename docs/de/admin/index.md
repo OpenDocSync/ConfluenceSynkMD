@@ -1,6 +1,6 @@
 # Admin-Handbuch
 
-Willkommen im ConfluentSynkMD Admin-Handbuch. Dieser Bereich deckt Installation, Deployment, Konfiguration und betriebliche Themen ab.
+Willkommen im ConfluenceSynkMD Admin-Handbuch. Dieser Bereich deckt Installation, Deployment, Konfiguration und betriebliche Themen ab.
 
 ---
 

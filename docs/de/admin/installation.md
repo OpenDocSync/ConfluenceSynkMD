@@ -1,6 +1,6 @@
 # Installation
 
-ConfluentSynkMD kann durch Bauen aus dem Quellcode mit dem .NET SDK installiert werden.
+ConfluenceSynkMD kann durch Bauen aus dem Quellcode mit dem .NET SDK installiert werden.
 
 ---
 
@@ -19,8 +19,8 @@ ConfluentSynkMD kann durch Bauen aus dem Quellcode mit dem .NET SDK installiert 
 === "Bash"
 
     ```bash
-    git clone https://github.com/OpenDocSync/ConfluentSynkMD.git
-    cd ConfluentSynkMD
+    git clone https://github.com/OpenDocSync/ConfluenceSynkMD.git
+    cd ConfluenceSynkMD
     dotnet restore
     dotnet build
     ```
@@ -28,8 +28,8 @@ ConfluentSynkMD kann durch Bauen aus dem Quellcode mit dem .NET SDK installiert 
 === "PowerShell"
 
     ```powershell
-    git clone https://github.com/OpenDocSync/ConfluentSynkMD.git
-    Set-Location ConfluentSynkMD
+    git clone https://github.com/OpenDocSync/ConfluenceSynkMD.git
+    Set-Location ConfluenceSynkMD
     dotnet restore
     dotnet build
     ```
@@ -37,8 +37,8 @@ ConfluentSynkMD kann durch Bauen aus dem Quellcode mit dem .NET SDK installiert 
 === "CMD"
 
     ```cmd
-    git clone https://github.com/OpenDocSync/ConfluentSynkMD.git
-    cd ConfluentSynkMD
+    git clone https://github.com/OpenDocSync/ConfluenceSynkMD.git
+    cd ConfluenceSynkMD
     dotnet restore
     dotnet build
     ```
@@ -48,19 +48,19 @@ ConfluentSynkMD kann durch Bauen aus dem Quellcode mit dem .NET SDK installiert 
 === "Bash"
 
     ```bash
-    dotnet run --project src/ConfluentSynkMD -- --help
+    dotnet run --project src/ConfluenceSynkMD -- --help
     ```
 
 === "PowerShell"
 
     ```powershell
-    dotnet run --project src/ConfluentSynkMD -- --help
+    dotnet run --project src/ConfluenceSynkMD -- --help
     ```
 
 === "CMD"
 
     ```cmd
-    dotnet run --project src/ConfluentSynkMD -- --help
+    dotnet run --project src/ConfluenceSynkMD -- --help
     ```
 
 ### Eigenständige Binärdatei erstellen
@@ -68,21 +68,21 @@ ConfluentSynkMD kann durch Bauen aus dem Quellcode mit dem .NET SDK installiert 
 === "Bash"
 
     ```bash
-    dotnet publish src/ConfluentSynkMD/ConfluentSynkMD.csproj \
+    dotnet publish src/ConfluenceSynkMD/ConfluenceSynkMD.csproj \
       -c Release -o ./publish --self-contained true -r linux-x64
     ```
 
 === "PowerShell"
 
     ```powershell
-    dotnet publish src/ConfluentSynkMD/ConfluentSynkMD.csproj `
+    dotnet publish src/ConfluenceSynkMD/ConfluenceSynkMD.csproj `
       -c Release -o ./publish --self-contained true -r linux-x64
     ```
 
 === "CMD"
 
     ```cmd
-    dotnet publish src/ConfluentSynkMD/ConfluentSynkMD.csproj ^
+    dotnet publish src/ConfluenceSynkMD/ConfluenceSynkMD.csproj ^
       -c Release -o .\publish --self-contained true -r linux-x64
     ```
 

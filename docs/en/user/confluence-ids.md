@@ -1,6 +1,6 @@
 # Finding Confluence IDs
 
-ConfluentSynkMD requires a **Space Key** and optionally a **Page ID** to know where to upload/download pages. This guide shows you how to find them.
+ConfluenceSynkMD requires a **Space Key** and optionally a **Page ID** to know where to upload/download pages. This guide shows you how to find them.
 
 ---
 

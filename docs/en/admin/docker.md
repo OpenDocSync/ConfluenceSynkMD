@@ -9,19 +9,19 @@ The Docker image comes pre-packaged with .NET, Node.js, and mermaid-cli — prov
 === "Bash"
 
     ```bash
-    docker build -t confluentsynkmd .
+    docker build -t confluencesynkmd .
     ```
 
 === "PowerShell"
 
     ```powershell
-    docker build -t confluentsynkmd .
+    docker build -t confluencesynkmd .
     ```
 
 === "CMD"
 
     ```cmd
-    docker build -t confluentsynkmd .
+    docker build -t confluencesynkmd .
     ```
 
 The Dockerfile uses a **multi-stage build**:
@@ -43,7 +43,7 @@ The Dockerfile uses a **multi-stage build**:
       -e CONFLUENCE__USEREMAIL \
       -e CONFLUENCE__APITOKEN \
       -v $(pwd)/docs:/workspace/docs:ro \
-      confluentsynkmd \
+      confluencesynkmd \
       --mode Upload \
       --path /workspace/docs \
       --conf-space YOUR_SPACE_KEY \
@@ -56,7 +56,7 @@ The Dockerfile uses a **multi-stage build**:
       -e CONFLUENCE__USEREMAIL \
       -e CONFLUENCE__APITOKEN \
       -v $(pwd)/output:/workspace/output \
-      confluentsynkmd \
+      confluencesynkmd \
       --mode Download \
       --path /workspace/output \
       --conf-space YOUR_SPACE_KEY \
@@ -69,7 +69,7 @@ The Dockerfile uses a **multi-stage build**:
       -e CONFLUENCE__USEREMAIL \
       -e CONFLUENCE__APITOKEN \
       -v $(pwd)/docs:/workspace/docs:ro \
-      confluentsynkmd \
+      confluencesynkmd \
       --mode Upload \
       --path /workspace/docs \
       --conf-space YOUR_SPACE_KEY \
@@ -82,7 +82,7 @@ The Dockerfile uses a **multi-stage build**:
       -e CONFLUENCE__USEREMAIL \
       -e CONFLUENCE__APITOKEN \
       -v $(pwd)/output:/workspace/output \
-      confluentsynkmd \
+      confluencesynkmd \
       --mode Download \
       --path /workspace/output \
       --conf-space YOUR_SPACE_KEY \
@@ -99,7 +99,7 @@ The Dockerfile uses a **multi-stage build**:
       -e CONFLUENCE__USEREMAIL `
       -e CONFLUENCE__APITOKEN `
       -v ${PWD}/docs:/workspace/docs:ro `
-      confluentsynkmd `
+      confluencesynkmd `
       --mode Upload `
       --path /workspace/docs `
       --conf-space YOUR_SPACE_KEY `
@@ -112,7 +112,7 @@ The Dockerfile uses a **multi-stage build**:
       -e CONFLUENCE__USEREMAIL `
       -e CONFLUENCE__APITOKEN `
       -v ${PWD}/output:/workspace/output `
-      confluentsynkmd `
+      confluencesynkmd `
       --mode Download `
       --path /workspace/output `
       --conf-space YOUR_SPACE_KEY `
@@ -125,7 +125,7 @@ The Dockerfile uses a **multi-stage build**:
       -e CONFLUENCE__USEREMAIL `
       -e CONFLUENCE__APITOKEN `
       -v ${PWD}/docs:/workspace/docs:ro `
-      confluentsynkmd `
+      confluencesynkmd `
       --mode Upload `
       --path /workspace/docs `
       --conf-space YOUR_SPACE_KEY `
@@ -138,7 +138,7 @@ The Dockerfile uses a **multi-stage build**:
       -e CONFLUENCE__USEREMAIL `
       -e CONFLUENCE__APITOKEN `
       -v ${PWD}/output:/workspace/output `
-      confluentsynkmd `
+      confluencesynkmd `
       --mode Download `
       --path /workspace/output `
       --conf-space YOUR_SPACE_KEY `
@@ -155,7 +155,7 @@ The Dockerfile uses a **multi-stage build**:
       -e CONFLUENCE__USEREMAIL ^
       -e CONFLUENCE__APITOKEN ^
       -v %cd%/docs:/workspace/docs:ro ^
-      confluentsynkmd ^
+      confluencesynkmd ^
       --mode Upload ^
       --path /workspace/docs ^
       --conf-space YOUR_SPACE_KEY ^
@@ -168,7 +168,7 @@ The Dockerfile uses a **multi-stage build**:
       -e CONFLUENCE__USEREMAIL ^
       -e CONFLUENCE__APITOKEN ^
       -v %cd%/output:/workspace/output ^
-      confluentsynkmd ^
+      confluencesynkmd ^
       --mode Download ^
       --path /workspace/output ^
       --conf-space YOUR_SPACE_KEY ^
@@ -181,7 +181,7 @@ The Dockerfile uses a **multi-stage build**:
       -e CONFLUENCE__USEREMAIL ^
       -e CONFLUENCE__APITOKEN ^
       -v %cd%/docs:/workspace/docs:ro ^
-      confluentsynkmd ^
+      confluencesynkmd ^
       --mode Upload ^
       --path /workspace/docs ^
       --conf-space YOUR_SPACE_KEY ^
@@ -194,7 +194,7 @@ The Dockerfile uses a **multi-stage build**:
       -e CONFLUENCE__USEREMAIL ^
       -e CONFLUENCE__APITOKEN ^
       -v %cd%/output:/workspace/output ^
-      confluentsynkmd ^
+      confluencesynkmd ^
       --mode Download ^
       --path /workspace/output ^
       --conf-space YOUR_SPACE_KEY ^
@@ -242,7 +242,7 @@ The Dockerfile uses a **multi-stage build**:
           - uses: actions/checkout@v4
 
           - name: Build Docker image
-            run: docker build -t confluentsynkmd .
+            run: docker build -t confluencesynkmd .
 
           - name: Run upload
             env:
@@ -257,7 +257,7 @@ The Dockerfile uses a **multi-stage build**:
                 -e CONFLUENCE__USEREMAIL \
                 -e CONFLUENCE__APITOKEN \
                 -v "$PWD/docs:/workspace/docs:ro" \
-                confluentsynkmd \
+                confluencesynkmd \
                 --mode Upload \
                 --path /workspace/docs \
                 --conf-space "${{ vars.CONFLUENCE_SPACE }}" \
@@ -278,7 +278,7 @@ The Dockerfile uses a **multi-stage build**:
         DOCKER_HOST: tcp://docker:2375
         DOCKER_TLS_CERTDIR: ""
       script:
-        - docker build -t confluentsynkmd .
+        - docker build -t confluencesynkmd .
         - |
           docker run --rm \
             -e CONFLUENCE__BASEURL \
@@ -286,7 +286,7 @@ The Dockerfile uses a **multi-stage build**:
             -e CONFLUENCE__USEREMAIL \
             -e CONFLUENCE__APITOKEN \
             -v "$CI_PROJECT_DIR/docs:/workspace/docs:ro" \
-            confluentsynkmd \
+            confluencesynkmd \
             --mode Upload \
             --path /workspace/docs \
             --conf-space "$CONFLUENCE_SPACE" \
@@ -305,7 +305,7 @@ The Dockerfile uses a **multi-stage build**:
 To add additional diagram renderers, extend the Dockerfile:
 
 ```dockerfile
-FROM confluentsynkmd AS base
+FROM confluencesynkmd AS base
 
 # Add PlantUML
 RUN apt-get update && apt-get install -y plantuml

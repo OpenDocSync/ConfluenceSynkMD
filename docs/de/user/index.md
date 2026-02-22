@@ -1,6 +1,6 @@
 # Benutzerhandbuch
 
-Willkommen im ConfluentSynkMD-Benutzerhandbuch. Dieser Bereich deckt alles ab, was Sie zur Synchronisation von Markdown-Dokumentation mit Confluence benötigen.
+Willkommen im ConfluenceSynkMD-Benutzerhandbuch. Dieser Bereich deckt alles ab, was Sie zur Synchronisation von Markdown-Dokumentation mit Confluence benötigen.
 
 ---
 
@@ -23,21 +23,21 @@ Verwenden Sie **Upload**, wenn Sie Ihre Markdown-Dokumentation auf Confluence pu
 === "Bash"
 
     ```bash
-    dotnet run --project src/ConfluentSynkMD -- \
+    dotnet run --project src/ConfluenceSynkMD -- \
       --mode Upload --path ./docs --conf-space DEV
     ```
 
 === "PowerShell"
 
     ```powershell
-    dotnet run --project src/ConfluentSynkMD -- `
+    dotnet run --project src/ConfluenceSynkMD -- `
       --mode Upload --path ./docs --conf-space DEV
     ```
 
 === "CMD"
 
     ```cmd
-    dotnet run --project src/ConfluentSynkMD -- ^
+    dotnet run --project src/ConfluenceSynkMD -- ^
       --mode Upload --path .\docs --conf-space DEV
     ```
 
@@ -48,21 +48,21 @@ Verwenden Sie **Download**, um bestehende Confluence-Seiten in Ihr lokales Repos
 === "Bash"
 
     ```bash
-    dotnet run --project src/ConfluentSynkMD -- \
+    dotnet run --project src/ConfluenceSynkMD -- \
       --mode Download --path ./output --conf-space DEV --conf-parent-id 12345
     ```
 
 === "PowerShell"
 
     ```powershell
-    dotnet run --project src/ConfluentSynkMD -- `
+    dotnet run --project src/ConfluenceSynkMD -- `
       --mode Download --path ./output --conf-space DEV --conf-parent-id 12345
     ```
 
 === "CMD"
 
     ```cmd
-    dotnet run --project src/ConfluentSynkMD -- ^
+    dotnet run --project src/ConfluenceSynkMD -- ^
       --mode Download --path .\output --conf-space DEV --conf-parent-id 12345
     ```
 
@@ -73,21 +73,21 @@ Verwenden Sie **LocalExport** für eine Vorschau des Confluence Storage Formats 
 === "Bash"
 
     ```bash
-    dotnet run --project src/ConfluentSynkMD -- \
+    dotnet run --project src/ConfluenceSynkMD -- \
       --mode Upload --path ./docs --conf-space DEV --local
     ```
 
 === "PowerShell"
 
     ```powershell
-    dotnet run --project src/ConfluentSynkMD -- `
+    dotnet run --project src/ConfluenceSynkMD -- `
       --mode Upload --path ./docs --conf-space DEV --local
     ```
 
 === "CMD"
 
     ```cmd
-    dotnet run --project src/ConfluentSynkMD -- ^
+    dotnet run --project src/ConfluenceSynkMD -- ^
       --mode Upload --path .\docs --conf-space DEV --local
     ```
 

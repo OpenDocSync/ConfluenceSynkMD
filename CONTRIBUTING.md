@@ -1,4 +1,4 @@
-# Contributing to ConfluentSynkMD
+# Contributing to ConfluenceSynkMD
 
 Thank you for your interest in contributing! This guide will help you get started.
 
@@ -7,8 +7,8 @@ Thank you for your interest in contributing! This guide will help you get starte
 1. **Fork** the repository on GitHub
 2. **Clone** your fork locally:
    ```bash
-   git clone https://github.com/OpenDocSync/ConfluentSynkMD.git
-   cd ConfluentSynkMD
+   git clone https://github.com/OpenDocSync/ConfluenceSynkMD.git
+   cd ConfluenceSynkMD
    ```
 3. **Create a branch** for your change:
    ```bash
@@ -80,7 +80,7 @@ Formatting defaults from `.editorconfig`:
 Please use [GitHub Issues](../../issues) with the **Bug Report** template. Include:
 - Steps to reproduce
 - Expected vs. actual behavior
-- OS, .NET version, ConfluentSynkMD version
+- OS, .NET version, ConfluenceSynkMD version
 
 ## Suggesting Features
 

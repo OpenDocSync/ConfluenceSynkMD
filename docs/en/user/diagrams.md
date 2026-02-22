@@ -1,6 +1,6 @@
 # Diagram Rendering
 
-ConfluentSynkMD can render code blocks for various diagram languages into image attachments that are embedded in your Confluence pages.
+ConfluenceSynkMD can render code blocks for various diagram languages into image attachments that are embedded in your Confluence pages.
 
 ---
 

@@ -1,6 +1,6 @@
 # Markdig-Renderer
 
-ConfluentSynkMD verwendet **Markdig** als Markdown-Parser und erweitert ihn mit benutzerdefinierten Renderern, die Confluence Storage Format (XHTML) statt Standard-HTML erzeugen.
+ConfluenceSynkMD verwendet **Markdig** als Markdown-Parser und erweitert ihn mit benutzerdefinierten Renderern, die Confluence Storage Format (XHTML) statt Standard-HTML erzeugen.
 
 ---
 
@@ -36,7 +36,7 @@ graph TD
 
 ## Neuen Renderer hinzufügen
 
-1. Renderer-Klasse in `src/ConfluentSynkMD/Markdig/Renderers/` erstellen
+1. Renderer-Klasse in `src/ConfluenceSynkMD/Markdig/Renderers/` erstellen
 2. In `ConfluenceRenderer.cs` registrieren
 3. Tests hinzufügen
 

@@ -1,6 +1,6 @@
 # CLI-Referenz
 
-Vollständige Referenz aller ConfluentSynkMD-Kommandozeilenoptionen.
+Vollständige Referenz aller ConfluenceSynkMD-Kommandozeilenoptionen.
 
 ---
 
@@ -103,7 +103,7 @@ Vollständige Referenz aller ConfluentSynkMD-Kommandozeilenoptionen.
 === "Bash"
 
     ```bash
-    dotnet run --project src/ConfluentSynkMD -- \
+    dotnet run --project src/ConfluenceSynkMD -- \
       --mode Upload \
       --path ./docs \
       --conf-space DEV \
@@ -122,7 +122,7 @@ Vollständige Referenz aller ConfluentSynkMD-Kommandozeilenoptionen.
 === "PowerShell"
 
     ```powershell
-    dotnet run --project src/ConfluentSynkMD -- `
+    dotnet run --project src/ConfluenceSynkMD -- `
       --mode Upload `
       --path ./docs `
       --conf-space DEV `
@@ -141,7 +141,7 @@ Vollständige Referenz aller ConfluentSynkMD-Kommandozeilenoptionen.
 === "CMD"
 
     ```cmd
-    dotnet run --project src/ConfluentSynkMD -- ^
+    dotnet run --project src/ConfluenceSynkMD -- ^
       --mode Upload ^
       --path .\docs ^
       --conf-space DEV ^
@@ -162,7 +162,7 @@ Vollständige Referenz aller ConfluentSynkMD-Kommandozeilenoptionen.
 === "Bash"
 
     ```bash
-    dotnet run --project src/ConfluentSynkMD -- \
+    dotnet run --project src/ConfluenceSynkMD -- \
       --mode Download --path ./output \
       --conf-space DEV --conf-parent-id 12345
     ```
@@ -170,7 +170,7 @@ Vollständige Referenz aller ConfluentSynkMD-Kommandozeilenoptionen.
 === "PowerShell"
 
     ```powershell
-    dotnet run --project src/ConfluentSynkMD -- `
+    dotnet run --project src/ConfluenceSynkMD -- `
       --mode Download --path ./output `
       --conf-space DEV --conf-parent-id 12345
     ```
@@ -178,7 +178,7 @@ Vollständige Referenz aller ConfluentSynkMD-Kommandozeilenoptionen.
 === "CMD"
 
     ```cmd
-    dotnet run --project src/ConfluentSynkMD -- ^
+    dotnet run --project src/ConfluenceSynkMD -- ^
       --mode Download --path .\output ^
       --conf-space DEV --conf-parent-id 12345
     ```
@@ -188,7 +188,7 @@ Vollständige Referenz aller ConfluentSynkMD-Kommandozeilenoptionen.
 === "Bash"
 
     ```bash
-    dotnet run --project src/ConfluentSynkMD -- \
+    dotnet run --project src/ConfluenceSynkMD -- \
       --mode Upload \
       --path ./docs \
       --conf-space DEV \
@@ -200,7 +200,7 @@ Vollständige Referenz aller ConfluentSynkMD-Kommandozeilenoptionen.
 === "PowerShell"
 
     ```powershell
-    dotnet run --project src/ConfluentSynkMD -- `
+    dotnet run --project src/ConfluenceSynkMD -- `
       --mode Upload `
       --path ./docs `
       --conf-space DEV `
@@ -212,7 +212,7 @@ Vollständige Referenz aller ConfluentSynkMD-Kommandozeilenoptionen.
 === "CMD"
 
     ```cmd
-    dotnet run --project src/ConfluentSynkMD -- ^
+    dotnet run --project src/ConfluenceSynkMD -- ^
       --mode Upload ^
       --path .\docs ^
       --conf-space DEV ^

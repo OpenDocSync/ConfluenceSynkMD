@@ -1,6 +1,6 @@
 # Confluence-IDs finden
 
-ConfluentSynkMD benötigt einen **Space Key** und optional eine **Page ID**, um zu wissen, wohin Seiten hochgeladen/heruntergeladen werden sollen.
+ConfluenceSynkMD benötigt einen **Space Key** und optional eine **Page ID**, um zu wissen, wohin Seiten hochgeladen/heruntergeladen werden sollen.
 
 ---
 
