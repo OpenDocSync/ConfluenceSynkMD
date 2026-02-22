@@ -56,10 +56,10 @@ This uploads all `.md` files from `./docs` as child pages under page `12345` in 
             --conf-parent-id 12345
         ```
 
-        ???+ tip "Path Hint"
-                - Keep `-v ${PWD}:/workspace` unchanged.
-                - Only change the `--path` suffix (for example `/workspace/docs`).
-                - `${PWD}` is your current local directory.
+    ???+ tip "Path Hint"
+        - Keep `-v ${PWD}:/workspace` unchanged.
+        - Only change the `--path` suffix (for example `/workspace/docs`).
+        - `${PWD}` is your current local directory.
 
 === "PowerShell"
 
@@ -77,10 +77,10 @@ This uploads all `.md` files from `./docs` as child pages under page `12345` in 
             --conf-parent-id 12345
         ```
 
-        ???+ tip "Path Hint"
-                - Keep `-v ${PWD}:/workspace` unchanged.
-                - Only change the `--path` suffix (for example `/workspace/docs`).
-                - `${PWD}` is your current local directory.
+    ???+ tip "Path Hint"
+        - Keep `-v ${PWD}:/workspace` unchanged.
+        - Only change the `--path` suffix (for example `/workspace/docs`).
+        - `${PWD}` is your current local directory.
 
 === "CMD"
 
@@ -98,10 +98,10 @@ This uploads all `.md` files from `./docs` as child pages under page `12345` in 
             --conf-parent-id 12345
         ```
 
-        ???+ tip "Path Hint"
-                - Keep `-v %cd%:/workspace` unchanged.
-                - Only change the `--path` suffix (for example `/workspace/docs`).
-                - `%cd%` is your current local directory.
+    ???+ tip "Path Hint"
+        - Keep `-v %cd%:/workspace` unchanged.
+        - Only change the `--path` suffix (for example `/workspace/docs`).
+        - `%cd%` is your current local directory.
 
 ---
 

@@ -196,10 +196,10 @@ Upload a folder of Markdown files to Confluence:
       --conf-parent-id YOUR_PAGE_ID
     ```
 
-        ???+ tip "Path Hint"
-                - Keep `-v ${PWD}:/workspace` unchanged.
-                - Only change the suffix in `--path` (for example `/workspace/docs`, `/workspace/my-docs`).
-                - `${PWD}` is your current local directory.
+    ???+ tip "Path Hint"
+        - Keep `-v ${PWD}:/workspace` unchanged.
+        - Only change the suffix in `--path` (for example `/workspace/docs`, `/workspace/my-docs`).
+        - `${PWD}` is your current local directory.
 
 === "PowerShell"
 
@@ -217,10 +217,10 @@ Upload a folder of Markdown files to Confluence:
       --conf-parent-id YOUR_PAGE_ID
     ```
 
-        ???+ tip "Path Hint"
-                - Keep `-v ${PWD}:/workspace` unchanged.
-                - Only change the suffix in `--path` (for example `/workspace/docs`, `/workspace/my-docs`).
-                - `${PWD}` is your current local directory.
+    ???+ tip "Path Hint"
+        - Keep `-v ${PWD}:/workspace` unchanged.
+        - Only change the suffix in `--path` (for example `/workspace/docs`, `/workspace/my-docs`).
+        - `${PWD}` is your current local directory.
 
 === "CMD"
 
@@ -238,10 +238,10 @@ Upload a folder of Markdown files to Confluence:
       --conf-parent-id YOUR_PAGE_ID
     ```
 
-        ???+ tip "Path Hint"
-                - Keep `-v %cd%:/workspace` unchanged.
-                - Only change the suffix in `--path` (for example `/workspace/docs`, `/workspace/my-docs`).
-                - `%cd%` is your current local directory.
+    ???+ tip "Path Hint"
+        - Keep `-v %cd%:/workspace` unchanged.
+        - Only change the suffix in `--path` (for example `/workspace/docs`, `/workspace/my-docs`).
+        - `%cd%` is your current local directory.
 
 #### Set Docker Paths Correctly
 
@@ -315,10 +315,10 @@ Download Confluence pages back to Markdown:
       --conf-parent-id YOUR_PAGE_ID
     ```
 
-        ???+ tip "Path Hint"
-                - Keep `-v ${PWD}:/workspace` unchanged.
-                - For download, `--path` points to the target folder inside the container, for example `/workspace/output`.
-                - `${PWD}` is your current local directory.
+    ???+ tip "Path Hint"
+        - Keep `-v ${PWD}:/workspace` unchanged.
+        - For download, `--path` points to the target folder inside the container, for example `/workspace/output`.
+        - `${PWD}` is your current local directory.
 
 === "PowerShell"
 
@@ -336,10 +336,10 @@ Download Confluence pages back to Markdown:
       --conf-parent-id YOUR_PAGE_ID
     ```
 
-        ???+ tip "Path Hint"
-                - Keep `-v ${PWD}:/workspace` unchanged.
-                - For download, `--path` points to the target folder inside the container, for example `/workspace/output`.
-                - `${PWD}` is your current local directory.
+    ???+ tip "Path Hint"
+        - Keep `-v ${PWD}:/workspace` unchanged.
+        - For download, `--path` points to the target folder inside the container, for example `/workspace/output`.
+        - `${PWD}` is your current local directory.
 
 === "CMD"
 
@@ -357,10 +357,10 @@ Download Confluence pages back to Markdown:
       --conf-parent-id YOUR_PAGE_ID
     ```
 
-        ???+ tip "Path Hint"
-                - Keep `-v %cd%:/workspace` unchanged.
-                - For download, `--path` points to the target folder inside the container, for example `/workspace/output`.
-                - `%cd%` is your current local directory.
+    ???+ tip "Path Hint"
+        - Keep `-v %cd%:/workspace` unchanged.
+        - For download, `--path` points to the target folder inside the container, for example `/workspace/output`.
+        - `%cd%` is your current local directory.
 
 ---
 

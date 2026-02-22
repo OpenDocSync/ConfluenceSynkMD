@@ -196,10 +196,10 @@ Laden Sie einen Ordner mit Markdown-Dateien nach Confluence hoch:
       --conf-parent-id IHRE_PAGE_ID
     ```
 
-        ???+ tip "Pfad-Hinweis"
-                - `-v ${PWD}:/workspace` bleibt unverändert.
-                - Passen Sie nur den `--path`-Suffix an (z. B. `/workspace/docs`, `/workspace/my-docs`).
-                - `${PWD}` ist Ihr aktueller lokaler Ordner.
+    ???+ tip "Pfad-Hinweis"
+        - `-v ${PWD}:/workspace` bleibt unverändert.
+        - Passen Sie nur den `--path`-Suffix an (z. B. `/workspace/docs`, `/workspace/my-docs`).
+        - `${PWD}` ist Ihr aktueller lokaler Ordner.
 
 === "PowerShell"
 
@@ -217,10 +217,10 @@ Laden Sie einen Ordner mit Markdown-Dateien nach Confluence hoch:
       --conf-parent-id IHRE_PAGE_ID
     ```
 
-        ???+ tip "Pfad-Hinweis"
-                - `-v ${PWD}:/workspace` bleibt unverändert.
-                - Passen Sie nur den `--path`-Suffix an (z. B. `/workspace/docs`, `/workspace/my-docs`).
-                - `${PWD}` ist Ihr aktueller lokaler Ordner.
+    ???+ tip "Pfad-Hinweis"
+        - `-v ${PWD}:/workspace` bleibt unverändert.
+        - Passen Sie nur den `--path`-Suffix an (z. B. `/workspace/docs`, `/workspace/my-docs`).
+        - `${PWD}` ist Ihr aktueller lokaler Ordner.
 
 === "CMD"
 
@@ -238,10 +238,10 @@ Laden Sie einen Ordner mit Markdown-Dateien nach Confluence hoch:
       --conf-parent-id IHRE_PAGE_ID
     ```
 
-        ???+ tip "Pfad-Hinweis"
-                - `-v %cd%:/workspace` bleibt unverändert.
-                - Passen Sie nur den `--path`-Suffix an (z. B. `/workspace/docs`, `/workspace/my-docs`).
-                - `%cd%` ist Ihr aktueller lokaler Ordner.
+    ???+ tip "Pfad-Hinweis"
+        - `-v %cd%:/workspace` bleibt unverändert.
+        - Passen Sie nur den `--path`-Suffix an (z. B. `/workspace/docs`, `/workspace/my-docs`).
+        - `%cd%` ist Ihr aktueller lokaler Ordner.
 
 #### Docker-Pfade richtig setzen
 
@@ -315,10 +315,10 @@ Laden Sie Confluence-Seiten als Markdown herunter:
       --conf-parent-id IHRE_PAGE_ID
     ```
 
-        ???+ tip "Pfad-Hinweis"
-                - `-v ${PWD}:/workspace` bleibt unverändert.
-                - Für Download zeigt `--path` auf den Zielordner im Container, z. B. `/workspace/output`.
-                - `${PWD}` ist Ihr aktueller lokaler Ordner.
+    ???+ tip "Pfad-Hinweis"
+        - `-v ${PWD}:/workspace` bleibt unverändert.
+        - Für Download zeigt `--path` auf den Zielordner im Container, z. B. `/workspace/output`.
+        - `${PWD}` ist Ihr aktueller lokaler Ordner.
 
 === "PowerShell"
 
@@ -336,10 +336,10 @@ Laden Sie Confluence-Seiten als Markdown herunter:
       --conf-parent-id IHRE_PAGE_ID
     ```
 
-        ???+ tip "Pfad-Hinweis"
-                - `-v ${PWD}:/workspace` bleibt unverändert.
-                - Für Download zeigt `--path` auf den Zielordner im Container, z. B. `/workspace/output`.
-                - `${PWD}` ist Ihr aktueller lokaler Ordner.
+    ???+ tip "Pfad-Hinweis"
+        - `-v ${PWD}:/workspace` bleibt unverändert.
+        - Für Download zeigt `--path` auf den Zielordner im Container, z. B. `/workspace/output`.
+        - `${PWD}` ist Ihr aktueller lokaler Ordner.
 
 === "CMD"
 
@@ -357,10 +357,10 @@ Laden Sie Confluence-Seiten als Markdown herunter:
       --conf-parent-id IHRE_PAGE_ID
     ```
 
-        ???+ tip "Pfad-Hinweis"
-                - `-v %cd%:/workspace` bleibt unverändert.
-                - Für Download zeigt `--path` auf den Zielordner im Container, z. B. `/workspace/output`.
-                - `%cd%` ist Ihr aktueller lokaler Ordner.
+    ???+ tip "Pfad-Hinweis"
+        - `-v %cd%:/workspace` bleibt unverändert.
+        - Für Download zeigt `--path` auf den Zielordner im Container, z. B. `/workspace/output`.
+        - `%cd%` ist Ihr aktueller lokaler Ordner.
 
 ---
 

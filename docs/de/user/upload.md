@@ -56,10 +56,10 @@ Dies lädt alle `.md`-Dateien aus `./docs` als Unterseiten der Seite `12345` im 
             --conf-parent-id 12345
         ```
 
-        ???+ tip "Pfad-Hinweis"
-                - `-v ${PWD}:/workspace` bleibt unverändert.
-                - Passen Sie nur den Suffix von `--path` an (z. B. `/workspace/docs`).
-                - `${PWD}` ist Ihr aktueller lokaler Ordner.
+    ???+ tip "Pfad-Hinweis"
+        - `-v ${PWD}:/workspace` bleibt unverändert.
+        - Passen Sie nur den Suffix von `--path` an (z. B. `/workspace/docs`).
+        - `${PWD}` ist Ihr aktueller lokaler Ordner.
 
 === "PowerShell"
 
@@ -77,10 +77,10 @@ Dies lädt alle `.md`-Dateien aus `./docs` als Unterseiten der Seite `12345` im 
             --conf-parent-id 12345
         ```
 
-        ???+ tip "Pfad-Hinweis"
-                - `-v ${PWD}:/workspace` bleibt unverändert.
-                - Passen Sie nur den Suffix von `--path` an (z. B. `/workspace/docs`).
-                - `${PWD}` ist Ihr aktueller lokaler Ordner.
+    ???+ tip "Pfad-Hinweis"
+        - `-v ${PWD}:/workspace` bleibt unverändert.
+        - Passen Sie nur den Suffix von `--path` an (z. B. `/workspace/docs`).
+        - `${PWD}` ist Ihr aktueller lokaler Ordner.
 
 === "CMD"
 
@@ -98,10 +98,10 @@ Dies lädt alle `.md`-Dateien aus `./docs` als Unterseiten der Seite `12345` im 
             --conf-parent-id 12345
         ```
 
-        ???+ tip "Pfad-Hinweis"
-                - `-v %cd%:/workspace` bleibt unverändert.
-                - Passen Sie nur den Suffix von `--path` an (z. B. `/workspace/docs`).
-                - `%cd%` ist Ihr aktueller lokaler Ordner.
+    ???+ tip "Pfad-Hinweis"
+        - `-v %cd%:/workspace` bleibt unverändert.
+        - Passen Sie nur den Suffix von `--path` an (z. B. `/workspace/docs`).
+        - `%cd%` ist Ihr aktueller lokaler Ordner.
 
 ---
 
