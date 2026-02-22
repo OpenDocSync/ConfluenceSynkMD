@@ -153,4 +153,60 @@ public class ConfluenceSettingsValidatorTests
             .Contain("UserEmail").And
             .Contain("ApiToken");
     }
+
+    [Fact]
+    public void BaseUrl_WithPath_AndMatchingApiPath_IsNormalized()
+    {
+        var settings = new ConfluenceSettings
+        {
+            BaseUrl = "https://example.atlassian.net/wiki/",
+            ApiPath = "/wiki",
+            AuthMode = "Basic",
+            UserEmail = "user@example.com",
+            ApiToken = "token123"
+        };
+
+        var act = () => ConfluenceSettingsValidator.ValidateOrThrow(settings);
+
+        act.Should().NotThrow();
+        settings.BaseUrl.Should().Be("https://example.atlassian.net");
+        settings.ApiPath.Should().Be("/wiki");
+    }
+
+    [Fact]
+    public void BaseUrl_WithPath_AndEmptyApiPath_MovesPathToApiPath()
+    {
+        var settings = new ConfluenceSettings
+        {
+            BaseUrl = "https://example.atlassian.net/wiki",
+            ApiPath = "",
+            AuthMode = "Basic",
+            UserEmail = "user@example.com",
+            ApiToken = "token123"
+        };
+
+        var act = () => ConfluenceSettingsValidator.ValidateOrThrow(settings);
+
+        act.Should().NotThrow();
+        settings.BaseUrl.Should().Be("https://example.atlassian.net");
+        settings.ApiPath.Should().Be("/wiki");
+    }
+
+    [Fact]
+    public void BaseUrl_WithPath_AndDifferentApiPath_Throws()
+    {
+        var settings = new ConfluenceSettings
+        {
+            BaseUrl = "https://example.atlassian.net/wiki",
+            ApiPath = "/confluence",
+            AuthMode = "Basic",
+            UserEmail = "user@example.com",
+            ApiToken = "token123"
+        };
+
+        var act = () => ConfluenceSettingsValidator.ValidateOrThrow(settings);
+
+        act.Should().Throw<InvalidOperationException>()
+            .WithMessage("*BaseUrl contains path*/wiki*ApiPath*/confluence*");
+    }
 }

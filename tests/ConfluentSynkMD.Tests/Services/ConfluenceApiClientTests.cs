@@ -97,6 +97,37 @@ public sealed class ConfluenceApiClientTests
         authHeader.Parameter.Should().Be("my-oauth-token");
     }
 
+    [Fact]
+    public async Task ConfigureHttpClient_BaseUrlPathAndApiPath_AreNormalizedWithoutDuplication()
+    {
+        var handler = new MockHttpMessageHandler();
+        handler.Enqueue(JsonContent(PaginatedResult<ConfluenceSpace>([])));
+
+        var settings = CreateSettings();
+        settings.BaseUrl = "https://example.atlassian.net/wiki";
+        settings.ApiPath = "wiki";
+        var sut = CreateSut(handler, settings);
+
+        try { await sut.GetSpaceByKeyAsync("TEST"); } catch { /* expected */ }
+
+        handler.CapturedRequests[0].RequestUri!.PathAndQuery
+            .Should().StartWith("/wiki/api/v2/spaces");
+    }
+
+    [Fact]
+    public void ConfigureHttpClient_BaseUrlPathAndDifferentApiPath_Throws()
+    {
+        var handler = new MockHttpMessageHandler();
+        var settings = CreateSettings();
+        settings.BaseUrl = "https://example.atlassian.net/wiki";
+        settings.ApiPath = "/confluence";
+
+        var act = () => CreateSut(handler, settings);
+
+        act.Should().Throw<InvalidOperationException>()
+            .WithMessage("*BaseUrl path*/wiki*ApiPath*/confluence*");
+    }
+
     // ─── GetSpaceByKeyAsync ──────────────────────────────────────────────────
 
     [Fact]

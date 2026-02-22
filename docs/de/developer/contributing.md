@@ -28,6 +28,7 @@ Vielen Dank für Ihr Interesse an ConfluentSynkMD! Diese Anleitung hilft Ihnen b
 
 - [.NET 10 SDK](https://dotnet.microsoft.com/download)
 - [Node.js 22+](https://nodejs.org/)
+- [@mermaid-js/mermaid-cli](https://www.npmjs.com/package/@mermaid-js/mermaid-cli) lokal im `PATH` (z. B. `npm install -g @mermaid-js/mermaid-cli`) für Mermaid-Rendering
 - Optional: [Docker](https://www.docker.com/)
 
 ### Bauen & Testen

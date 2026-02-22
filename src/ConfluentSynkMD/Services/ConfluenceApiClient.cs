@@ -20,6 +20,7 @@ public sealed class ConfluenceApiClient : IConfluenceApiClient
     private readonly HttpClient _http;
     private readonly ILogger _logger;
     private readonly ConfluenceSettings _settings;
+    private readonly string _baseUrl;
     private readonly string _apiBase;
     private readonly string _v2;
 
@@ -37,7 +38,7 @@ public sealed class ConfluenceApiClient : IConfluenceApiClient
         _http = http;
         _logger = logger.ForContext<ConfluenceApiClient>();
         _settings = settings.Value;
-        _apiBase = _settings.ApiPath.TrimEnd('/');
+        (_baseUrl, _apiBase) = NormalizeEndpointSettings(_settings);
         _v2 = $"{_apiBase}/api/{_settings.ApiVersion}";
 
         ConfigureHttpClient();
@@ -45,7 +46,7 @@ public sealed class ConfluenceApiClient : IConfluenceApiClient
 
     private void ConfigureHttpClient()
     {
-        _http.BaseAddress = new Uri(_settings.BaseUrl.TrimEnd('/'));
+        _http.BaseAddress = new Uri(_baseUrl, UriKind.Absolute);
 
         if (_settings.AuthMode.Equals("Bearer", StringComparison.OrdinalIgnoreCase))
         {
@@ -69,6 +70,45 @@ public sealed class ConfluenceApiClient : IConfluenceApiClient
         // Apply custom headers from configuration
         foreach (var (key, value) in _settings.CustomHeaders)
             _http.DefaultRequestHeaders.Add(key, value);
+    }
+
+    private static (string BaseUrl, string ApiPath) NormalizeEndpointSettings(ConfluenceSettings settings)
+    {
+        if (!Uri.TryCreate(settings.BaseUrl.Trim(), UriKind.Absolute, out var baseUri)
+            || !string.Equals(baseUri.Scheme, Uri.UriSchemeHttps, StringComparison.OrdinalIgnoreCase))
+        {
+            throw new InvalidOperationException(
+                "BaseUrl must be a valid absolute HTTPS URL (e.g. https://yoursite.atlassian.net).");
+        }
+
+        var normalizedApiPath = NormalizeApiPath(settings.ApiPath);
+        var basePath = baseUri.AbsolutePath.Trim('/');
+        if (!string.IsNullOrEmpty(basePath))
+        {
+            var basePathSegment = $"/{basePath}";
+            if (string.IsNullOrEmpty(normalizedApiPath))
+            {
+                normalizedApiPath = basePathSegment;
+            }
+            else if (!string.Equals(normalizedApiPath, basePathSegment, StringComparison.OrdinalIgnoreCase))
+            {
+                throw new InvalidOperationException(
+                    $"BaseUrl path '{basePathSegment}' conflicts with ApiPath '{normalizedApiPath}'. " +
+                    "Use a host-only BaseUrl or set ApiPath to the same path.");
+            }
+        }
+
+        return ($"{baseUri.Scheme}://{baseUri.Authority}", normalizedApiPath);
+    }
+
+    private static string NormalizeApiPath(string? apiPath)
+    {
+        var trimmed = apiPath?.Trim() ?? string.Empty;
+        if (string.IsNullOrEmpty(trimmed) || trimmed == "/")
+            return string.Empty;
+
+        var segment = trimmed.Trim('/');
+        return string.IsNullOrEmpty(segment) ? string.Empty : $"/{segment}";
     }
 
     // ─── Space ──────────────────────────────────────────────────────────────

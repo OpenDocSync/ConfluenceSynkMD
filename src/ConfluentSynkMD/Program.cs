@@ -424,8 +424,10 @@ rootCommand.SetAction(async (parseResult, ct) =>
     if (!result.CanContinue)
     {
         runLogger.Error("PipelineFailed");
-        Environment.ExitCode = 1;
+        return 1;
     }
+
+    return 0;
 });
 
 // -- Helper: map CLI log level string to Serilog LogEventLevel ---------------

@@ -28,6 +28,7 @@ Thank you for your interest in contributing to ConfluentSynkMD! This guide will 
 
 - [.NET 10 SDK](https://dotnet.microsoft.com/download)
 - [Node.js 22+](https://nodejs.org/) — for Mermaid diagram rendering
+- [@mermaid-js/mermaid-cli](https://www.npmjs.com/package/@mermaid-js/mermaid-cli) installed on `PATH` for local Mermaid rendering (for example: `npm install -g @mermaid-js/mermaid-cli`)
 - Optional: [Docker](https://www.docker.com/) — for containerized testing
 
 ### Build & Test
