@@ -38,6 +38,71 @@ Upload converts your local Markdown files into Confluence Storage Format (XHTML)
 
 This uploads all `.md` files from `./docs` as child pages under page `12345` in space `DEV`.
 
+### Docker Upload
+
+=== "Bash"
+
+        ```bash
+        docker run --rm -it \
+            -e CONFLUENCE__BASEURL=https://yoursite.atlassian.net \
+            -e CONFLUENCE__AUTHMODE=Basic \
+            -e CONFLUENCE__USEREMAIL=user@example.com \
+            -e CONFLUENCE__APITOKEN=your-token \
+            -v ${PWD}:/workspace \
+            confluencesynkmd \
+            --mode Upload \
+            --path /workspace/docs \
+            --conf-space DEV \
+            --conf-parent-id 12345
+        ```
+
+        ???+ tip "Path Hint"
+                - Keep `-v ${PWD}:/workspace` unchanged.
+                - Only change the `--path` suffix (for example `/workspace/docs`).
+                - `${PWD}` is your current local directory.
+
+=== "PowerShell"
+
+        ```powershell
+        docker run --rm -it `
+            -e CONFLUENCE__BASEURL=https://yoursite.atlassian.net `
+            -e CONFLUENCE__AUTHMODE=Basic `
+            -e CONFLUENCE__USEREMAIL=user@example.com `
+            -e CONFLUENCE__APITOKEN=your-token `
+            -v ${PWD}:/workspace `
+            confluencesynkmd `
+            --mode Upload `
+            --path /workspace/docs `
+            --conf-space DEV `
+            --conf-parent-id 12345
+        ```
+
+        ???+ tip "Path Hint"
+                - Keep `-v ${PWD}:/workspace` unchanged.
+                - Only change the `--path` suffix (for example `/workspace/docs`).
+                - `${PWD}` is your current local directory.
+
+=== "CMD"
+
+        ```cmd
+        docker run --rm -it ^
+            -e CONFLUENCE__BASEURL=https://yoursite.atlassian.net ^
+            -e CONFLUENCE__AUTHMODE=Basic ^
+            -e CONFLUENCE__USEREMAIL=user@example.com ^
+            -e CONFLUENCE__APITOKEN=your-token ^
+            -v %cd%:/workspace ^
+            confluencesynkmd ^
+            --mode Upload ^
+            --path /workspace/docs ^
+            --conf-space DEV ^
+            --conf-parent-id 12345
+        ```
+
+        ???+ tip "Path Hint"
+                - Keep `-v %cd%:/workspace` unchanged.
+                - Only change the `--path` suffix (for example `/workspace/docs`).
+                - `%cd%` is your current local directory.
+
 ---
 
 ## Hierarchical Upload

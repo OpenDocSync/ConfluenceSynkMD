@@ -38,6 +38,71 @@ Upload konvertiert Ihre lokalen Markdown-Dateien in das Confluence Storage Forma
 
 Dies lädt alle `.md`-Dateien aus `./docs` als Unterseiten der Seite `12345` im Space `DEV` hoch.
 
+### Docker-Upload
+
+=== "Bash"
+
+        ```bash
+        docker run --rm -it \
+            -e CONFLUENCE__BASEURL=https://yoursite.atlassian.net \
+            -e CONFLUENCE__AUTHMODE=Basic \
+            -e CONFLUENCE__USEREMAIL=user@example.com \
+            -e CONFLUENCE__APITOKEN=ihr-token \
+            -v ${PWD}:/workspace \
+            confluencesynkmd \
+            --mode Upload \
+            --path /workspace/docs \
+            --conf-space DEV \
+            --conf-parent-id 12345
+        ```
+
+        ???+ tip "Pfad-Hinweis"
+                - `-v ${PWD}:/workspace` bleibt unverändert.
+                - Passen Sie nur den Suffix von `--path` an (z. B. `/workspace/docs`).
+                - `${PWD}` ist Ihr aktueller lokaler Ordner.
+
+=== "PowerShell"
+
+        ```powershell
+        docker run --rm -it `
+            -e CONFLUENCE__BASEURL=https://yoursite.atlassian.net `
+            -e CONFLUENCE__AUTHMODE=Basic `
+            -e CONFLUENCE__USEREMAIL=user@example.com `
+            -e CONFLUENCE__APITOKEN=ihr-token `
+            -v ${PWD}:/workspace `
+            confluencesynkmd `
+            --mode Upload `
+            --path /workspace/docs `
+            --conf-space DEV `
+            --conf-parent-id 12345
+        ```
+
+        ???+ tip "Pfad-Hinweis"
+                - `-v ${PWD}:/workspace` bleibt unverändert.
+                - Passen Sie nur den Suffix von `--path` an (z. B. `/workspace/docs`).
+                - `${PWD}` ist Ihr aktueller lokaler Ordner.
+
+=== "CMD"
+
+        ```cmd
+        docker run --rm -it ^
+            -e CONFLUENCE__BASEURL=https://yoursite.atlassian.net ^
+            -e CONFLUENCE__AUTHMODE=Basic ^
+            -e CONFLUENCE__USEREMAIL=user@example.com ^
+            -e CONFLUENCE__APITOKEN=ihr-token ^
+            -v %cd%:/workspace ^
+            confluencesynkmd ^
+            --mode Upload ^
+            --path /workspace/docs ^
+            --conf-space DEV ^
+            --conf-parent-id 12345
+        ```
+
+        ???+ tip "Pfad-Hinweis"
+                - `-v %cd%:/workspace` bleibt unverändert.
+                - Passen Sie nur den Suffix von `--path` an (z. B. `/workspace/docs`).
+                - `%cd%` ist Ihr aktueller lokaler Ordner.
+
 ---
 
 ## Hierarchischer Upload
