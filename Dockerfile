@@ -1,13 +1,12 @@
 # ──────────────────────────────────────────────────────────────────────────────
 # Stage 1: Build .NET application
 # ──────────────────────────────────────────────────────────────────────────────
-FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:10.0@sha256:0a506ab0c8aa077361af42f82569d364ab1b8741e967955d883e3f23683d473a AS build
 WORKDIR /src
 
 # Copy solution and project files first (layer caching)
 COPY *.slnx ./
 COPY src/ConfluentSynkMD/ConfluentSynkMD.csproj src/ConfluentSynkMD/
-COPY tests/ConfluentSynkMD.Tests/ConfluentSynkMD.Tests.csproj tests/ConfluentSynkMD.Tests/
 RUN dotnet restore src/ConfluentSynkMD/ConfluentSynkMD.csproj
 
 # Copy source and build
@@ -17,9 +16,15 @@ RUN dotnet publish src/ConfluentSynkMD/ConfluentSynkMD.csproj -c Release -o /app
 # ──────────────────────────────────────────────────────────────────────────────
 # Stage 2: Runtime image with Node.js + mermaid-cli
 # ──────────────────────────────────────────────────────────────────────────────
-FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
+FROM mcr.microsoft.com/dotnet/aspnet:10.0@sha256:52dcfb4225fda614c38ba5997a4ec72cbd5260a624125174416e547ff9eb9b8c AS runtime
+
+ARG NODEJS_DEB_VERSION=22.22.0-1nodesource1
+ARG MERMAID_CLI_VERSION=11.12.0
 
 # Install Node.js (LTS) and Chromium dependencies for mermaid-cli/Puppeteer
+# NOTE: Chromium runtime packages below are intentionally unpinned to receive
+# distro security updates. This reduces strict bit-for-bit reproducibility.
+# For fully reproducible builds, pin package versions or use a Debian snapshot mirror.
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     ca-certificates \
@@ -47,11 +52,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # Install Node.js 22 LTS
 RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
-    && apt-get install -y nodejs \
+    && apt-get install -y nodejs=${NODEJS_DEB_VERSION} \
     && rm -rf /var/lib/apt/lists/*
 
 # Install mermaid-cli globally (includes Puppeteer + bundled Chromium)
-RUN npm install -g @mermaid-js/mermaid-cli \
+RUN npm install -g @mermaid-js/mermaid-cli@${MERMAID_CLI_VERSION} \
     && npx puppeteer browsers install chrome
 
 # Create puppeteer config for container
