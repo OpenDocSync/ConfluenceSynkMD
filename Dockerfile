@@ -17,7 +17,7 @@ RUN dotnet publish src/ConfluentSynkMD/ConfluentSynkMD.csproj -c Release -o /app
 # ──────────────────────────────────────────────────────────────────────────────
 # Stage 2: Runtime image with Node.js + mermaid-cli
 # ──────────────────────────────────────────────────────────────────────────────
-FROM mcr.microsoft.com/dotnet/aspnet:10.0-preview AS runtime
+FROM mcr.microsoft.com/dotnet/aspnet:11.0-preview AS runtime
 
 # Install Node.js (LTS) and Chromium dependencies for mermaid-cli/Puppeteer
 RUN apt-get update && apt-get install -y --no-install-recommends \
