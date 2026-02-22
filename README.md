@@ -125,8 +125,6 @@ Credential settings can also be passed via CLI flags (overrides environment vari
 | `--conf-api-token` | `CONFLUENCE__APITOKEN` | API token (Basic Auth) |
 | `--conf-bearer-token` | `CONFLUENCE__BEARERTOKEN` | Bearer token (OAuth 2.0) |
 
-> **Tip:** For local development, you can still use a `.env` file with `CONFLUENCE__*` variables. However, the tool no longer auto-loads `.env` — you need to source it manually (e.g. `export $(cat .env | xargs)` on Linux/macOS, or `Get-Content .env | ForEach-Object { $k,$v = $_ -split '=',2; [System.Environment]::SetEnvironmentVariable($k,$v) }` on PowerShell).
-
 ---
 
 ## CLI Reference
@@ -226,10 +224,12 @@ docker build -t confluentsynkmd .
 ### Run (PowerShell / Windows)
 
 ```powershell
-# Upload (local development, optional): use --env-file
-# Run this command from the directory that contains .env
+# Upload: inject credentials via environment variables
 docker run --rm -it `
-  --env-file ./.env `
+  -e CONFLUENCE__BASEURL `
+  -e CONFLUENCE__AUTHMODE `
+  -e CONFLUENCE__USEREMAIL `
+  -e CONFLUENCE__APITOKEN `
   -v ${PWD}/docs:/workspace/docs:ro `
   confluentsynkmd `
   --mode Upload `
@@ -237,9 +237,12 @@ docker run --rm -it `
   --conf-space YOUR_SPACE_KEY `
   --conf-parent-id YOUR_PAGE_ID
 
-# Download (local development, optional): separate writable output mount
+# Download: separate writable output mount
 docker run --rm -it `
-  --env-file ./.env `
+  -e CONFLUENCE__BASEURL `
+  -e CONFLUENCE__AUTHMODE `
+  -e CONFLUENCE__USEREMAIL `
+  -e CONFLUENCE__APITOKEN `
   -v ${PWD}/output:/workspace/output `
   confluentsynkmd `
   --mode Download `
@@ -287,7 +290,7 @@ docker run --rm -it `
 | `-v ${PWD}:/workspace` | Full workspace mount (fallback), only when many cross-folder references are required |
 
 > [!NOTE]
-> For CI/CD, prefer secret stores (GitHub/GitLab protected variables). Keep `--env-file` as a local development option.
+> For CI/CD, prefer secret stores (GitHub/GitLab protected variables).
 
 > [!TIP]
 > Paths with spaces should be quoted in shell-specific syntax, e.g. PowerShell: `-v "${PWD}/my docs:/workspace/docs:ro"`.
@@ -400,7 +403,7 @@ ConfluentSynkMD/
 │   └── Services/                  # API client, hierarchy resolver, diagram renderers, image optimizer
 ├── tests/ConfluentSynkMD.Tests/   # Unit and integration tests (xUnit)
 ├── Dockerfile                     # Multi-stage Docker build
-└── .env.example                   # Template for environment variables
+└── docs/                          # MkDocs documentation and content
 ```
 
 ---

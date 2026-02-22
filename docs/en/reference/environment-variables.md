@@ -60,25 +60,3 @@ Environment variables use `__` (double underscore) as a section separator, follo
 | `CONFLUENCE__BASEURL` | `Confluence:BaseUrl` |
 | `CONFLUENCE__APITOKEN` | `Confluence:ApiToken` |
 | `CONFLUENCE__MAXIMAGEWIDTH` | `Confluence:MaxImageWidth` |
-
----
-
-## Optional: `.env` File
-
-For local development convenience, you can store variables in a `.env` file and source it before running the tool:
-
-```ini
-# Confluence Cloud Connection
-CONFLUENCE__BASEURL=https://yoursite.atlassian.net
-CONFLUENCE__AUTHMODE=Basic
-
-# Basic Auth
-CONFLUENCE__USEREMAIL=your-email@example.com
-CONFLUENCE__APITOKEN=your-api-token-here
-
-# Bearer Auth (alternative)
-# CONFLUENCE__BEARERTOKEN=your-oauth2-bearer-token
-```
-
-!!! note
-    The tool does **not** auto-load `.env` files. Source the file yourself before running the tool, or use environment variables / CLI flags directly.

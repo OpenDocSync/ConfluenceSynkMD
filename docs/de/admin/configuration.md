@@ -52,34 +52,3 @@ Umgebungsvariablen verwenden `__` (doppelter Unterstrich) als Trennzeichen:
 CONFLUENCE__BASEURL  →  Confluence:BaseUrl
 CONFLUENCE__APITOKEN →  Confluence:ApiToken
 ```
-
----
-
-## Optional: `.env`-Datei
-
-Für lokalen Komfort während der Entwicklung können Sie Variablen in einer `.env`-Datei speichern und diese manuell laden:
-
-=== "Bash"
-
-    ```bash
-    export $(cat .env | grep -v '^#' | xargs)
-    ```
-
-=== "PowerShell"
-
-    ```powershell
-    Get-Content .env | Where-Object { $_ -notmatch '^\s*#' -and $_ -match '=' } |
-        ForEach-Object { $k,$v = $_ -split '=',2; [System.Environment]::SetEnvironmentVariable($k.Trim(),$v.Trim()) }
-    ```
-
-=== "CMD"
-
-    ```cmd
-    for /f "usebackq tokens=1,* delims==" %%A in (".env") do @if not "%%A"=="" if not "%%A:~0,1"=="#" set "%%A=%%B"
-    ```
-
-!!! warning
-    Committen Sie niemals `.env`-Dateien in die Versionsverwaltung.
-
-!!! note
-    Das Tool lädt `.env`-Dateien **nicht** automatisch. Laden Sie die Datei selbst oder verwenden Sie Umgebungsvariablen / CLI-Flags direkt.

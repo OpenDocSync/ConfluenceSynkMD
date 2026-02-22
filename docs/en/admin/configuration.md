@@ -57,37 +57,6 @@ This follows the standard .NET configuration pattern for `IConfiguration`.
 
 ---
 
-## Optional: `.env` File
-
-For local convenience during development, you can store variables in a `.env` file and source it manually:
-
-=== "Bash"
-
-    ```bash
-    export $(cat .env | grep -v '^#' | xargs)
-    ```
-
-=== "PowerShell"
-
-    ```powershell
-    Get-Content .env | Where-Object { $_ -notmatch '^\s*#' -and $_ -match '=' } |
-        ForEach-Object { $k,$v = $_ -split '=',2; [System.Environment]::SetEnvironmentVariable($k.Trim(),$v.Trim()) }
-    ```
-
-=== "CMD"
-
-    ```cmd
-    for /f "usebackq tokens=1,* delims==" %%A in (".env") do @if not "%%A"=="" if not "%%A:~0,1"=="#" set "%%A=%%B"
-    ```
-
-!!! warning
-    Never commit `.env` files to version control. The `.gitignore` already excludes `.env`.
-
-!!! note
-    The tool does **not** auto-load `.env` files. You must source the file yourself or use environment variables / CLI flags directly.
-
----
-
 ## Image Optimization
 
 Control image processing with:

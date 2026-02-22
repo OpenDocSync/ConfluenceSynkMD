@@ -60,25 +60,3 @@ Umgebungsvariablen verwenden `__` (doppelter Unterstrich) als Trennzeichen:
 | `CONFLUENCE__BASEURL` | `Confluence:BaseUrl` |
 | `CONFLUENCE__APITOKEN` | `Confluence:ApiToken` |
 | `CONFLUENCE__MAXIMAGEWIDTH` | `Confluence:MaxImageWidth` |
-
----
-
-## Optional: `.env`-Datei
-
-Für lokalen Komfort können Sie Variablen in einer `.env`-Datei speichern und manuell laden:
-
-```ini
-# Confluence Cloud Verbindung
-CONFLUENCE__BASEURL=https://yoursite.atlassian.net
-CONFLUENCE__AUTHMODE=Basic
-
-# Basic Auth
-CONFLUENCE__USEREMAIL=ihre-email@example.com
-CONFLUENCE__APITOKEN=ihr-api-token
-
-# Bearer Auth (Alternative)
-# CONFLUENCE__BEARERTOKEN=ihr-oauth2-bearer-token
-```
-
-!!! note
-    Das Tool lädt `.env`-Dateien **nicht** automatisch. Laden Sie die Datei selbst oder verwenden Sie Umgebungsvariablen / CLI-Flags direkt.

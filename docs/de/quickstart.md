@@ -140,9 +140,6 @@ Setzen Sie `CONFLUENCE__*`-Variablen in Ihrer Shell:
 !!! tip "API-Token"
     Generieren Sie einen API-Token unter [id.atlassian.com/manage-profile/security/api-tokens](https://id.atlassian.com/manage-profile/security/api-tokens).
 
-!!! note "Optional: `.env`-Datei"
-    Für lokalen Komfort können Sie Variablen in einer `.env`-Datei speichern und diese vor dem Start manuell laden. Das Tool lädt `.env`-Dateien **nicht** automatisch.
-
 ---
 
 ## Ihr erster Upload
