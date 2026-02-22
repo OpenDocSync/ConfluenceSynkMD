@@ -1,7 +1,7 @@
 # ──────────────────────────────────────────────────────────────────────────────
 # Stage 1: Build .NET application
 # ──────────────────────────────────────────────────────────────────────────────
-FROM mcr.microsoft.com/dotnet/sdk:10.0-preview AS build
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 
 # Copy solution and project files first (layer caching)
@@ -17,7 +17,7 @@ RUN dotnet publish src/ConfluentSynkMD/ConfluentSynkMD.csproj -c Release -o /app
 # ──────────────────────────────────────────────────────────────────────────────
 # Stage 2: Runtime image with Node.js + mermaid-cli
 # ──────────────────────────────────────────────────────────────────────────────
-FROM mcr.microsoft.com/dotnet/aspnet:10.0-preview AS runtime
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
 
 # Install Node.js (LTS) and Chromium dependencies for mermaid-cli/Puppeteer
 RUN apt-get update && apt-get install -y --no-install-recommends \
