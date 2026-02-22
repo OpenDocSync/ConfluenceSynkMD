@@ -1,4 +1,4 @@
-name: Docker Manual Pin Check
+name: Docker Dependency Refresh
 
 on:
   schedule:
@@ -6,240 +6,113 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
-  issues: write
+  contents: write
+  pull-requests: write
 
 jobs:
-  check-pins:
+  refresh-dependencies:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
         uses: actions/checkout@v6
 
-      - name: Check Dockerfile manual pins
-        id: pincheck
+      - name: Parse Dockerfile dependency args
+        id: parse
         shell: bash
         run: |
           set -euo pipefail
 
           python3 - <<'PY'
-          import json
+          import os
           import re
           from pathlib import Path
 
           dockerfile = Path("Dockerfile").read_text(encoding="utf-8")
 
-          runtime_from = re.search(r"^FROM\s+([^\s]+)\s+AS\s+runtime$", dockerfile, re.MULTILINE)
-          if not runtime_from:
-              raise SystemExit("Could not parse runtime FROM image from Dockerfile")
+          node_major = re.search(r"^ARG\s+NODEJS_MAJOR=([^\s]+)$", dockerfile, re.MULTILINE)
+          mermaid = re.search(r"^ARG\s+MERMAID_CLI_VERSION=([^\s]+)$", dockerfile, re.MULTILINE)
 
-          node_arg = re.search(r"^ARG\s+NODEJS_DEB_VERSION=([^\s]+)$", dockerfile, re.MULTILINE)
-          mermaid_arg = re.search(r"^ARG\s+MERMAID_CLI_VERSION=([^\s]+)$", dockerfile, re.MULTILINE)
+          if not node_major or not mermaid:
+              raise SystemExit("Could not parse required Dockerfile args (NODEJS_MAJOR / MERMAID_CLI_VERSION)")
 
-          if not node_arg or not mermaid_arg:
-              raise SystemExit("Could not parse required ARG pins (NODEJS_DEB_VERSION / MERMAID_CLI_VERSION)")
-
-          install_block = re.search(
-              r"apt-get install -y --no-install-recommends \\\n+(.*?)\n\s*&& rm -rf /var/lib/apt/lists/\*",
-              dockerfile,
-              re.DOTALL,
-          )
-          if not install_block:
-              raise SystemExit("Could not parse apt-get install block")
-
-          pinned = {}
-          unpinned = []
-          for raw in install_block.group(1).splitlines():
-              line = raw.strip()
-              if not line or line.startswith("#"):
-                  continue
-              line = line.rstrip("\\").strip()
-              if not line:
-                  continue
-              if "=" in line:
-                  pkg, ver = line.split("=", 1)
-                  pinned[pkg.strip()] = ver.strip()
-              else:
-                  unpinned.append(line)
-
-          payload = {
-              "runtime_image": runtime_from.group(1),
-              "node_pinned": node_arg.group(1),
-              "mermaid_pinned": mermaid_arg.group(1),
-              "apt_pinned": pinned,
-              "apt_unpinned": unpinned,
-          }
-
-          Path("pincheck_input.json").write_text(json.dumps(payload, indent=2), encoding="utf-8")
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as out:
+              out.write(f"node_major={node_major.group(1)}\n")
+              out.write(f"mermaid_current={mermaid.group(1)}\n")
           PY
 
-          RUNTIME_IMAGE=$(python3 -c "import json;print(json.load(open('pincheck_input.json'))['runtime_image'])")
-          APT_PACKAGES=$(python3 -c "import json;d=json.load(open('pincheck_input.json'));print(' '.join(d['apt_pinned'].keys()))")
+      - name: Resolve latest dependency versions
+        id: latest
+        shell: bash
+        run: |
+          set -euo pipefail
 
-          if [ -n "${APT_PACKAGES}" ]; then
-            docker run --rm "${RUNTIME_IMAGE}" bash -lc "apt-get update -qq >/dev/null && apt-cache policy ${APT_PACKAGES}" > apt_policy.txt
-          else
-            : > apt_policy.txt
+          MERMAID_LATEST=$(docker run --rm node:22-alpine sh -lc "npm view @mermaid-js/mermaid-cli version")
+
+          echo "mermaid_latest=${MERMAID_LATEST}" >> "${GITHUB_OUTPUT}"
+
+      - name: Update Dockerfile when drift detected
+        id: update
+        shell: bash
+        env:
+          MERMAID_CURRENT: ${{ steps.parse.outputs.mermaid_current }}
+          MERMAID_LATEST: ${{ steps.latest.outputs.mermaid_latest }}
+        run: |
+          set -euo pipefail
+
+          if [ "${MERMAID_CURRENT}" = "${MERMAID_LATEST}" ]; then
+            echo "needs_update=false" >> "${GITHUB_OUTPUT}"
+            echo "No dependency drift detected."
+            exit 0
           fi
 
-          docker run --rm "${RUNTIME_IMAGE}" bash -lc "apt-get update -qq >/dev/null && apt-get install -y -qq --no-install-recommends curl ca-certificates gnupg >/dev/null && curl -fsSL https://deb.nodesource.com/setup_22.x | bash - >/dev/null && apt-cache policy nodejs" > node_policy.txt
-
-          docker run --rm node:22-alpine sh -lc "npm view @mermaid-js/mermaid-cli version" > mermaid_latest.txt
-
           python3 - <<'PY'
-          import json
           import os
           import re
           from pathlib import Path
 
-          data = json.loads(Path("pincheck_input.json").read_text(encoding="utf-8"))
+          path = Path("Dockerfile")
+          content = path.read_text(encoding="utf-8")
 
-          apt_pinned = data["apt_pinned"]
-          apt_unpinned = data["apt_unpinned"]
-          node_pinned = data["node_pinned"]
-          mermaid_pinned = data["mermaid_pinned"]
+          updated = re.sub(
+              r"^ARG\s+MERMAID_CLI_VERSION=.*$",
+              f"ARG MERMAID_CLI_VERSION={os.environ['MERMAID_LATEST']}",
+              content,
+              flags=re.MULTILINE,
+          )
 
-          policy = Path("apt_policy.txt").read_text(encoding="utf-8") if Path("apt_policy.txt").exists() else ""
-          candidates = {}
-          current_pkg = None
-          for line in policy.splitlines():
-              m_pkg = re.match(r"^([^:\s]+):$", line.strip())
-              if m_pkg:
-                  current_pkg = m_pkg.group(1)
-                  continue
-              m_candidate = re.match(r"^\s*Candidate:\s*(\S+)", line)
-              if m_candidate and current_pkg:
-                  candidates[current_pkg] = m_candidate.group(1)
+          if updated == content:
+              raise SystemExit("Failed to update MERMAID_CLI_VERSION in Dockerfile")
 
-          node_policy = Path("node_policy.txt").read_text(encoding="utf-8")
-          m_node = re.search(r"^\s*Candidate:\s*(\S+)", node_policy, re.MULTILINE)
-          node_candidate = m_node.group(1) if m_node else "unknown"
-
-          mermaid_latest = Path("mermaid_latest.txt").read_text(encoding="utf-8").strip()
-
-          apt_drift = []
-          for pkg, pinned_version in sorted(apt_pinned.items()):
-              candidate = candidates.get(pkg)
-              if not candidate:
-                  apt_drift.append((pkg, pinned_version, "unknown"))
-              elif candidate != pinned_version:
-                  apt_drift.append((pkg, pinned_version, candidate))
-
-          node_drift = node_candidate != node_pinned
-          mermaid_drift = mermaid_latest and (mermaid_latest != mermaid_pinned)
-
-          has_drift = bool(apt_unpinned or apt_drift or node_drift or mermaid_drift)
-
-          lines = []
-          lines.append("# Docker manual pin drift report")
-          lines.append("")
-          lines.append(f"- Runtime image: `{data['runtime_image']}`")
-          lines.append(f"- Node.js pin: `{node_pinned}`")
-          lines.append(f"- Node.js candidate: `{node_candidate}`")
-          lines.append(f"- mermaid-cli pin: `{mermaid_pinned}`")
-          lines.append(f"- mermaid-cli latest: `{mermaid_latest or 'unknown'}`")
-          lines.append("")
-
-          if apt_unpinned:
-              lines.append("## Unpinned apt packages")
-              for pkg in apt_unpinned:
-                  lines.append(f"- `{pkg}`")
-              lines.append("")
-
-          if apt_drift:
-              lines.append("## apt pin drift")
-              for pkg, pinned_version, candidate in apt_drift:
-                  lines.append(f"- `{pkg}` pinned `{pinned_version}` vs candidate `{candidate}`")
-              lines.append("")
-
-          if node_drift:
-              lines.append("## Node.js drift")
-              lines.append(f"- pinned `{node_pinned}` vs candidate `{node_candidate}`")
-              lines.append("")
-
-          if mermaid_drift:
-              lines.append("## mermaid-cli drift")
-              lines.append(f"- pinned `{mermaid_pinned}` vs latest `{mermaid_latest}`")
-              lines.append("")
-
-          if not has_drift:
-              lines.append("No drift detected. All tracked manual pins match current candidates.")
-
-          Path("pincheck_report.md").write_text("\n".join(lines), encoding="utf-8")
-
-          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as fh:
-              fh.write(f"has_drift={'true' if has_drift else 'false'}\n")
+          path.write_text(updated, encoding="utf-8")
           PY
 
-      - name: Create or update issue when drift is detected
-        if: steps.pincheck.outputs.has_drift == 'true'
-        uses: actions/github-script@v8
+          echo "needs_update=true" >> "${GITHUB_OUTPUT}"
+
+      - name: Create pull request for dependency refresh
+        if: steps.update.outputs.needs_update == 'true'
+        uses: peter-evans/create-pull-request@v7
         with:
-          script: |
-            const fs = require('fs');
-            const title = 'Docker manual dependency pin drift';
-            const body = fs.readFileSync('pincheck_report.md', 'utf8');
+          commit-message: "chore(docker): refresh mermaid-cli pin"
+          branch: "chore/docker-dependency-refresh"
+          delete-branch: true
+          title: "chore(docker): refresh mermaid-cli pin"
+          body: |
+            Automated Docker dependency refresh.
 
-            const issues = await github.paginate(github.rest.issues.listForRepo, {
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              state: 'open',
-              per_page: 100,
-            });
+            - `MERMAID_CLI_VERSION`: `${{ steps.parse.outputs.mermaid_current }}` → `${{ steps.latest.outputs.mermaid_latest }}`
+            - `NODEJS_MAJOR`: `${{ steps.parse.outputs.node_major }}` (tracked major channel)
 
-            const existing = issues.find(i => i.title === title);
-            if (existing) {
-              await github.rest.issues.update({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: existing.number,
-                body,
-              });
-              await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: existing.number,
-                body: 'Pin-check workflow detected current drift and refreshed this issue.',
-              });
-            } else {
-              await github.rest.issues.create({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                title,
-                body,
-              });
-            }
+            Notes:
+            - Ubuntu APT packages are intentionally unpinned in `Dockerfile` to receive security updates during regular rebuilds.
+            - Base images remain digest-pinned for supply-chain integrity.
+            - This PR updates only intentional app-level pinning.
 
-      - name: Close existing issue when no drift is detected
-        if: steps.pincheck.outputs.has_drift == 'false'
-        uses: actions/github-script@v8
-        with:
-          script: |
-            const title = 'Docker manual dependency pin drift';
-
-            const issues = await github.paginate(github.rest.issues.listForRepo, {
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              state: 'open',
-              per_page: 100,
-            });
-
-            const existing = issues.find(i => i.title === title);
-            if (!existing) {
-              return;
-            }
-
-            await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: existing.number,
-              body: 'Pin-check workflow detected no drift. Closing this issue automatically.',
-            });
-
-            await github.rest.issues.update({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: existing.number,
-              state: 'closed',
-            });
+      - name: Job summary
+        shell: bash
+        run: |
+          echo "## Docker dependency refresh" >> "${GITHUB_STEP_SUMMARY}"
+          echo "- Node major: \`${{ steps.parse.outputs.node_major }}\`" >> "${GITHUB_STEP_SUMMARY}"
+          echo "- Mermaid current: \`${{ steps.parse.outputs.mermaid_current }}\`" >> "${GITHUB_STEP_SUMMARY}"
+          echo "- Mermaid latest: \`${{ steps.latest.outputs.mermaid_latest }}\`" >> "${GITHUB_STEP_SUMMARY}"
+          echo "- Update required: \`${{ steps.update.outputs.needs_update || 'false' }}\`" >> "${GITHUB_STEP_SUMMARY}"
