@@ -1,0 +1,74 @@
+root = true
+
+[*.cs]
+charset = utf-8-bom
+indent_style = space
+indent_size = 4
+end_of_line = crlf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+csharp_new_line_before_open_brace = all
+csharp_indent_case_contents = true
+csharp_indent_switch_labels = true
+
+dotnet_naming_rule.public_members_pascal_case.symbols = public_members
+dotnet_naming_rule.public_members_pascal_case.style = pascal_case
+dotnet_naming_rule.public_members_pascal_case.severity = warning
+
+dotnet_naming_symbols.public_members.applicable_kinds = property,method,event,field
+dotnet_naming_symbols.public_members.applicable_accessibilities = public,protected,protected_internal
+dotnet_naming_symbols.public_members.required_modifiers = 
+
+dotnet_naming_style.pascal_case.capitalization = pascal_case
+
+dotnet_naming_rule.private_fields_underscore.symbols = private_fields
+dotnet_naming_rule.private_fields_underscore.style = underscore_camel_case
+dotnet_naming_rule.private_fields_underscore.severity = warning
+
+dotnet_naming_symbols.private_fields.applicable_kinds = field
+dotnet_naming_symbols.private_fields.applicable_accessibilities = private
+dotnet_naming_symbols.private_fields.required_modifiers = 
+
+dotnet_naming_style.underscore_camel_case.capitalization = camel_case
+dotnet_naming_style.underscore_camel_case.required_prefix = _
+
+# var-Nutzung (differenziert nach Microsoft Coding Conventions)
+csharp_style_var_for_built_in_types = false:suggestion
+csharp_style_var_when_type_is_apparent = true:suggestion
+csharp_style_var_elsewhere = false:suggestion
+
+# Braces immer verwenden
+csharp_prefer_braces = true:suggestion
+
+# Namespace: file-scoped
+csharp_style_namespace_declarations = file_scoped:suggestion
+
+# Expression-bodied: Block-Bodies bevorzugen
+csharp_style_expression_bodied_methods = false:suggestion
+csharp_style_expression_bodied_properties = false:suggestion
+csharp_style_expression_bodied_constructors = false:suggestion
+csharp_style_expression_bodied_operators = false:suggestion
+csharp_style_expression_bodied_accessors = false:suggestion
+
+# Primary Constructors: erlaubt
+csharp_style_prefer_primary_constructors = true:suggestion
+
+# Collection Expressions: bevorzugt
+dotnet_style_prefer_collection_expression = when_types_loosely_match:suggestion
+
+# Ungenutzte Ausdrücke
+csharp_style_unused_value_expression_statement_preference = discard_variable:suggestion
+
+# Test-spezifische Unterdrückungen
+[tests/**/*.cs]
+dotnet_diagnostic.IDE0058.severity = none
+dotnet_diagnostic.CA1707.severity = none
+
+[*.{md,yml,yaml,json}]
+charset = utf-8
+indent_style = space
+indent_size = 2
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true

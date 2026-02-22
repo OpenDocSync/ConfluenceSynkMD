@@ -1,0 +1,61 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    env:
+      TREAT_WARNINGS_AS_ERRORS: "false"
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+    strategy:
+      matrix:
+        dotnet-version: [10.0.x]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: ${{ matrix.dotnet-version }}
+
+      - name: Restore
+        run: dotnet restore ConfluentSynkMD.slnx
+
+      - name: Build
+        run: |
+          dotnet build ConfluentSynkMD.slnx \
+            --no-restore \
+            --configuration Release \
+            -p:TreatWarningsAsErrors=${{ env.TREAT_WARNINGS_AS_ERRORS }} \
+            '-flp:logfile=build.warnings.log;warningsonly'
+
+      - name: Upload build warnings artifact
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: build-warnings-log
+          path: build.warnings.log
+          if-no-files-found: warn
+
+      - name: Test with coverage
+        run: dotnet test ConfluentSynkMD.slnx --no-build --configuration Release --collect:"XPlat Code Coverage" --results-directory ./TestResults
+
+      - name: Upload coverage artifact
+        uses: actions/upload-artifact@v6
+        with:
+          name: coverage-reports
+          path: TestResults/**/coverage.cobertura.xml
+          if-no-files-found: warn
+
+      - name: Upload to Codecov (optional)
+        if: ${{ env.CODECOV_TOKEN != '' }}
+        uses: codecov/codecov-action@v5
+        with:
+          files: TestResults/**/coverage.cobertura.xml
+          fail_ci_if_error: false

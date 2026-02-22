@@ -1,0 +1,117 @@
+site_name: ConfluentSynkMD
+site_description: Bidirectional Markdown ↔ Confluence synchronization tool
+site_url: https://christopherdukart.github.io/ConfluentSynkMD/
+repo_url: https://github.com/christopherdukart/ConfluentSynkMD
+repo_name: ConfluentSynkMD
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  language: en
+  features:
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.tabs.link
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: deep purple
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: deep purple
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  icon:
+    repo: fontawesome/brands/github
+
+plugins:
+  - search
+  - i18n:
+      docs_structure: folder
+      reconfigure_material: true
+      languages:
+        - locale: en
+          default: true
+          name: English
+          build: true
+        - locale: de
+          name: Deutsch
+          build: true
+  - mermaid2
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:mermaid2.fence_mermaid_custom
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.mark
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/YOUR_USERNAME/ConfluentSynkMD
+
+nav:
+  - Home: index.md
+  - Quick Start: quickstart.md
+  - User Guide:
+      - Overview: user/index.md
+      - Upload Workflow: user/upload.md
+      - Download Workflow: user/download.md
+      - Local Export: user/local-export.md
+      - Frontmatter & Metadata: user/frontmatter.md
+      - Diagram Rendering: user/diagrams.md
+      - Finding Confluence IDs: user/confluence-ids.md
+  - Developer Guide:
+      - Overview: developer/index.md
+      - Architecture: developer/architecture.md
+      - ETL Pipeline: developer/etl-pipeline.md
+      - Markdig Renderers: developer/markdig-renderers.md
+      - Building & Testing: developer/building-testing.md
+      - Contributing: developer/contributing.md
+  - Admin Guide:
+      - Overview: admin/index.md
+      - Installation: admin/installation.md
+      - Docker Deployment: admin/docker.md
+      - Configuration & Environment: admin/configuration.md
+      - Authentication: admin/authentication.md
+      - CI/CD Integration: admin/cicd.md
+      - Troubleshooting: admin/troubleshooting.md
+  - Reference:
+      - CLI Reference: reference/cli.md
+      - Environment Variables: reference/environment-variables.md
+      - Frontmatter Schema: reference/frontmatter-schema.md
+      - Changelog: reference/changelog.md
