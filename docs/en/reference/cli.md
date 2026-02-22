@@ -1,9 +1,9 @@
 # CLI Reference
 
-Complete reference of all ConfluentSynkMD command-line options.
+Complete reference of all ConfluenceSynkMD command-line options.
 
 ```
-ConfluentSynkMD – Markdown ↔ Confluence Synchronization Tool
+ConfluenceSynkMD – Markdown ↔ Confluence Synchronization Tool
 ```
 
 ---
@@ -107,7 +107,7 @@ Override Confluence connection settings (takes priority over environment variabl
 === "Bash"
 
     ```bash
-    dotnet run --project src/ConfluentSynkMD -- \
+    dotnet run --project src/ConfluenceSynkMD -- \
       --mode Upload \
       --path ./docs \
       --conf-space DEV \
@@ -127,7 +127,7 @@ Override Confluence connection settings (takes priority over environment variabl
 === "PowerShell"
 
     ```powershell
-    dotnet run --project src/ConfluentSynkMD -- `
+    dotnet run --project src/ConfluenceSynkMD -- `
       --mode Upload `
       --path ./docs `
       --conf-space DEV `
@@ -147,7 +147,7 @@ Override Confluence connection settings (takes priority over environment variabl
 === "CMD"
 
     ```cmd
-    dotnet run --project src/ConfluentSynkMD -- ^
+    dotnet run --project src/ConfluenceSynkMD -- ^
       --mode Upload ^
       --path .\docs ^
       --conf-space DEV ^
@@ -169,7 +169,7 @@ Override Confluence connection settings (takes priority over environment variabl
 === "Bash"
 
     ```bash
-    dotnet run --project src/ConfluentSynkMD -- \
+    dotnet run --project src/ConfluenceSynkMD -- \
       --mode Download \
       --path ./output \
       --conf-space DEV \
@@ -179,7 +179,7 @@ Override Confluence connection settings (takes priority over environment variabl
 === "PowerShell"
 
     ```powershell
-    dotnet run --project src/ConfluentSynkMD -- `
+    dotnet run --project src/ConfluenceSynkMD -- `
       --mode Download `
       --path ./output `
       --conf-space DEV `
@@ -189,7 +189,7 @@ Override Confluence connection settings (takes priority over environment variabl
 === "CMD"
 
     ```cmd
-    dotnet run --project src/ConfluentSynkMD -- ^
+    dotnet run --project src/ConfluenceSynkMD -- ^
       --mode Download ^
       --path .\output ^
       --conf-space DEV ^
@@ -201,7 +201,7 @@ Override Confluence connection settings (takes priority over environment variabl
 === "Bash"
 
     ```bash
-    dotnet run --project src/ConfluentSynkMD -- \
+    dotnet run --project src/ConfluenceSynkMD -- \
       --mode Upload \
       --path ./docs \
       --conf-space DEV \
@@ -213,7 +213,7 @@ Override Confluence connection settings (takes priority over environment variabl
 === "PowerShell"
 
     ```powershell
-    dotnet run --project src/ConfluentSynkMD -- `
+    dotnet run --project src/ConfluenceSynkMD -- `
       --mode Upload `
       --path ./docs `
       --conf-space DEV `
@@ -225,7 +225,7 @@ Override Confluence connection settings (takes priority over environment variabl
 === "CMD"
 
     ```cmd
-    dotnet run --project src/ConfluentSynkMD -- ^
+    dotnet run --project src/ConfluenceSynkMD -- ^
       --mode Upload ^
       --path .\docs ^
       --conf-space DEV ^
@@ -239,7 +239,7 @@ Override Confluence connection settings (takes priority over environment variabl
 === "Bash"
 
     ```bash
-    dotnet run --project src/ConfluentSynkMD -- \
+    dotnet run --project src/ConfluenceSynkMD -- \
       --mode Upload \
       --path ./docs \
       --conf-space DEV \
@@ -253,7 +253,7 @@ Override Confluence connection settings (takes priority over environment variabl
 === "PowerShell"
 
     ```powershell
-    dotnet run --project src/ConfluentSynkMD -- `
+    dotnet run --project src/ConfluenceSynkMD -- `
       --mode Upload `
       --path ./docs `
       --conf-space DEV `
@@ -267,7 +267,7 @@ Override Confluence connection settings (takes priority over environment variabl
 === "CMD"
 
     ```cmd
-    dotnet run --project src/ConfluentSynkMD -- ^
+    dotnet run --project src/ConfluenceSynkMD -- ^
       --mode Upload ^
       --path .\docs ^
       --conf-space DEV ^

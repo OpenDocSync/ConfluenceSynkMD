@@ -9,7 +9,7 @@ Lokaler Export konvertiert Markdown in das Confluence Storage Format (XHTML) auf
 === "Bash"
 
     ```bash
-    dotnet run --project src/ConfluentSynkMD -- \
+    dotnet run --project src/ConfluenceSynkMD -- \
       --mode Upload \
       --path ./docs \
       --conf-space DEV \
@@ -19,7 +19,7 @@ Lokaler Export konvertiert Markdown in das Confluence Storage Format (XHTML) auf
 === "PowerShell"
 
     ```powershell
-    dotnet run --project src/ConfluentSynkMD -- `
+    dotnet run --project src/ConfluenceSynkMD -- `
       --mode Upload `
       --path ./docs `
       --conf-space DEV `
@@ -29,7 +29,7 @@ Lokaler Export konvertiert Markdown in das Confluence Storage Format (XHTML) auf
 === "CMD"
 
     ```cmd
-    dotnet run --project src/ConfluentSynkMD -- ^
+    dotnet run --project src/ConfluenceSynkMD -- ^
       --mode Upload ^
       --path .\docs ^
       --conf-space DEV ^
@@ -48,21 +48,21 @@ Lokaler Export konvertiert Markdown in das Confluence Storage Format (XHTML) auf
 === "Bash"
 
     ```bash
-    dotnet run --project src/ConfluentSynkMD -- \
+    dotnet run --project src/ConfluenceSynkMD -- \
       --mode Upload --path ./docs --conf-space DEV --local
     ```
 
 === "PowerShell"
 
     ```powershell
-    dotnet run --project src/ConfluentSynkMD -- `
+    dotnet run --project src/ConfluenceSynkMD -- `
       --mode Upload --path ./docs --conf-space DEV --local
     ```
 
 === "CMD"
 
     ```cmd
-    dotnet run --project src/ConfluentSynkMD -- ^
+    dotnet run --project src/ConfluenceSynkMD -- ^
       --mode Upload --path .\docs --conf-space DEV --local
     ```
 
@@ -71,7 +71,7 @@ Lokaler Export konvertiert Markdown in das Confluence Storage Format (XHTML) auf
 ```yaml
 - name: Confluence-Konvertierung validieren
   run: |
-    dotnet run --project src/ConfluentSynkMD -- \
+    dotnet run --project src/ConfluenceSynkMD -- \
       --mode Upload --path ./docs --conf-space DEV --local
 ```
 
@@ -80,7 +80,7 @@ Lokaler Export konvertiert Markdown in das Confluence Storage Format (XHTML) auf
 === "Bash"
 
     ```bash
-    dotnet run --project src/ConfluentSynkMD -- \
+    dotnet run --project src/ConfluenceSynkMD -- \
       --mode Upload --path ./docs --conf-space DEV \
       --local --debug-line-markers --loglevel debug
     ```
@@ -88,7 +88,7 @@ Lokaler Export konvertiert Markdown in das Confluence Storage Format (XHTML) auf
 === "PowerShell"
 
     ```powershell
-    dotnet run --project src/ConfluentSynkMD -- `
+    dotnet run --project src/ConfluenceSynkMD -- `
       --mode Upload --path ./docs --conf-space DEV `
       --local --debug-line-markers --loglevel debug
     ```
@@ -96,7 +96,7 @@ Lokaler Export konvertiert Markdown in das Confluence Storage Format (XHTML) auf
 === "CMD"
 
     ```cmd
-    dotnet run --project src/ConfluentSynkMD -- ^
+    dotnet run --project src/ConfluenceSynkMD -- ^
       --mode Upload --path .\docs --conf-space DEV ^
       --local --debug-line-markers --loglevel debug
     ```

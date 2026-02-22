@@ -17,8 +17,8 @@ Describe what this PR changes and why.
 
 ## Validation
 
-- [ ] `dotnet build ConfluentSynkMD.slnx --configuration Release`
-- [ ] `dotnet test ConfluentSynkMD.slnx --configuration Release --no-build`
+- [ ] `dotnet build ConfluenceSynkMD.slnx --configuration Release`
+- [ ] `dotnet test ConfluenceSynkMD.slnx --configuration Release --no-build`
 - [ ] Added/updated tests where appropriate
 
 ## Breaking changes

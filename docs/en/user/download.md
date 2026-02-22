@@ -9,7 +9,7 @@ Download fetches Confluence pages and converts them back into Markdown files on 
 === "Bash"
 
     ```bash
-    dotnet run --project src/ConfluentSynkMD -- \
+    dotnet run --project src/ConfluenceSynkMD -- \
       --mode Download \
       --path ./output \
       --conf-space DEV \
@@ -19,7 +19,7 @@ Download fetches Confluence pages and converts them back into Markdown files on 
 === "PowerShell"
 
     ```powershell
-    dotnet run --project src/ConfluentSynkMD -- `
+    dotnet run --project src/ConfluenceSynkMD -- `
       --mode Download `
       --path ./output `
       --conf-space DEV `
@@ -29,7 +29,7 @@ Download fetches Confluence pages and converts them back into Markdown files on 
 === "CMD"
 
     ```cmd
-    dotnet run --project src/ConfluentSynkMD -- ^
+    dotnet run --project src/ConfluenceSynkMD -- ^
       --mode Download ^
       --path .\output ^
       --conf-space DEV ^
@@ -47,7 +47,7 @@ Instead of using a numeric page ID, you can specify the root page by title:
 === "Bash"
 
     ```bash
-    dotnet run --project src/ConfluentSynkMD -- \
+    dotnet run --project src/ConfluenceSynkMD -- \
       --mode Download \
       --path ./output \
       --conf-space DEV \
@@ -57,7 +57,7 @@ Instead of using a numeric page ID, you can specify the root page by title:
 === "PowerShell"
 
     ```powershell
-    dotnet run --project src/ConfluentSynkMD -- `
+    dotnet run --project src/ConfluenceSynkMD -- `
       --mode Download `
       --path ./output `
       --conf-space DEV `
@@ -67,7 +67,7 @@ Instead of using a numeric page ID, you can specify the root page by title:
 === "CMD"
 
     ```cmd
-    dotnet run --project src/ConfluentSynkMD -- ^
+    dotnet run --project src/ConfluenceSynkMD -- ^
       --mode Download ^
       --path .\output ^
       --conf-space DEV ^
@@ -78,7 +78,7 @@ Instead of using a numeric page ID, you can specify the root page by title:
 
 ## Directory Structure Reconstruction
 
-If pages were originally uploaded with `--keep-hierarchy`, ConfluentSynkMD restores the exact directory structure on download using `source-path` metadata that was embedded during upload.
+If pages were originally uploaded with `--keep-hierarchy`, ConfluenceSynkMD restores the exact directory structure on download using `source-path` metadata that was embedded during upload.
 
 **Example output:**
 
@@ -111,7 +111,7 @@ output/
 
     ```bash
     # Download all pages from a Confluence space
-    dotnet run --project src/ConfluentSynkMD -- \
+    dotnet run --project src/ConfluenceSynkMD -- \
       --mode Download \
       --path ./migrated-docs \
       --conf-space TEAM \
@@ -122,7 +122,7 @@ output/
 
     ```powershell
     # Download all pages from a Confluence space
-    dotnet run --project src/ConfluentSynkMD -- `
+    dotnet run --project src/ConfluenceSynkMD -- `
       --mode Download `
       --path ./migrated-docs `
       --conf-space TEAM `
@@ -133,7 +133,7 @@ output/
 
     ```cmd
     REM Download all pages from a Confluence space
-    dotnet run --project src/ConfluentSynkMD -- ^
+    dotnet run --project src/ConfluenceSynkMD -- ^
       --mode Download ^
       --path .\migrated-docs ^
       --conf-space TEAM ^
@@ -150,7 +150,7 @@ If someone edits a page directly in Confluence:
 
     ```bash
     # Download the latest state
-    dotnet run --project src/ConfluentSynkMD -- \
+    dotnet run --project src/ConfluenceSynkMD -- \
       --mode Download \
       --path ./docs \
       --conf-space DEV \
@@ -161,7 +161,7 @@ If someone edits a page directly in Confluence:
 
     ```powershell
     # Download the latest state
-    dotnet run --project src/ConfluentSynkMD -- `
+    dotnet run --project src/ConfluenceSynkMD -- `
       --mode Download `
       --path ./docs `
       --conf-space DEV `
@@ -172,7 +172,7 @@ If someone edits a page directly in Confluence:
 
     ```cmd
     REM Download the latest state
-    dotnet run --project src/ConfluentSynkMD -- ^
+    dotnet run --project src/ConfluenceSynkMD -- ^
       --mode Download ^
       --path .\docs ^
       --conf-space DEV ^

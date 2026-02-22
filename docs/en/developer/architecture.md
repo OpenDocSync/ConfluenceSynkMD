@@ -1,6 +1,6 @@
 # Architecture
 
-ConfluentSynkMD follows an **ETL (Extract-Transform-Load)** pipeline pattern. Every sync operation — upload, download, or local export — flows through the same three-stage pipeline.
+ConfluenceSynkMD follows an **ETL (Extract-Transform-Load)** pipeline pattern. Every sync operation — upload, download, or local export — flows through the same three-stage pipeline.
 
 ---
 

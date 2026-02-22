@@ -6,12 +6,12 @@ WORKDIR /src
 
 # Copy solution and project files first (layer caching)
 COPY *.slnx ./
-COPY src/ConfluentSynkMD/ConfluentSynkMD.csproj src/ConfluentSynkMD/
-RUN dotnet restore src/ConfluentSynkMD/ConfluentSynkMD.csproj
+COPY src/ConfluenceSynkMD/ConfluenceSynkMD.csproj src/ConfluenceSynkMD/
+RUN dotnet restore src/ConfluenceSynkMD/ConfluenceSynkMD.csproj
 
 # Copy source and build
 COPY src/ src/
-RUN dotnet publish src/ConfluentSynkMD/ConfluentSynkMD.csproj -c Release -o /app/publish --no-restore
+RUN dotnet publish src/ConfluenceSynkMD/ConfluenceSynkMD.csproj -c Release -o /app/publish --no-restore
 
 # ──────────────────────────────────────────────────────────────────────────────
 # Stage 2: Runtime image with Node.js + mermaid-cli
@@ -78,4 +78,4 @@ RUN useradd -m -u 1001 appuser && chown -R appuser:appuser /app
 USER appuser
 
 # Default entrypoint
-ENTRYPOINT ["dotnet", "ConfluentSynkMD.dll"]
+ENTRYPOINT ["dotnet", "ConfluenceSynkMD.dll"]

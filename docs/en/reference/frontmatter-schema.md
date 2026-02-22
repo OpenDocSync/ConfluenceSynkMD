@@ -1,12 +1,12 @@
 # Frontmatter Schema
 
-Complete specification of YAML frontmatter fields supported by ConfluentSynkMD.
+Complete specification of YAML frontmatter fields supported by ConfluenceSynkMD.
 
 ---
 
 ## Overview
 
-ConfluentSynkMD reads YAML frontmatter from the top of Markdown files to control per-document behavior. Frontmatter is optional — files without it are processed normally.
+ConfluenceSynkMD reads YAML frontmatter from the top of Markdown files to control per-document behavior. Frontmatter is optional — files without it are processed normally.
 
 ```yaml
 ---
@@ -100,7 +100,7 @@ Explicit Confluence Page ID. When set, upload will update this specific page ins
 
 ## Inline HTML Comments
 
-As an alternative to YAML frontmatter, ConfluentSynkMD also reads inline HTML comments:
+As an alternative to YAML frontmatter, ConfluenceSynkMD also reads inline HTML comments:
 
 ```html
 <!-- confluence-page-id: 12345 -->

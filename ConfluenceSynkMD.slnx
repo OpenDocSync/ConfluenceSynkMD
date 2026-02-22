@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/ConfluenceSynkMD/ConfluenceSynkMD.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/ConfluenceSynkMD.Tests/ConfluenceSynkMD.Tests.csproj" />
+  </Folder>
+</Solution>

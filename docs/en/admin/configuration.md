@@ -1,6 +1,6 @@
 # Configuration & Environment
 
-ConfluentSynkMD reads connection settings from **environment variables** and/or **CLI flags**.
+ConfluenceSynkMD reads connection settings from **environment variables** and/or **CLI flags**.
 
 ---
 
@@ -78,4 +78,4 @@ Images are optimized _before_ upload to reduce Confluence storage and improve pa
 | `CONFLUENCE__APIVERSION` | `v2` | `v1` |
 
 !!! note
-    ConfluentSynkMD is primarily tested against Confluence Cloud with API v2. Data Center support is not officially guaranteed.
+    ConfluenceSynkMD is primarily tested against Confluence Cloud with API v2. Data Center support is not officially guaranteed.

@@ -1,6 +1,6 @@
 # Developer Guide
 
-Welcome to the ConfluentSynkMD Developer Guide. This section is for contributors and developers who want to understand the codebase, extend functionality, or fix bugs.
+Welcome to the ConfluenceSynkMD Developer Guide. This section is for contributors and developers who want to understand the codebase, extend functionality, or fix bugs.
 
 ---
 
@@ -23,8 +23,8 @@ Welcome to the ConfluentSynkMD Developer Guide. This section is for contributors
 ## Repository Structure
 
 ```
-ConfluentSynkMD/
-├── src/ConfluentSynkMD/           # Main application
+ConfluenceSynkMD/
+├── src/ConfluenceSynkMD/           # Main application
 │   ├── Configuration/             # Settings records
 │   ├── ETL/                       # Extract-Transform-Load pipeline
 │   │   ├── Core/                  # Pipeline runner, step interfaces
@@ -34,7 +34,7 @@ ConfluentSynkMD/
 │   ├── Markdig/                   # Custom Markdig renderers
 │   ├── Models/                    # Domain models
 │   └── Services/                  # API client, resolvers, renderers
-├── tests/ConfluentSynkMD.Tests/   # Unit & integration tests
+├── tests/ConfluenceSynkMD.Tests/   # Unit & integration tests
 ├── docs/                          # MkDocs documentation (this site)
 └── Dockerfile                     # Multi-stage Docker build
 ```
@@ -45,8 +45,8 @@ ConfluentSynkMD/
 
 ```bash
 # Clone and build
-git clone https://github.com/OpenDocSync/ConfluentSynkMD.git
-cd ConfluentSynkMD
+git clone https://github.com/OpenDocSync/ConfluenceSynkMD.git
+cd ConfluenceSynkMD
 dotnet restore
 dotnet build
 

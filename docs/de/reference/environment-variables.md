@@ -1,6 +1,6 @@
 # Umgebungsvariablen
 
-Vollständige Referenz aller von ConfluentSynkMD verwendeten Umgebungsvariablen.
+Vollständige Referenz aller von ConfluenceSynkMD verwendeten Umgebungsvariablen.
 
 !!! tip "CLI-Override"
     Alle Credential-Variablen können auch über CLI-Flags gesetzt werden (z.B. `--conf-base-url`). CLI-Flags haben Vorrang vor Umgebungsvariablen. Siehe [CLI-Referenz](cli.md) für Details.

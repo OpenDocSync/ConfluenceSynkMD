@@ -1,6 +1,6 @@
 # Konfiguration & Umgebung
 
-ConfluentSynkMD liest Verbindungseinstellungen aus **Umgebungsvariablen** und/oder **CLI-Flags**.
+ConfluenceSynkMD liest Verbindungseinstellungen aus **Umgebungsvariablen** und/oder **CLI-Flags**.
 
 ---
 

@@ -1,6 +1,6 @@
 # Schnellstart
 
-ConfluentSynkMD in unter 5 Minuten einrichten und loslegen.
+ConfluenceSynkMD in unter 5 Minuten einrichten und loslegen.
 
 ---
 
@@ -20,8 +20,8 @@ ConfluentSynkMD in unter 5 Minuten einrichten und loslegen.
 
     ```bash
     # Repository klonen
-    git clone https://github.com/OpenDocSync/ConfluentSynkMD.git
-    cd ConfluentSynkMD
+    git clone https://github.com/OpenDocSync/ConfluenceSynkMD.git
+    cd ConfluenceSynkMD
 
     # Bauen
     dotnet build
@@ -31,8 +31,8 @@ ConfluentSynkMD in unter 5 Minuten einrichten und loslegen.
 
     ```powershell
     # Repository klonen
-    git clone https://github.com/OpenDocSync/ConfluentSynkMD.git
-    Set-Location ConfluentSynkMD
+    git clone https://github.com/OpenDocSync/ConfluenceSynkMD.git
+    Set-Location ConfluenceSynkMD
 
     # Bauen
     dotnet build
@@ -42,8 +42,8 @@ ConfluentSynkMD in unter 5 Minuten einrichten und loslegen.
 
     ```cmd
     REM Repository klonen
-    git clone https://github.com/OpenDocSync/ConfluentSynkMD.git
-    cd ConfluentSynkMD
+    git clone https://github.com/OpenDocSync/ConfluenceSynkMD.git
+    cd ConfluenceSynkMD
 
     REM Bauen
     dotnet build
@@ -54,19 +54,19 @@ ConfluentSynkMD in unter 5 Minuten einrichten und loslegen.
 === "Bash"
 
     ```bash
-    docker build -t confluentsynkmd .
+    docker build -t confluencesynkmd .
     ```
 
 === "PowerShell"
 
     ```powershell
-    docker build -t confluentsynkmd .
+    docker build -t confluencesynkmd .
     ```
 
 === "CMD"
 
     ```cmd
-    docker build -t confluentsynkmd .
+    docker build -t confluencesynkmd .
     ```
 
 ---
@@ -151,7 +151,7 @@ Laden Sie einen Ordner mit Markdown-Dateien nach Confluence hoch:
 === "Bash"
 
     ```bash
-    dotnet run --project src/ConfluentSynkMD -- \
+    dotnet run --project src/ConfluenceSynkMD -- \
       --mode Upload \
       --path ./my-docs \
       --conf-space IHR_SPACE_KEY \
@@ -161,7 +161,7 @@ Laden Sie einen Ordner mit Markdown-Dateien nach Confluence hoch:
 === "PowerShell"
 
     ```powershell
-    dotnet run --project src/ConfluentSynkMD -- `
+    dotnet run --project src/ConfluenceSynkMD -- `
       --mode Upload `
       --path ./my-docs `
       --conf-space IHR_SPACE_KEY `
@@ -171,7 +171,7 @@ Laden Sie einen Ordner mit Markdown-Dateien nach Confluence hoch:
 === "CMD"
 
     ```cmd
-    dotnet run --project src/ConfluentSynkMD -- ^
+    dotnet run --project src/ConfluenceSynkMD -- ^
       --mode Upload ^
       --path .\my-docs ^
       --conf-space IHR_SPACE_KEY ^
@@ -189,7 +189,7 @@ Laden Sie einen Ordner mit Markdown-Dateien nach Confluence hoch:
       -e CONFLUENCE__USEREMAIL=user@example.com \
       -e CONFLUENCE__APITOKEN=ihr-token \
       -v ${PWD}:/workspace \
-      confluentsynkmd \
+      confluencesynkmd \
       --mode Upload \
       --path /workspace/my-docs \
       --conf-space IHR_SPACE_KEY \
@@ -205,7 +205,7 @@ Laden Sie einen Ordner mit Markdown-Dateien nach Confluence hoch:
       -e CONFLUENCE__USEREMAIL=user@example.com `
       -e CONFLUENCE__APITOKEN=ihr-token `
       -v ${PWD}:/workspace `
-      confluentsynkmd `
+      confluencesynkmd `
       --mode Upload `
       --path /workspace/my-docs `
       --conf-space IHR_SPACE_KEY `
@@ -221,7 +221,7 @@ Laden Sie einen Ordner mit Markdown-Dateien nach Confluence hoch:
       -e CONFLUENCE__USEREMAIL=user@example.com ^
       -e CONFLUENCE__APITOKEN=ihr-token ^
       -v %cd%:/workspace ^
-      confluentsynkmd ^
+      confluencesynkmd ^
       --mode Upload ^
       --path /workspace/my-docs ^
       --conf-space IHR_SPACE_KEY ^
@@ -239,7 +239,7 @@ Laden Sie Confluence-Seiten als Markdown herunter:
 === "Bash"
 
     ```bash
-    dotnet run --project src/ConfluentSynkMD -- \
+    dotnet run --project src/ConfluenceSynkMD -- \
       --mode Download \
       --path ./output \
       --conf-space IHR_SPACE_KEY \
@@ -249,7 +249,7 @@ Laden Sie Confluence-Seiten als Markdown herunter:
 === "PowerShell"
 
     ```powershell
-    dotnet run --project src/ConfluentSynkMD -- `
+    dotnet run --project src/ConfluenceSynkMD -- `
       --mode Download `
       --path ./output `
       --conf-space IHR_SPACE_KEY `
@@ -259,7 +259,7 @@ Laden Sie Confluence-Seiten als Markdown herunter:
 === "CMD"
 
     ```cmd
-    dotnet run --project src/ConfluentSynkMD -- ^
+    dotnet run --project src/ConfluenceSynkMD -- ^
       --mode Download ^
       --path .\output ^
       --conf-space IHR_SPACE_KEY ^
@@ -277,7 +277,7 @@ Laden Sie Confluence-Seiten als Markdown herunter:
       -e CONFLUENCE__USEREMAIL=user@example.com \
       -e CONFLUENCE__APITOKEN=ihr-token \
       -v ${PWD}:/workspace \
-      confluentsynkmd \
+      confluencesynkmd \
       --mode Download \
       --path /workspace/output \
       --conf-space IHR_SPACE_KEY \
@@ -293,7 +293,7 @@ Laden Sie Confluence-Seiten als Markdown herunter:
       -e CONFLUENCE__USEREMAIL=user@example.com `
       -e CONFLUENCE__APITOKEN=ihr-token `
       -v ${PWD}:/workspace `
-      confluentsynkmd `
+      confluencesynkmd `
       --mode Download `
       --path /workspace/output `
       --conf-space IHR_SPACE_KEY `
@@ -309,7 +309,7 @@ Laden Sie Confluence-Seiten als Markdown herunter:
       -e CONFLUENCE__USEREMAIL=user@example.com ^
       -e CONFLUENCE__APITOKEN=ihr-token ^
       -v %cd%:/workspace ^
-      confluentsynkmd ^
+      confluencesynkmd ^
       --mode Download ^
       --path /workspace/output ^
       --conf-space IHR_SPACE_KEY ^

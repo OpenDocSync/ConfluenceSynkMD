@@ -1,6 +1,6 @@
 # ETL-Pipeline
 
-Die ETL-Pipeline (Extract-Transform-Load) ist die zentrale Ausführungsengine von ConfluentSynkMD.
+Die ETL-Pipeline (Extract-Transform-Load) ist die zentrale Ausführungsengine von ConfluenceSynkMD.
 
 ---
 

@@ -1,12 +1,12 @@
 # User Guide
 
-Welcome to the ConfluentSynkMD User Guide. This section covers everything you need to synchronize Markdown documentation with Confluence.
+Welcome to the ConfluenceSynkMD User Guide. This section covers everything you need to synchronize Markdown documentation with Confluence.
 
 ---
 
 ## Sync Modes
 
-ConfluentSynkMD supports three synchronization modes:
+ConfluenceSynkMD supports three synchronization modes:
 
 | Mode | Direction | Description |
 |---|---|---|
@@ -25,21 +25,21 @@ Use **Upload** when you want to publish your Markdown documentation to Confluenc
 === "Bash"
 
     ```bash
-    dotnet run --project src/ConfluentSynkMD -- \
+    dotnet run --project src/ConfluenceSynkMD -- \
       --mode Upload --path ./docs --conf-space DEV
     ```
 
 === "PowerShell"
 
     ```powershell
-    dotnet run --project src/ConfluentSynkMD -- `
+    dotnet run --project src/ConfluenceSynkMD -- `
       --mode Upload --path ./docs --conf-space DEV
     ```
 
 === "CMD"
 
     ```cmd
-    dotnet run --project src/ConfluentSynkMD -- ^
+    dotnet run --project src/ConfluenceSynkMD -- ^
       --mode Upload --path .\docs --conf-space DEV
     ```
 
@@ -53,21 +53,21 @@ Use **Download** when you want to pull existing Confluence pages into your local
 === "Bash"
 
     ```bash
-    dotnet run --project src/ConfluentSynkMD -- \
+    dotnet run --project src/ConfluenceSynkMD -- \
       --mode Download --path ./output --conf-space DEV --conf-parent-id 12345
     ```
 
 === "PowerShell"
 
     ```powershell
-    dotnet run --project src/ConfluentSynkMD -- `
+    dotnet run --project src/ConfluenceSynkMD -- `
       --mode Download --path ./output --conf-space DEV --conf-parent-id 12345
     ```
 
 === "CMD"
 
     ```cmd
-    dotnet run --project src/ConfluentSynkMD -- ^
+    dotnet run --project src/ConfluenceSynkMD -- ^
       --mode Download --path .\output --conf-space DEV --conf-parent-id 12345
     ```
 
@@ -78,21 +78,21 @@ Use **LocalExport** when you want to preview the Confluence Storage Format (XHTM
 === "Bash"
 
     ```bash
-    dotnet run --project src/ConfluentSynkMD -- \
+    dotnet run --project src/ConfluenceSynkMD -- \
       --mode Upload --path ./docs --conf-space DEV --local
     ```
 
 === "PowerShell"
 
     ```powershell
-    dotnet run --project src/ConfluentSynkMD -- `
+    dotnet run --project src/ConfluenceSynkMD -- `
       --mode Upload --path ./docs --conf-space DEV --local
     ```
 
 === "CMD"
 
     ```cmd
-    dotnet run --project src/ConfluentSynkMD -- ^
+    dotnet run --project src/ConfluenceSynkMD -- ^
       --mode Upload --path .\docs --conf-space DEV --local
     ```
 

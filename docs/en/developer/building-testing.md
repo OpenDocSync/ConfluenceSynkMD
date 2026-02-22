@@ -1,6 +1,6 @@
 # Building & Testing
 
-This page covers how to build, test, and measure code coverage for ConfluentSynkMD.
+This page covers how to build, test, and measure code coverage for ConfluenceSynkMD.
 
 ---
 

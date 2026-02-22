@@ -1,6 +1,6 @@
 # Markdig Renderers
 
-ConfluentSynkMD uses **Markdig** as its Markdown parser and extends it with custom renderers that produce Confluence Storage Format (XHTML) instead of standard HTML.
+ConfluenceSynkMD uses **Markdig** as its Markdown parser and extends it with custom renderers that produce Confluence Storage Format (XHTML) instead of standard HTML.
 
 ---
 
@@ -51,7 +51,7 @@ graph TD
 
 ## Adding a New Renderer
 
-1. **Create the renderer class** in `src/ConfluentSynkMD/Markdig/Renderers/`:
+1. **Create the renderer class** in `src/ConfluenceSynkMD/Markdig/Renderers/`:
 
 ```csharp
 public class MyCustomRenderer : ConfluenceObjectRenderer<MyMarkdownObject>

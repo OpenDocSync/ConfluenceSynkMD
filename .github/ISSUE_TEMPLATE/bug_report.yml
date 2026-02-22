@@ -60,7 +60,7 @@ body:
   - type: input
     id: toolversion
     attributes:
-      label: ConfluentSynkMD version
+      label: ConfluenceSynkMD version
       placeholder: e.g. 0.1.0 or commit SHA
     validations:
       required: true

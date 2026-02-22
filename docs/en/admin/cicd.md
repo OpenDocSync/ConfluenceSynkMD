@@ -37,7 +37,7 @@ jobs:
       - name: Install mermaid-cli
         run: npm install -g @mermaid-js/mermaid-cli
 
-      - name: Build ConfluentSynkMD
+      - name: Build ConfluenceSynkMD
         run: dotnet build
 
       - name: Upload to Confluence
@@ -47,7 +47,7 @@ jobs:
           CONFLUENCE__USEREMAIL: ${{ secrets.CONFLUENCE_EMAIL }}
           CONFLUENCE__APITOKEN: ${{ secrets.CONFLUENCE_TOKEN }}
         run: |
-          dotnet run --project src/ConfluentSynkMD -- \
+          dotnet run --project src/ConfluenceSynkMD -- \
             --mode Upload \
             --path ./docs \
             --conf-space ${{ vars.CONFLUENCE_SPACE }} \
@@ -80,7 +80,7 @@ Use the Docker image directly for simpler CI setups:
   sync:
     runs-on: ubuntu-latest
     container:
-      image: confluentsynkmd:latest
+      image: confluencesynkmd:latest
     steps:
       - uses: actions/checkout@v4
       - name: Upload
@@ -89,7 +89,7 @@ Use the Docker image directly for simpler CI setups:
           CONFLUENCE__USEREMAIL: ${{ secrets.CONFLUENCE_EMAIL }}
           CONFLUENCE__APITOKEN: ${{ secrets.CONFLUENCE_TOKEN }}
         run: |
-          dotnet ConfluentSynkMD.dll \
+          dotnet ConfluenceSynkMD.dll \
             --mode Upload --path ./docs \
             --conf-space ${{ vars.CONFLUENCE_SPACE }}
 ```
@@ -111,7 +111,7 @@ Use `--local` mode in PR checks to validate that Markdown files convert successf
       - run: dotnet build
       - name: Validate conversion
         run: |
-          dotnet run --project src/ConfluentSynkMD -- \
+          dotnet run --project src/ConfluenceSynkMD -- \
             --mode Upload --path ./docs \
             --conf-space DUMMY --local
 ```

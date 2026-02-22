@@ -1,6 +1,6 @@
 # ETL Pipeline
 
-The ETL (Extract-Transform-Load) pipeline is the core execution engine of ConfluentSynkMD. It orchestrates document processing through a series of composable steps.
+The ETL (Extract-Transform-Load) pipeline is the core execution engine of ConfluenceSynkMD. It orchestrates document processing through a series of composable steps.
 
 ---
 

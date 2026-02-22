@@ -1,15 +1,15 @@
-# ConfluentSynkMD
+# ConfluenceSynkMD
 
-[![CI](https://github.com/OpenDocSync/ConfluentSynkMD/actions/workflows/ci.yml/badge.svg)](https://github.com/OpenDocSync/ConfluentSynkMD/actions/workflows/ci.yml)
-[![codecov](https://codecov.io/gh/OpenDocSync/ConfluentSynkMD/graph/badge.svg)](https://codecov.io/gh/OpenDocSync/ConfluentSynkMD)
+[![CI](https://github.com/OpenDocSync/ConfluenceSynkMD/actions/workflows/ci.yml/badge.svg)](https://github.com/OpenDocSync/ConfluenceSynkMD/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/OpenDocSync/ConfluenceSynkMD/graph/badge.svg)](https://codecov.io/gh/OpenDocSync/ConfluenceSynkMD)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Docs](https://img.shields.io/badge/docs-GitHub%20Pages-blue?logo=materialformkdocs)](https://opendocsync.github.io/ConfluentSynkMD/)
+[![Docs](https://img.shields.io/badge/docs-GitHub%20Pages-blue?logo=materialformkdocs)](https://opendocsync.github.io/ConfluenceSynkMD/)
 
-**ConfluentSynkMD** is a .NET 10 CLI tool for bidirectional synchronization of Markdown documentation with Atlassian Confluence Cloud. It converts Markdown into Confluence Storage Format (XHTML) for upload, and Confluence pages back into Markdown for download — preserving directory-based hierarchy, rendering diagrams, and optimizing images.
+**ConfluenceSynkMD** is a .NET 10 CLI tool for bidirectional synchronization of Markdown documentation with Atlassian Confluence Cloud. It converts Markdown into Confluence Storage Format (XHTML) for upload, and Confluence pages back into Markdown for download — preserving directory-based hierarchy, rendering diagrams, and optimizing images.
 
-## Why ConfluentSynkMD?
+## Why ConfluenceSynkMD?
 
-Keeping documentation in Markdown (version-controlled, editor-friendly) while publishing to Confluence (company wiki, stakeholder access) usually means manual copy-paste or fragile scripts. **ConfluentSynkMD** bridges that gap with a single CLI command: write in Markdown, publish to Confluence, download changes back — fully automated and round-trip safe.
+Keeping documentation in Markdown (version-controlled, editor-friendly) while publishing to Confluence (company wiki, stakeholder access) usually means manual copy-paste or fragile scripts. **ConfluenceSynkMD** bridges that gap with a single CLI command: write in Markdown, publish to Confluence, download changes back — fully automated and round-trip safe.
 
 ---
 
@@ -34,7 +34,7 @@ Keeping documentation in Markdown (version-controlled, editor-friendly) while pu
 
 ## 📖 Documentation
 
-Full documentation is available at **[opendocsync.github.io/ConfluentSynkMD](https://opendocsync.github.io/ConfluentSynkMD/)**.
+Full documentation is available at **[opendocsync.github.io/ConfluenceSynkMD](https://opendocsync.github.io/ConfluenceSynkMD/)**.
 
 | Section | Description |
 |---|---|
@@ -60,33 +60,33 @@ Full documentation is available at **[opendocsync.github.io/ConfluentSynkMD](htt
 
 ```bash
 # Clone and build
-git clone https://github.com/OpenDocSync/ConfluentSynkMD.git
-cd ConfluentSynkMD
+git clone https://github.com/OpenDocSync/ConfluenceSynkMD.git
+cd ConfluenceSynkMD
 dotnet build
 
 # Upload a documentation folder to Confluence
-dotnet run --project src/ConfluentSynkMD -- \
+dotnet run --project src/ConfluenceSynkMD -- \
   --mode Upload \
   --path ./docs \
   --conf-space YOUR_SPACE_KEY \
   --conf-parent-id YOUR_PAGE_ID
 
 # Download Confluence pages back to Markdown
-dotnet run --project src/ConfluentSynkMD -- \
+dotnet run --project src/ConfluenceSynkMD -- \
   --mode Download \
   --path ./output \
   --conf-space YOUR_SPACE_KEY \
   --conf-parent-id YOUR_PAGE_ID
 
 # Download a specific subtree by root page title
-dotnet run --project src/ConfluentSynkMD -- \
+dotnet run --project src/ConfluenceSynkMD -- \
   --mode Download \
   --path ./output \
   --conf-space YOUR_SPACE_KEY \
   --root-page "My Documentation"
 
 # Local export only (no API calls)
-dotnet run --project src/ConfluentSynkMD -- \
+dotnet run --project src/ConfluenceSynkMD -- \
   --mode Upload \
   --path ./docs \
   --conf-space YOUR_SPACE_KEY \
@@ -130,7 +130,7 @@ Credential settings can also be passed via CLI flags (overrides environment vari
 ## CLI Reference
 
 ```
-ConfluentSynkMD – Markdown ↔ Confluence Synchronization Tool
+ConfluenceSynkMD – Markdown ↔ Confluence Synchronization Tool
 ```
 
 ### Core Options
@@ -218,7 +218,7 @@ The Docker image comes pre-packaged with .NET, Node.js, and mermaid-cli.
 ### Build
 
 ```bash
-docker build -t confluentsynkmd .
+docker build -t confluencesynkmd .
 ```
 
 ### Run (PowerShell / Windows)
@@ -231,7 +231,7 @@ docker run --rm -it `
   -e CONFLUENCE__USEREMAIL `
   -e CONFLUENCE__APITOKEN `
   -v ${PWD}/docs:/workspace/docs:ro `
-  confluentsynkmd `
+  confluencesynkmd `
   --mode Upload `
   --path /workspace/docs `
   --conf-space YOUR_SPACE_KEY `
@@ -244,7 +244,7 @@ docker run --rm -it `
   -e CONFLUENCE__USEREMAIL `
   -e CONFLUENCE__APITOKEN `
   -v ${PWD}/output:/workspace/output `
-  confluentsynkmd `
+  confluencesynkmd `
   --mode Download `
   --path /workspace/output `
   --conf-space YOUR_SPACE_KEY `
@@ -258,7 +258,7 @@ docker run --rm -it `
   -e CONFLUENCE__USEREMAIL `
   -e CONFLUENCE__APITOKEN `
   -v ${PWD}/docs:/workspace/docs:ro `
-  confluentsynkmd `
+  confluencesynkmd `
   --mode Upload `
   --path /workspace/docs `
   --conf-space YOUR_SPACE_KEY `
@@ -271,7 +271,7 @@ docker run --rm -it `
   -e CONFLUENCE__USEREMAIL `
   -e CONFLUENCE__APITOKEN `
   -v ${PWD}/output:/workspace/output `
-  confluentsynkmd `
+  confluencesynkmd `
   --mode Download `
   --path /workspace/output `
   --conf-space YOUR_SPACE_KEY `
@@ -345,7 +345,7 @@ The write-back comment (`<!-- confluence-space-key: ... -->`) reflects the actua
 
 ## Architecture
 
-ConfluentSynkMD follows an **ETL (Extract-Transform-Load)** pipeline pattern:
+ConfluenceSynkMD follows an **ETL (Extract-Transform-Load)** pipeline pattern:
 
 ```mermaid
 graph LR
@@ -390,8 +390,8 @@ graph LR
 ## Project Structure
 
 ```
-ConfluentSynkMD/
-├── src/ConfluentSynkMD/           # Main application
+ConfluenceSynkMD/
+├── src/ConfluenceSynkMD/           # Main application
 │   ├── Configuration/             # Settings records (ConfluenceSettings, ConverterOptions, LayoutOptions)
 │   ├── ETL/                       # Extract-Transform-Load pipeline
 │   │   ├── Core/                  # Pipeline runner, step interfaces, batch context
@@ -401,7 +401,7 @@ ConfluentSynkMD/
 │   ├── Markdig/                   # Custom Markdig renderers (headings, code, images, links, alerts…)
 │   ├── Models/                    # Domain models (DocumentNode, ConvertedDocument, etc.)
 │   └── Services/                  # API client, hierarchy resolver, diagram renderers, image optimizer
-├── tests/ConfluentSynkMD.Tests/   # Unit and integration tests (xUnit)
+├── tests/ConfluenceSynkMD.Tests/   # Unit and integration tests (xUnit)
 ├── Dockerfile                     # Multi-stage Docker build
 └── docs/                          # MkDocs documentation and content
 ```
@@ -425,7 +425,7 @@ The test suite includes unit and integration tests. Diagram rendering integratio
 
 ### Round-Trip / Integration Tests
 
-Round-trip behavior is covered by integration tests in `tests/ConfluentSynkMD.Tests/Integration`.
+Round-trip behavior is covered by integration tests in `tests/ConfluenceSynkMD.Tests/Integration`.
 
 ```bash
 # Run integration tests only

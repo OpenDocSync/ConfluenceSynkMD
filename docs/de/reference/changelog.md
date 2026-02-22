@@ -1,6 +1,6 @@
 # Änderungsprotokoll
 
-Alle bemerkenswerten Änderungen an ConfluentSynkMD werden hier dokumentiert.
+Alle bemerkenswerten Änderungen an ConfluenceSynkMD werden hier dokumentiert.
 
 Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), und dieses Projekt folgt [Semantischer Versionierung](https://semver.org/lang/de/spec/v2.0.0.html).
 
@@ -20,7 +20,7 @@ Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.1.0/),
 
 ### Hinzugefügt
 
-- Initiale öffentliche Version des ConfluentSynkMD CLI
+- Initiale öffentliche Version des ConfluenceSynkMD CLI
 - ETL-Pipeline für Markdown ↔ Confluence Synchronisation
 - Upload-, Download- und lokaler Export-Modus
 - Diagramm-Rendering-Support (Mermaid, Draw.io, PlantUML, LaTeX)
