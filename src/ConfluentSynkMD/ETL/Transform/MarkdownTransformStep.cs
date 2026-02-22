@@ -291,6 +291,10 @@ public sealed partial class MarkdownTransformStep : IPipelineStep
         }
     }
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage(
+        "Globalization",
+        "CA1305:Specify IFormatProvider",
+        Justification = "False positive on StringBuilder usage in this method; no culture-sensitive formatting is performed here.")]
     private void ConvertMacro(IElement macro, StringBuilder sb, int depth, HashSet<string> referencedImages, Dictionary<string, string> cdataBlocks)
     {
         var macroName = macro.GetAttribute("ac:name") ?? "";
@@ -328,7 +332,8 @@ public sealed partial class MarkdownTransformStep : IPipelineStep
                     break;
                 }
 
-                sb.AppendLine(CultureInfo.InvariantCulture, $"```{lang}");
+                sb.Append("```");
+                sb.AppendLine(lang);
                 sb.AppendLine(code.Trim());
                 sb.AppendLine("```");
                 sb.AppendLine();
@@ -352,7 +357,9 @@ public sealed partial class MarkdownTransformStep : IPipelineStep
             default:
                 // Preserve unknown macros as HTML comments for future handling
                 _logger.Debug("Unknown macro '{Name}', preserving as comment.", macroName);
-                sb.AppendLine($"<!-- confluence-macro: {macroName} -->");
+                sb.Append("<!-- confluence-macro: ");
+                sb.Append(macroName);
+                sb.AppendLine(" -->");
                 var body = macro.QuerySelector("ac\\:rich-text-body")?.TextContent ?? "";
                 if (!string.IsNullOrWhiteSpace(body))
                     sb.AppendLine(body.Trim());
