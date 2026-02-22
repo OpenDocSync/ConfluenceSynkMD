@@ -68,4 +68,4 @@ ConfluentSynkMD ist ein .NET 10 CLI-Tool zur Synchronisation von Markdown-Dokume
 
 ## Lizenz
 
-ConfluentSynkMD ist unter der [MIT-Lizenz](https://github.com/YOUR_USERNAME/ConfluentSynkMD/blob/main/LICENSE) lizenziert.
+ConfluentSynkMD ist unter der [MIT-Lizenz](https://github.com/OpenDocSync/ConfluentSynkMD/blob/main/LICENSE) lizenziert.

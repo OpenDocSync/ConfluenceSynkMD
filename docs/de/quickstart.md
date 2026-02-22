@@ -20,7 +20,7 @@ ConfluentSynkMD in unter 5 Minuten einrichten und loslegen.
 
     ```bash
     # Repository klonen
-    git clone https://github.com/YOUR_USERNAME/ConfluentSynkMD.git
+    git clone https://github.com/OpenDocSync/ConfluentSynkMD.git
     cd ConfluentSynkMD
 
     # Bauen
@@ -31,7 +31,7 @@ ConfluentSynkMD in unter 5 Minuten einrichten und loslegen.
 
     ```powershell
     # Repository klonen
-    git clone https://github.com/YOUR_USERNAME/ConfluentSynkMD.git
+    git clone https://github.com/OpenDocSync/ConfluentSynkMD.git
     Set-Location ConfluentSynkMD
 
     # Bauen
@@ -42,7 +42,7 @@ ConfluentSynkMD in unter 5 Minuten einrichten und loslegen.
 
     ```cmd
     REM Repository klonen
-    git clone https://github.com/YOUR_USERNAME/ConfluentSynkMD.git
+    git clone https://github.com/OpenDocSync/ConfluentSynkMD.git
     cd ConfluentSynkMD
 
     REM Bauen

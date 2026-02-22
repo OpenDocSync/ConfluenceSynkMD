@@ -19,7 +19,7 @@ ConfluentSynkMD kann durch Bauen aus dem Quellcode mit dem .NET SDK installiert 
 === "Bash"
 
     ```bash
-    git clone https://github.com/YOUR_USERNAME/ConfluentSynkMD.git
+    git clone https://github.com/OpenDocSync/ConfluentSynkMD.git
     cd ConfluentSynkMD
     dotnet restore
     dotnet build
@@ -28,7 +28,7 @@ ConfluentSynkMD kann durch Bauen aus dem Quellcode mit dem .NET SDK installiert 
 === "PowerShell"
 
     ```powershell
-    git clone https://github.com/YOUR_USERNAME/ConfluentSynkMD.git
+    git clone https://github.com/OpenDocSync/ConfluentSynkMD.git
     Set-Location ConfluentSynkMD
     dotnet restore
     dotnet build
@@ -37,7 +37,7 @@ ConfluentSynkMD kann durch Bauen aus dem Quellcode mit dem .NET SDK installiert 
 === "CMD"
 
     ```cmd
-    git clone https://github.com/YOUR_USERNAME/ConfluentSynkMD.git
+    git clone https://github.com/OpenDocSync/ConfluentSynkMD.git
     cd ConfluentSynkMD
     dotnet restore
     dotnet build

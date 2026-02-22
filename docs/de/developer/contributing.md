@@ -10,7 +10,7 @@ Vielen Dank für Ihr Interesse an ConfluentSynkMD! Diese Anleitung hilft Ihnen b
 2. **Klonen** Sie Ihren Fork lokal:
 
     ```bash
-    git clone https://github.com/YOUR_USERNAME/ConfluentSynkMD.git
+    git clone https://github.com/OpenDocSync/ConfluentSynkMD.git
     cd ConfluentSynkMD
     ```
 
@@ -89,4 +89,4 @@ Formatierungsstandards aus `.editorconfig`:
 
 ## Verhaltenskodex
 
-Durch Ihre Teilnahme stimmen Sie unserem [Verhaltenskodex](https://github.com/YOUR_USERNAME/ConfluentSynkMD/blob/main/CODE_OF_CONDUCT.md) zu.
+Durch Ihre Teilnahme stimmen Sie unserem [Verhaltenskodex](https://github.com/OpenDocSync/ConfluentSynkMD/blob/main/CODE_OF_CONDUCT.md) zu.

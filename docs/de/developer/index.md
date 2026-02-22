@@ -41,7 +41,7 @@ ConfluentSynkMD/
 ## Einstieg
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/ConfluentSynkMD.git
+git clone https://github.com/OpenDocSync/ConfluentSynkMD.git
 cd ConfluentSynkMD
 dotnet restore
 dotnet build

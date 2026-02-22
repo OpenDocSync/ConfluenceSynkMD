@@ -20,7 +20,7 @@ ConfluentSynkMD can be installed by building from source with the .NET SDK.
 
     ```bash
     # Clone the repository
-    git clone https://github.com/YOUR_USERNAME/ConfluentSynkMD.git
+    git clone https://github.com/OpenDocSync/ConfluentSynkMD.git
     cd ConfluentSynkMD
 
     # Restore dependencies
@@ -34,7 +34,7 @@ ConfluentSynkMD can be installed by building from source with the .NET SDK.
 
     ```powershell
     # Clone the repository
-    git clone https://github.com/YOUR_USERNAME/ConfluentSynkMD.git
+    git clone https://github.com/OpenDocSync/ConfluentSynkMD.git
     Set-Location ConfluentSynkMD
 
     # Restore dependencies
@@ -48,7 +48,7 @@ ConfluentSynkMD can be installed by building from source with the .NET SDK.
 
     ```cmd
     REM Clone the repository
-    git clone https://github.com/YOUR_USERNAME/ConfluentSynkMD.git
+    git clone https://github.com/OpenDocSync/ConfluentSynkMD.git
     cd ConfluentSynkMD
 
     REM Restore dependencies

@@ -1,9 +1,9 @@
 # ConfluentSynkMD
 
-[![CI](https://github.com/christopherdukart/ConfluentSynkMD/actions/workflows/ci.yml/badge.svg)](https://github.com/christopherdukart/ConfluentSynkMD/actions/workflows/ci.yml)
-[![codecov](https://codecov.io/gh/christopherdukart/ConfluentSynkMD/graph/badge.svg)](https://codecov.io/gh/christopherdukart/ConfluentSynkMD)
+[![CI](https://github.com/OpenDocSync/ConfluentSynkMD/actions/workflows/ci.yml/badge.svg)](https://github.com/OpenDocSync/ConfluentSynkMD/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/OpenDocSync/ConfluentSynkMD/graph/badge.svg)](https://codecov.io/gh/OpenDocSync/ConfluentSynkMD)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Docs](https://img.shields.io/badge/docs-GitHub%20Pages-blue?logo=materialformkdocs)](https://christopherdukart.github.io/ConfluentSynkMD/)
+[![Docs](https://img.shields.io/badge/docs-GitHub%20Pages-blue?logo=materialformkdocs)](https://opendocsync.github.io/ConfluentSynkMD/)
 
 **ConfluentSynkMD** is a .NET 10 CLI tool for bidirectional synchronization of Markdown documentation with Atlassian Confluence Cloud. It converts Markdown into Confluence Storage Format (XHTML) for upload, and Confluence pages back into Markdown for download — preserving directory-based hierarchy, rendering diagrams, and optimizing images.
 
@@ -34,7 +34,7 @@ Keeping documentation in Markdown (version-controlled, editor-friendly) while pu
 
 ## 📖 Documentation
 
-Full documentation is available at **[christopherdukart.github.io/ConfluentSynkMD](https://christopherdukart.github.io/ConfluentSynkMD/)**.
+Full documentation is available at **[opendocsync.github.io/ConfluentSynkMD](https://opendocsync.github.io/ConfluentSynkMD/)**.
 
 | Section | Description |
 |---|---|
@@ -60,7 +60,7 @@ Full documentation is available at **[christopherdukart.github.io/ConfluentSynkM
 
 ```bash
 # Clone and build
-git clone https://github.com/christopherdukart/ConfluentSynkMD.git
+git clone https://github.com/OpenDocSync/ConfluentSynkMD.git
 cd ConfluentSynkMD
 dotnet build
 

@@ -20,7 +20,7 @@ Get ConfluentSynkMD up and running in under 5 minutes.
 
     ```bash
     # Clone the repository
-    git clone https://github.com/YOUR_USERNAME/ConfluentSynkMD.git
+    git clone https://github.com/OpenDocSync/ConfluentSynkMD.git
     cd ConfluentSynkMD
 
     # Build
@@ -31,7 +31,7 @@ Get ConfluentSynkMD up and running in under 5 minutes.
 
     ```powershell
     # Clone the repository
-    git clone https://github.com/YOUR_USERNAME/ConfluentSynkMD.git
+    git clone https://github.com/OpenDocSync/ConfluentSynkMD.git
     Set-Location ConfluentSynkMD
 
     # Build
@@ -42,7 +42,7 @@ Get ConfluentSynkMD up and running in under 5 minutes.
 
     ```cmd
     REM Clone the repository
-    git clone https://github.com/YOUR_USERNAME/ConfluentSynkMD.git
+    git clone https://github.com/OpenDocSync/ConfluentSynkMD.git
     cd ConfluentSynkMD
 
     REM Build
