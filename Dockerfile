@@ -18,45 +18,53 @@ RUN dotnet publish src/ConfluentSynkMD/ConfluentSynkMD.csproj -c Release -o /app
 # ──────────────────────────────────────────────────────────────────────────────
 FROM mcr.microsoft.com/dotnet/aspnet:10.0@sha256:52dcfb4225fda614c38ba5997a4ec72cbd5260a624125174416e547ff9eb9b8c AS runtime
 
-ARG NODEJS_DEB_VERSION=22.22.0-1nodesource1
+ARG NODEJS_MAJOR=22
 ARG MERMAID_CLI_VERSION=11.12.0
+ENV PUPPETEER_CACHE_DIR=/app/.cache/puppeteer
 # Dependabot tracks Docker base image updates (FROM).
-# ARG and apt package pins below are not auto-updated by Dependabot and require periodic manual refresh.
+# MERMAID_CLI_VERSION and NODEJS_MAJOR are intentionally explicit and checked in CI.
 
 # Install Node.js (LTS) and Chromium dependencies for mermaid-cli/Puppeteer
-# NOTE: Package versions are pinned for reproducible builds.
-# When updating base image digests, refresh these versions together.
+# NOTE: Ubuntu archive package versions are intentionally unpinned to receive
+# upstream security updates on regular image rebuilds.
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    curl=8.5.0-2ubuntu10.6 \
-    ca-certificates=20240203 \
-    gnupg=2.4.4-2ubuntu17.4 \
+    curl \
+    ca-certificates \
+    gnupg \
     # Chromium dependencies for Puppeteer headless rendering
-    libnss3=2:3.98-1build1 \
-    libatk1.0-0t64=2.52.0-1build1 \
-    libatk-bridge2.0-0t64=2.52.0-1build1 \
-    libcups2t64=2.4.7-1.2ubuntu7.9 \
-    libdrm2=2.4.125-1ubuntu0.1~24.04.1 \
-    libxkbcommon0=1.6.0-1build1 \
-    libxcomposite1=1:0.4.5-1build3 \
-    libxdamage1=1:1.1.6-1build1 \
-    libxfixes3=1:6.0.0-2build1 \
-    libxrandr2=2:1.5.2-2build1 \
-    libgbm1=25.2.8-0ubuntu0.24.04.1 \
-    libpango-1.0-0=1.52.1+ds-1build1 \
-    libcairo2=1.18.0-3build1 \
-    libasound2t64=1.2.11-1ubuntu0.2 \
-    libxshmfence1=1.3-1build5 \
-    libxss1=1:1.2.3-1build3 \
-    fonts-liberation=1:2.1.5-3 \
-    fonts-noto-color-emoji=2.047-0ubuntu0.24.04.1 \
+    libnss3 \
+    libatk1.0-0t64 \
+    libatk-bridge2.0-0t64 \
+    libcups2t64 \
+    libdrm2 \
+    libxkbcommon0 \
+    libxcomposite1 \
+    libxdamage1 \
+    libxfixes3 \
+    libxrandr2 \
+    libgbm1 \
+    libpango-1.0-0 \
+    libcairo2 \
+    libasound2t64 \
+    libxshmfence1 \
+    libxss1 \
+    fonts-liberation \
+    fonts-noto-color-emoji \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Node.js 22 LTS
-RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
-    && apt-get install -y nodejs=${NODEJS_DEB_VERSION} \
+# Install Node.js LTS from explicitly configured NodeSource APT repository
+RUN install -d -m 0755 /etc/apt/keyrings \
+        && curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key \
+            | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg \
+        && chmod 0644 /etc/apt/keyrings/nodesource.gpg \
+        && echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_${NODEJS_MAJOR}.x nodistro main" \
+            > /etc/apt/sources.list.d/nodesource.list \
+        && apt-get update \
+            && apt-get install -y --no-install-recommends nodejs \
     && rm -rf /var/lib/apt/lists/*
 
 # Install mermaid-cli globally (includes Puppeteer + bundled Chromium)
+RUN mkdir -p ${PUPPETEER_CACHE_DIR}
 RUN npm install -g @mermaid-js/mermaid-cli@${MERMAID_CLI_VERSION} \
     && npx puppeteer browsers install chrome
 
