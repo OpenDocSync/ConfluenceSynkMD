@@ -18,6 +18,8 @@ public static class ConfluenceSettingsValidator
 
         if (string.IsNullOrWhiteSpace(settings.BaseUrl))
             errors.Add("BaseUrl is required. Set via --conf-base-url or CONFLUENCE__BASEURL.");
+        else
+            NormalizeBaseUrlAndApiPath(settings, errors);
 
         var authMode = settings.AuthMode?.Trim();
 
@@ -45,5 +47,51 @@ public static class ConfluenceSettingsValidator
                 "Confluence configuration is incomplete:\n" +
                 string.Join("\n", errors.Select(e => $"  • {e}")));
         }
+    }
+
+    private static void NormalizeBaseUrlAndApiPath(ConfluenceSettings settings, ICollection<string> errors)
+    {
+        if (!Uri.TryCreate(settings.BaseUrl.Trim(), UriKind.Absolute, out var baseUri)
+            || !string.Equals(baseUri.Scheme, Uri.UriSchemeHttps, StringComparison.OrdinalIgnoreCase))
+        {
+            errors.Add("BaseUrl must be a valid absolute HTTPS URL (e.g. https://yoursite.atlassian.net).");
+            return;
+        }
+
+        if (!string.IsNullOrWhiteSpace(baseUri.Query) || !string.IsNullOrWhiteSpace(baseUri.Fragment))
+            errors.Add("BaseUrl must not contain query string or fragment.");
+
+        var normalizedApiPath = NormalizeApiPath(settings.ApiPath);
+        var basePath = baseUri.AbsolutePath.Trim('/');
+        var origin = $"{baseUri.Scheme}://{baseUri.Authority}";
+
+        if (!string.IsNullOrEmpty(basePath))
+        {
+            var basePathSegment = $"/{basePath}";
+
+            if (string.IsNullOrEmpty(normalizedApiPath))
+            {
+                normalizedApiPath = basePathSegment;
+            }
+            else if (!string.Equals(normalizedApiPath, basePathSegment, StringComparison.OrdinalIgnoreCase))
+            {
+                errors.Add(
+                    $"BaseUrl contains path '{basePathSegment}' while ApiPath is '{normalizedApiPath}'. " +
+                    "Use a host-only BaseUrl or make ApiPath match the BaseUrl path.");
+            }
+        }
+
+        settings.BaseUrl = origin;
+        settings.ApiPath = normalizedApiPath;
+    }
+
+    private static string NormalizeApiPath(string? apiPath)
+    {
+        var trimmed = apiPath?.Trim() ?? string.Empty;
+        if (string.IsNullOrEmpty(trimmed) || trimmed == "/")
+            return string.Empty;
+
+        var segment = trimmed.Trim('/');
+        return string.IsNullOrEmpty(segment) ? string.Empty : $"/{segment}";
     }
 }

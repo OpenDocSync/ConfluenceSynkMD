@@ -9,8 +9,8 @@ namespace ConfluentSynkMD.Services;
 /// Renders Mermaid diagram source code to PNG images using
 /// @mermaid-js/mermaid-cli (mmdc).
 ///
-/// In Docker: mmdc is globally installed, called directly.
-/// Locally: falls back to npx.cmd / npx for on-demand install.
+/// Requires mmdc to be installed and available on PATH.
+/// In containers, Puppeteer sandbox is disabled via generated config.
 /// </summary>
 public sealed class MermaidRenderer : IMermaidRenderer
 {
@@ -42,18 +42,14 @@ public sealed class MermaidRenderer : IMermaidRenderer
             // Write Mermaid source to temp file
             await File.WriteAllTextAsync(inputFile, mermaidSource, ct);
 
-            // Create puppeteer config (no-sandbox required in Docker)
+            // Create puppeteer config (no-sandbox only when running in container)
             var puppeteerConfig = Path.Combine(tempDir, "puppeteer-config.json");
-            if (!File.Exists(puppeteerConfig))
-            {
-                await File.WriteAllTextAsync(puppeteerConfig,
-                    """{"args": ["--no-sandbox", "--disable-setuid-sandbox"]}""", ct);
-            }
+            var puppeteerConfigJson = IsRunningInContainer()
+                ? """{"args": ["--no-sandbox", "--disable-setuid-sandbox"]}"""
+                : "{}";
+            await File.WriteAllTextAsync(puppeteerConfig, puppeteerConfigJson, ct);
 
-            // Determine how to invoke mmdc:
-            // 1. Docker/global install: mmdc is on PATH
-            // 2. Local Windows: use npx.cmd -p @mermaid-js/mermaid-cli mmdc
-            // 3. Local Unix: use npx -p @mermaid-js/mermaid-cli mmdc
+            // Determine how to invoke mmdc from PATH.
             var (command, args) = ResolveMmdc(inputFile, outputFile, puppeteerConfig);
 
             var psi = new ProcessStartInfo
@@ -71,7 +67,7 @@ public sealed class MermaidRenderer : IMermaidRenderer
 
             using var process = Process.Start(psi)
                 ?? throw new InvalidOperationException(
-                    "Failed to start mmdc process. Is Node.js installed (or are you running in Docker)?");
+                    "Failed to start mmdc process. Ensure @mermaid-js/mermaid-cli is installed and available on PATH.");
 
             var stdout = await process.StandardOutput.ReadToEndAsync(ct);
             var stderr = await process.StandardError.ReadToEndAsync(ct);
@@ -123,19 +119,21 @@ public sealed class MermaidRenderer : IMermaidRenderer
     {
         var mmdcArgs = $"-i \"{inputFile}\" -o \"{outputFile}\" -b transparent --scale 2 -p \"{puppeteerConfig}\"";
 
-        // Check if mmdc is globally available (Docker / global npm install)
+        // mmdc must be available on PATH.
         if (IsCommandAvailable("mmdc"))
         {
             return ("mmdc", mmdcArgs);
         }
 
-        // Fallback: use npx to install on-demand
-        if (OperatingSystem.IsWindows())
-        {
-            return ("npx.cmd", $"-y -p @mermaid-js/mermaid-cli mmdc {mmdcArgs}");
-        }
+        throw new InvalidOperationException(
+            "mmdc is not available on PATH. Install @mermaid-js/mermaid-cli first (for example: npm install -g @mermaid-js/mermaid-cli).",
+            innerException: null);
+    }
 
-        return ("npx", $"-y -p @mermaid-js/mermaid-cli mmdc {mmdcArgs}");
+    private static bool IsRunningInContainer()
+    {
+        var value = Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER");
+        return string.Equals(value, "true", StringComparison.OrdinalIgnoreCase);
     }
 
     private static bool IsCommandAvailable(string command)
