@@ -36,8 +36,7 @@ ConfluentSynkMD/
 │   └── Services/                  # API client, resolvers, renderers
 ├── tests/ConfluentSynkMD.Tests/   # Unit & integration tests
 ├── docs/                          # MkDocs documentation (this site)
-├── Dockerfile                     # Multi-stage Docker build
-└── .env.example                   # Env var template
+└── Dockerfile                     # Multi-stage Docker build
 ```
 
 ---

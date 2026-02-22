@@ -32,6 +32,6 @@ We will acknowledge reports as quickly as possible and provide status updates.
 ## Security Best Practices for Contributors
 
 - Never commit credentials, tokens, API keys, or personal secrets
-- Use `.env` locally and keep real secrets out of git
+- Use environment variables or secret stores and keep real secrets out of git
 - Prefer placeholders in examples (for example `YOUR_SPACE_KEY`, `YOUR_PAGE_ID`)
 - If you find accidentally committed credentials, report immediately using the channels above

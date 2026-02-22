@@ -140,9 +140,6 @@ Pass credentials directly as command-line arguments:
 !!! tip "API Token"
     Generate an API token at [id.atlassian.com/manage-profile/security/api-tokens](https://id.atlassian.com/manage-profile/security/api-tokens).
 
-!!! note "Optional: `.env` file"
-    For local convenience, you can store variables in a `.env` file and source it before running the tool. The tool does **not** auto-load `.env` files.
-
 ---
 
 ## Your First Upload

@@ -18,7 +18,7 @@ Willkommen im ConfluentSynkMD Admin-Handbuch. Dieser Bereich deckt Installation,
 
 - [Installation](installation.md) — .NET SDK installieren und aus Quellcode bauen
 - [Docker-Deployment](docker.md) — Mit Docker bauen und ausführen
-- [Konfiguration & Umgebung](configuration.md) — Umgebungsvariablen und `.env`-Setup
+- [Konfiguration & Umgebung](configuration.md) — Umgebungsvariablen und CLI-Credential-Flags
 - [Authentifizierung](authentication.md) — Basic Auth vs. Bearer Auth
 - [CI/CD-Integration](cicd.md) — Automatisierung mit GitHub Actions
 - [Fehlerbehebung](troubleshooting.md) — Häufige Probleme und Lösungen

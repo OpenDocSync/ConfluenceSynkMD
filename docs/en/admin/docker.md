@@ -36,28 +36,7 @@ The Dockerfile uses a **multi-stage build**:
 === "Bash"
 
     ```bash
-    # Upload (local development, optional): use --env-file
-    # Run from the directory that contains .env
-    docker run --rm -it \
-      --env-file ./.env \
-      -v $(pwd)/docs:/workspace/docs:ro \
-      confluentsynkmd \
-      --mode Upload \
-      --path /workspace/docs \
-      --conf-space YOUR_SPACE_KEY \
-      --conf-parent-id YOUR_PAGE_ID
-
-    # Download (local development, optional): separate writable output mount
-    docker run --rm -it \
-      --env-file ./.env \
-      -v $(pwd)/output:/workspace/output \
-      confluentsynkmd \
-      --mode Download \
-      --path /workspace/output \
-      --conf-space YOUR_SPACE_KEY \
-      --conf-parent-id YOUR_PAGE_ID
-
-    # Upload (CI/CD recommended): inject secrets as runner environment variables
+    # Upload: inject credentials as environment variables
     docker run --rm -it \
       -e CONFLUENCE__BASEURL \
       -e CONFLUENCE__AUTHMODE \
@@ -70,7 +49,33 @@ The Dockerfile uses a **multi-stage build**:
       --conf-space YOUR_SPACE_KEY \
       --conf-parent-id YOUR_PAGE_ID
 
-    # Download (CI/CD recommended): writable output mount
+    # Download: separate writable output mount
+    docker run --rm -it \
+      -e CONFLUENCE__BASEURL \
+      -e CONFLUENCE__AUTHMODE \
+      -e CONFLUENCE__USEREMAIL \
+      -e CONFLUENCE__APITOKEN \
+      -v $(pwd)/output:/workspace/output \
+      confluentsynkmd \
+      --mode Download \
+      --path /workspace/output \
+      --conf-space YOUR_SPACE_KEY \
+      --conf-parent-id YOUR_PAGE_ID
+
+    # Upload (CI/CD): inject secrets as runner environment variables
+    docker run --rm -it \
+      -e CONFLUENCE__BASEURL \
+      -e CONFLUENCE__AUTHMODE \
+      -e CONFLUENCE__USEREMAIL \
+      -e CONFLUENCE__APITOKEN \
+      -v $(pwd)/docs:/workspace/docs:ro \
+      confluentsynkmd \
+      --mode Upload \
+      --path /workspace/docs \
+      --conf-space YOUR_SPACE_KEY \
+      --conf-parent-id YOUR_PAGE_ID
+
+    # Download (CI/CD): writable output mount
     docker run --rm -it \
       -e CONFLUENCE__BASEURL \
       -e CONFLUENCE__AUTHMODE \
@@ -87,28 +92,7 @@ The Dockerfile uses a **multi-stage build**:
 === "PowerShell"
 
     ```powershell
-    # Upload (local development, optional): use --env-file
-    # Run from the directory that contains .env
-    docker run --rm -it `
-      --env-file ./.env `
-      -v ${PWD}/docs:/workspace/docs:ro `
-      confluentsynkmd `
-      --mode Upload `
-      --path /workspace/docs `
-      --conf-space YOUR_SPACE_KEY `
-      --conf-parent-id YOUR_PAGE_ID
-
-    # Download (local development, optional): separate writable output mount
-    docker run --rm -it `
-      --env-file ./.env `
-      -v ${PWD}/output:/workspace/output `
-      confluentsynkmd `
-      --mode Download `
-      --path /workspace/output `
-      --conf-space YOUR_SPACE_KEY `
-      --conf-parent-id YOUR_PAGE_ID
-
-    # Upload (CI/CD recommended): inject secrets as runner environment variables
+    # Upload: inject credentials as environment variables
     docker run --rm -it `
       -e CONFLUENCE__BASEURL `
       -e CONFLUENCE__AUTHMODE `
@@ -121,7 +105,33 @@ The Dockerfile uses a **multi-stage build**:
       --conf-space YOUR_SPACE_KEY `
       --conf-parent-id YOUR_PAGE_ID
 
-    # Download (CI/CD recommended): writable output mount
+    # Download: separate writable output mount
+    docker run --rm -it `
+      -e CONFLUENCE__BASEURL `
+      -e CONFLUENCE__AUTHMODE `
+      -e CONFLUENCE__USEREMAIL `
+      -e CONFLUENCE__APITOKEN `
+      -v ${PWD}/output:/workspace/output `
+      confluentsynkmd `
+      --mode Download `
+      --path /workspace/output `
+      --conf-space YOUR_SPACE_KEY `
+      --conf-parent-id YOUR_PAGE_ID
+
+    # Upload (CI/CD): inject secrets as runner environment variables
+    docker run --rm -it `
+      -e CONFLUENCE__BASEURL `
+      -e CONFLUENCE__AUTHMODE `
+      -e CONFLUENCE__USEREMAIL `
+      -e CONFLUENCE__APITOKEN `
+      -v ${PWD}/docs:/workspace/docs:ro `
+      confluentsynkmd `
+      --mode Upload `
+      --path /workspace/docs `
+      --conf-space YOUR_SPACE_KEY `
+      --conf-parent-id YOUR_PAGE_ID
+
+    # Download (CI/CD): writable output mount
     docker run --rm -it `
       -e CONFLUENCE__BASEURL `
       -e CONFLUENCE__AUTHMODE `
@@ -138,28 +148,7 @@ The Dockerfile uses a **multi-stage build**:
 === "CMD"
 
     ```cmd
-    REM Upload (local development, optional): use --env-file
-    REM Run from the directory that contains .env
-    docker run --rm -it ^
-      --env-file ./.env ^
-      -v %cd%/docs:/workspace/docs:ro ^
-      confluentsynkmd ^
-      --mode Upload ^
-      --path /workspace/docs ^
-      --conf-space YOUR_SPACE_KEY ^
-      --conf-parent-id YOUR_PAGE_ID
-
-    REM Download (local development, optional): separate writable output mount
-    docker run --rm -it ^
-      --env-file ./.env ^
-      -v %cd%/output:/workspace/output ^
-      confluentsynkmd ^
-      --mode Download ^
-      --path /workspace/output ^
-      --conf-space YOUR_SPACE_KEY ^
-      --conf-parent-id YOUR_PAGE_ID
-
-    REM Upload (CI/CD recommended): inject secrets as runner environment variables
+    REM Upload: credentials via environment variables
     docker run --rm -it ^
       -e CONFLUENCE__BASEURL ^
       -e CONFLUENCE__AUTHMODE ^
@@ -172,7 +161,33 @@ The Dockerfile uses a **multi-stage build**:
       --conf-space YOUR_SPACE_KEY ^
       --conf-parent-id YOUR_PAGE_ID
 
-    REM Download (CI/CD recommended): writable output mount
+    REM Download: separate writable output mount
+    docker run --rm -it ^
+      -e CONFLUENCE__BASEURL ^
+      -e CONFLUENCE__AUTHMODE ^
+      -e CONFLUENCE__USEREMAIL ^
+      -e CONFLUENCE__APITOKEN ^
+      -v %cd%/output:/workspace/output ^
+      confluentsynkmd ^
+      --mode Download ^
+      --path /workspace/output ^
+      --conf-space YOUR_SPACE_KEY ^
+      --conf-parent-id YOUR_PAGE_ID
+
+    REM Upload (CI/CD): inject secrets as runner environment variables
+    docker run --rm -it ^
+      -e CONFLUENCE__BASEURL ^
+      -e CONFLUENCE__AUTHMODE ^
+      -e CONFLUENCE__USEREMAIL ^
+      -e CONFLUENCE__APITOKEN ^
+      -v %cd%/docs:/workspace/docs:ro ^
+      confluentsynkmd ^
+      --mode Upload ^
+      --path /workspace/docs ^
+      --conf-space YOUR_SPACE_KEY ^
+      --conf-parent-id YOUR_PAGE_ID
+
+    REM Download (CI/CD): writable output mount
     docker run --rm -it ^
       -e CONFLUENCE__BASEURL ^
       -e CONFLUENCE__AUTHMODE ^
@@ -206,7 +221,7 @@ The Dockerfile uses a **multi-stage build**:
   The PowerShell mount syntax with space-containing paths was validated against the Docker image. Validate Bash syntax in your target CI runner.
 
 !!! warning "Security"
-    For CI/CD, prefer platform secret stores (GitHub/GitLab protected variables) and inject them at runtime. Use `--env-file` mainly for local development.
+  For CI/CD, prefer platform secret stores (GitHub/GitLab protected variables) and inject them at runtime.
 
 ---
 

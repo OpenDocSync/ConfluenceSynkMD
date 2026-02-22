@@ -31,10 +31,12 @@ Das Docker-Image enthält .NET, Node.js und mermaid-cli — eine konsistente, po
 === "Bash"
 
     ```bash
-    # Upload (lokale Entwicklung, optional): mit --env-file
-    # Befehl im Verzeichnis mit .env ausführen
+    # Upload: Zugangsdaten per Umgebungsvariablen injizieren
     docker run --rm -it \
-      --env-file ./.env \
+      -e CONFLUENCE__BASEURL \
+      -e CONFLUENCE__AUTHMODE \
+      -e CONFLUENCE__USEREMAIL \
+      -e CONFLUENCE__APITOKEN \
       -v $(pwd)/docs:/workspace/docs:ro \
       confluentsynkmd \
       --mode Upload \
@@ -42,9 +44,12 @@ Das Docker-Image enthält .NET, Node.js und mermaid-cli — eine konsistente, po
       --conf-space IHR_SPACE_KEY \
       --conf-parent-id IHRE_PAGE_ID
 
-    # Download (lokale Entwicklung, optional): separater schreibbarer Output-Mount
+    # Download: separater schreibbarer Output-Mount
     docker run --rm -it \
-      --env-file ./.env \
+      -e CONFLUENCE__BASEURL \
+      -e CONFLUENCE__AUTHMODE \
+      -e CONFLUENCE__USEREMAIL \
+      -e CONFLUENCE__APITOKEN \
       -v $(pwd)/output:/workspace/output \
       confluentsynkmd \
       --mode Download \
@@ -82,10 +87,12 @@ Das Docker-Image enthält .NET, Node.js und mermaid-cli — eine konsistente, po
 === "PowerShell"
 
     ```powershell
-    # Upload (lokale Entwicklung, optional): mit --env-file
-    # Befehl im Verzeichnis mit .env ausführen
+    # Upload: Zugangsdaten per Umgebungsvariablen injizieren
     docker run --rm -it `
-      --env-file ./.env `
+      -e CONFLUENCE__BASEURL `
+      -e CONFLUENCE__AUTHMODE `
+      -e CONFLUENCE__USEREMAIL `
+      -e CONFLUENCE__APITOKEN `
       -v ${PWD}/docs:/workspace/docs:ro `
       confluentsynkmd `
       --mode Upload `
@@ -93,9 +100,12 @@ Das Docker-Image enthält .NET, Node.js und mermaid-cli — eine konsistente, po
       --conf-space IHR_SPACE_KEY `
       --conf-parent-id IHRE_PAGE_ID
 
-    # Download (lokale Entwicklung, optional): separater schreibbarer Output-Mount
+    # Download: separater schreibbarer Output-Mount
     docker run --rm -it `
-      --env-file ./.env `
+      -e CONFLUENCE__BASEURL `
+      -e CONFLUENCE__AUTHMODE `
+      -e CONFLUENCE__USEREMAIL `
+      -e CONFLUENCE__APITOKEN `
       -v ${PWD}/output:/workspace/output `
       confluentsynkmd `
       --mode Download `
@@ -133,10 +143,12 @@ Das Docker-Image enthält .NET, Node.js und mermaid-cli — eine konsistente, po
 === "CMD"
 
     ```cmd
-    REM Upload (lokale Entwicklung, optional): mit --env-file
-    REM Befehl im Verzeichnis mit .env ausführen
+    REM Upload: Zugangsdaten per Umgebungsvariablen
     docker run --rm -it ^
-      --env-file ./.env ^
+      -e CONFLUENCE__BASEURL ^
+      -e CONFLUENCE__AUTHMODE ^
+      -e CONFLUENCE__USEREMAIL ^
+      -e CONFLUENCE__APITOKEN ^
       -v %cd%/docs:/workspace/docs:ro ^
       confluentsynkmd ^
       --mode Upload ^
@@ -144,9 +156,12 @@ Das Docker-Image enthält .NET, Node.js und mermaid-cli — eine konsistente, po
       --conf-space IHR_SPACE_KEY ^
       --conf-parent-id IHRE_PAGE_ID
 
-    REM Download (lokale Entwicklung, optional): separater schreibbarer Output-Mount
+    REM Download: separater schreibbarer Output-Mount
     docker run --rm -it ^
-      --env-file ./.env ^
+      -e CONFLUENCE__BASEURL ^
+      -e CONFLUENCE__AUTHMODE ^
+      -e CONFLUENCE__USEREMAIL ^
+      -e CONFLUENCE__APITOKEN ^
       -v %cd%/output:/workspace/output ^
       confluentsynkmd ^
       --mode Download ^
@@ -201,7 +216,7 @@ Das Docker-Image enthält .NET, Node.js und mermaid-cli — eine konsistente, po
   Die PowerShell-Mount-Syntax mit Pfaden inklusive Leerzeichen wurde gegen das Docker-Image geprüft. Bash-Syntax im Ziel-CI-Runner separat validieren.
 
 !!! warning "Sicherheit"
-    Für CI/CD bevorzugt Secrets des CI-Systems (GitHub/GitLab geschützte Variablen) zur Laufzeit injizieren. `--env-file` primär für lokale Entwicklung nutzen.
+  Für CI/CD bevorzugt Secrets des CI-Systems (GitHub/GitLab geschützte Variablen) zur Laufzeit injizieren.
 
 ---
 
