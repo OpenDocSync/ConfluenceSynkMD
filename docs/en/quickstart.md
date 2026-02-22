@@ -196,6 +196,11 @@ Upload a folder of Markdown files to Confluence:
       --conf-parent-id YOUR_PAGE_ID
     ```
 
+        ???+ tip "Path Hint"
+                - Keep `-v ${PWD}:/workspace` unchanged.
+                - Only change the suffix in `--path` (for example `/workspace/docs`, `/workspace/my-docs`).
+                - `${PWD}` is your current local directory.
+
 === "PowerShell"
 
     ```powershell
@@ -212,6 +217,11 @@ Upload a folder of Markdown files to Confluence:
       --conf-parent-id YOUR_PAGE_ID
     ```
 
+        ???+ tip "Path Hint"
+                - Keep `-v ${PWD}:/workspace` unchanged.
+                - Only change the suffix in `--path` (for example `/workspace/docs`, `/workspace/my-docs`).
+                - `${PWD}` is your current local directory.
+
 === "CMD"
 
     ```cmd
@@ -227,6 +237,27 @@ Upload a folder of Markdown files to Confluence:
       --conf-space YOUR_SPACE_KEY ^
       --conf-parent-id YOUR_PAGE_ID
     ```
+
+        ???+ tip "Path Hint"
+                - Keep `-v %cd%:/workspace` unchanged.
+                - Only change the suffix in `--path` (for example `/workspace/docs`, `/workspace/my-docs`).
+                - `%cd%` is your current local directory.
+
+#### Set Docker Paths Correctly
+
+The most common issue is mixing up `-v` (volume mount) and `--path`.
+
+- **Keep unchanged:** The container base path `/workspace` stays the same as long as you use `-v ...:/workspace`.
+- **Change this:** Only adjust the part **after** `/workspace` in `--path` to match your local folder.
+- **Where values come from:** `${PWD}` (Bash/PowerShell) and `%cd%` (CMD) are your current local directory.
+
+| Local start directory | Mount | `--path` inside container |
+|---|---|---|
+| Project root with a `docs` subfolder | `-v ${PWD}:/workspace` | `--path /workspace/docs` |
+| You are already inside the `docs` folder | `-v ${PWD}:/workspace` | `--path /workspace` |
+| Mount only `docs` explicitly | `-v ${PWD}/docs:/workspace` | `--path /workspace` |
+
+If the right side of `-v` is not `/workspace`, `--path` must use that same container base path.
 
 ---
 
@@ -284,6 +315,11 @@ Download Confluence pages back to Markdown:
       --conf-parent-id YOUR_PAGE_ID
     ```
 
+        ???+ tip "Path Hint"
+                - Keep `-v ${PWD}:/workspace` unchanged.
+                - For download, `--path` points to the target folder inside the container, for example `/workspace/output`.
+                - `${PWD}` is your current local directory.
+
 === "PowerShell"
 
     ```powershell
@@ -300,6 +336,11 @@ Download Confluence pages back to Markdown:
       --conf-parent-id YOUR_PAGE_ID
     ```
 
+        ???+ tip "Path Hint"
+                - Keep `-v ${PWD}:/workspace` unchanged.
+                - For download, `--path` points to the target folder inside the container, for example `/workspace/output`.
+                - `${PWD}` is your current local directory.
+
 === "CMD"
 
     ```cmd
@@ -315,6 +356,11 @@ Download Confluence pages back to Markdown:
       --conf-space YOUR_SPACE_KEY ^
       --conf-parent-id YOUR_PAGE_ID
     ```
+
+        ???+ tip "Path Hint"
+                - Keep `-v %cd%:/workspace` unchanged.
+                - For download, `--path` points to the target folder inside the container, for example `/workspace/output`.
+                - `%cd%` is your current local directory.
 
 ---
 

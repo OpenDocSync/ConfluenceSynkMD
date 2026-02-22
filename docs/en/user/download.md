@@ -38,6 +38,71 @@ Download fetches Confluence pages and converts them back into Markdown files on 
 
 This downloads all child pages under page `12345` in space `DEV` and saves them as `.md` files in `./output`.
 
+### Docker Download
+
+=== "Bash"
+
+    ```bash
+    docker run --rm -it \
+      -e CONFLUENCE__BASEURL=https://yoursite.atlassian.net \
+      -e CONFLUENCE__AUTHMODE=Basic \
+      -e CONFLUENCE__USEREMAIL=user@example.com \
+      -e CONFLUENCE__APITOKEN=your-token \
+      -v ${PWD}:/workspace \
+      confluencesynkmd \
+      --mode Download \
+      --path /workspace/output \
+      --conf-space DEV \
+      --conf-parent-id 12345
+    ```
+
+    ???+ tip "Path Hint"
+        - Keep `-v ${PWD}:/workspace` unchanged.
+        - For download, `--path` points to the target folder inside the container (for example `/workspace/output`).
+        - `${PWD}` is your current local directory.
+
+=== "PowerShell"
+
+    ```powershell
+    docker run --rm -it `
+      -e CONFLUENCE__BASEURL=https://yoursite.atlassian.net `
+      -e CONFLUENCE__AUTHMODE=Basic `
+      -e CONFLUENCE__USEREMAIL=user@example.com `
+      -e CONFLUENCE__APITOKEN=your-token `
+      -v ${PWD}:/workspace `
+      confluencesynkmd `
+      --mode Download `
+      --path /workspace/output `
+      --conf-space DEV `
+      --conf-parent-id 12345
+    ```
+
+    ???+ tip "Path Hint"
+        - Keep `-v ${PWD}:/workspace` unchanged.
+        - For download, `--path` points to the target folder inside the container (for example `/workspace/output`).
+        - `${PWD}` is your current local directory.
+
+=== "CMD"
+
+    ```cmd
+    docker run --rm -it ^
+      -e CONFLUENCE__BASEURL=https://yoursite.atlassian.net ^
+      -e CONFLUENCE__AUTHMODE=Basic ^
+      -e CONFLUENCE__USEREMAIL=user@example.com ^
+      -e CONFLUENCE__APITOKEN=your-token ^
+      -v %cd%:/workspace ^
+      confluencesynkmd ^
+      --mode Download ^
+      --path /workspace/output ^
+      --conf-space DEV ^
+      --conf-parent-id 12345
+    ```
+
+    ???+ tip "Path Hint"
+        - Keep `-v %cd%:/workspace` unchanged.
+        - For download, `--path` points to the target folder inside the container (for example `/workspace/output`).
+        - `%cd%` is your current local directory.
+
 ---
 
 ## Download by Root Page Title

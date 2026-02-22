@@ -196,6 +196,11 @@ Laden Sie einen Ordner mit Markdown-Dateien nach Confluence hoch:
       --conf-parent-id IHRE_PAGE_ID
     ```
 
+        ???+ tip "Pfad-Hinweis"
+                - `-v ${PWD}:/workspace` bleibt unverändert.
+                - Passen Sie nur den `--path`-Suffix an (z. B. `/workspace/docs`, `/workspace/my-docs`).
+                - `${PWD}` ist Ihr aktueller lokaler Ordner.
+
 === "PowerShell"
 
     ```powershell
@@ -212,6 +217,11 @@ Laden Sie einen Ordner mit Markdown-Dateien nach Confluence hoch:
       --conf-parent-id IHRE_PAGE_ID
     ```
 
+        ???+ tip "Pfad-Hinweis"
+                - `-v ${PWD}:/workspace` bleibt unverändert.
+                - Passen Sie nur den `--path`-Suffix an (z. B. `/workspace/docs`, `/workspace/my-docs`).
+                - `${PWD}` ist Ihr aktueller lokaler Ordner.
+
 === "CMD"
 
     ```cmd
@@ -227,6 +237,27 @@ Laden Sie einen Ordner mit Markdown-Dateien nach Confluence hoch:
       --conf-space IHR_SPACE_KEY ^
       --conf-parent-id IHRE_PAGE_ID
     ```
+
+        ???+ tip "Pfad-Hinweis"
+                - `-v %cd%:/workspace` bleibt unverändert.
+                - Passen Sie nur den `--path`-Suffix an (z. B. `/workspace/docs`, `/workspace/my-docs`).
+                - `%cd%` ist Ihr aktueller lokaler Ordner.
+
+#### Docker-Pfade richtig setzen
+
+Die häufigste Fehlerquelle ist die Kombination aus `-v` (Volume-Mount) und `--path`.
+
+- **Unverändert lassen:** Der Container-Pfad `/workspace` bleibt gleich, solange Sie `-v ...:/workspace` verwenden.
+- **Anpassen:** Nur der Teil **hinter** `/workspace` in `--path` wird an Ihren lokalen Ordner angepasst.
+- **Wertquelle:** `${PWD}` (Bash/PowerShell) bzw. `%cd%` (CMD) ist Ihr aktueller lokaler Ordner.
+
+| Lokaler Startordner | Mount | `--path` im Container |
+|---|---|---|
+| Projektordner mit Unterordner `docs` | `-v ${PWD}:/workspace` | `--path /workspace/docs` |
+| Sie stehen bereits im Ordner `docs` | `-v ${PWD}:/workspace` | `--path /workspace` |
+| Explizit nur `docs` mounten | `-v ${PWD}/docs:/workspace` | `--path /workspace` |
+
+Wenn `-v` rechts nicht `/workspace` ist, muss `--path` auf denselben Container-Basispfad zeigen.
 
 ---
 
@@ -284,6 +315,11 @@ Laden Sie Confluence-Seiten als Markdown herunter:
       --conf-parent-id IHRE_PAGE_ID
     ```
 
+        ???+ tip "Pfad-Hinweis"
+                - `-v ${PWD}:/workspace` bleibt unverändert.
+                - Für Download zeigt `--path` auf den Zielordner im Container, z. B. `/workspace/output`.
+                - `${PWD}` ist Ihr aktueller lokaler Ordner.
+
 === "PowerShell"
 
     ```powershell
@@ -300,6 +336,11 @@ Laden Sie Confluence-Seiten als Markdown herunter:
       --conf-parent-id IHRE_PAGE_ID
     ```
 
+        ???+ tip "Pfad-Hinweis"
+                - `-v ${PWD}:/workspace` bleibt unverändert.
+                - Für Download zeigt `--path` auf den Zielordner im Container, z. B. `/workspace/output`.
+                - `${PWD}` ist Ihr aktueller lokaler Ordner.
+
 === "CMD"
 
     ```cmd
@@ -315,6 +356,11 @@ Laden Sie Confluence-Seiten als Markdown herunter:
       --conf-space IHR_SPACE_KEY ^
       --conf-parent-id IHRE_PAGE_ID
     ```
+
+        ???+ tip "Pfad-Hinweis"
+                - `-v %cd%:/workspace` bleibt unverändert.
+                - Für Download zeigt `--path` auf den Zielordner im Container, z. B. `/workspace/output`.
+                - `%cd%` ist Ihr aktueller lokaler Ordner.
 
 ---
 

@@ -373,7 +373,7 @@ public sealed class ConfluenceApiClient : IConfluenceApiClient
     private async Task<T> GetAsync<T>(string path, CancellationToken ct)
     {
         var response = await _http.GetAsync(path, ct);
-        response.EnsureSuccessStatusCode();
+        await EnsureSuccessStatusCodeWithDetailsAsync(response, path, ct);
         return await response.Content.ReadFromJsonAsync<T>(JsonOptions, ct)
                ?? throw new InvalidOperationException($"Failed to deserialize response from {path}.");
     }
@@ -382,7 +382,7 @@ public sealed class ConfluenceApiClient : IConfluenceApiClient
         string path, TRequest body, CancellationToken ct)
     {
         var response = await _http.PostAsJsonAsync(path, body, JsonOptions, ct);
-        response.EnsureSuccessStatusCode();
+        await EnsureSuccessStatusCodeWithDetailsAsync(response, path, ct);
         return await response.Content.ReadFromJsonAsync<TResponse>(JsonOptions, ct)
                ?? throw new InvalidOperationException($"Failed to deserialize response from {path}.");
     }
@@ -391,9 +391,43 @@ public sealed class ConfluenceApiClient : IConfluenceApiClient
         string path, TRequest body, CancellationToken ct)
     {
         var response = await _http.PutAsJsonAsync(path, body, JsonOptions, ct);
-        response.EnsureSuccessStatusCode();
+        await EnsureSuccessStatusCodeWithDetailsAsync(response, path, ct);
         return await response.Content.ReadFromJsonAsync<TResponse>(JsonOptions, ct)
                ?? throw new InvalidOperationException($"Failed to deserialize response from {path}.");
+    }
+
+    private async Task EnsureSuccessStatusCodeWithDetailsAsync(
+        HttpResponseMessage response,
+        string path,
+        CancellationToken ct)
+    {
+        if (response.IsSuccessStatusCode)
+        {
+            return;
+        }
+
+        string responseBody;
+        try
+        {
+            responseBody = await response.Content.ReadAsStringAsync(ct);
+        }
+        catch
+        {
+            responseBody = "<response-body-unavailable>";
+        }
+
+        var truncatedBody = responseBody.Length > 2000
+            ? responseBody[..2000] + "…"
+            : responseBody;
+
+        _logger.Error(
+            "Confluence API request failed: {Method} {Path} -> {StatusCode}. Response: {ResponseBody}",
+            response.RequestMessage?.Method.Method ?? "UNKNOWN",
+            path,
+            (int)response.StatusCode,
+            string.IsNullOrWhiteSpace(truncatedBody) ? "<empty>" : truncatedBody);
+
+        response.EnsureSuccessStatusCode();
     }
 
     private async IAsyncEnumerable<T> FetchPaginatedAsync<T>(

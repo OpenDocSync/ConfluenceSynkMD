@@ -78,6 +78,23 @@ public sealed class ConfluenceLoadStep : IPipelineStep
                 ?? throw new InvalidOperationException(
                     $"Space '{context.Options.ConfluenceSpaceKey}' has no homepage and no --conf-parent-id / --root-page was specified.");
 
+            // Pre-flight: ensure the chosen root parent exists and belongs to the resolved target space.
+            var rootParent = await _api.GetPageByIdAsync(rootParentId, ct);
+            if (rootParent is null)
+            {
+                throw new InvalidOperationException(
+                    $"Configured root parent page '{rootParentId}' was not found. " +
+                    "Please verify --conf-parent-id or use --root-page.");
+            }
+
+            if (!string.Equals(rootParent.SpaceId, space.Id, StringComparison.Ordinal))
+            {
+                throw new InvalidOperationException(
+                    $"Configured root parent page '{rootParentId}' belongs to space '{rootParent.SpaceId}', " +
+                    $"but target space is '{space.Id}' (key '{space.Key}'). " +
+                    "Use a parent page ID from the same space, omit --conf-parent-id, or use --root-page.");
+            }
+
             // Pre-flight: verify title uniqueness across batch (Python parity — _process_items)
             var titleToPath = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             foreach (var doc in context.TransformedDocuments)

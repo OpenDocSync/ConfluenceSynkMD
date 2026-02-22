@@ -36,6 +36,71 @@ Download ruft Confluence-Seiten ab und konvertiert sie zurück in Markdown-Datei
       --conf-parent-id 12345
     ```
 
+### Docker-Download
+
+=== "Bash"
+
+    ```bash
+    docker run --rm -it \
+      -e CONFLUENCE__BASEURL=https://yoursite.atlassian.net \
+      -e CONFLUENCE__AUTHMODE=Basic \
+      -e CONFLUENCE__USEREMAIL=user@example.com \
+      -e CONFLUENCE__APITOKEN=ihr-token \
+      -v ${PWD}:/workspace \
+      confluencesynkmd \
+      --mode Download \
+      --path /workspace/output \
+      --conf-space DEV \
+      --conf-parent-id 12345
+    ```
+
+    ???+ tip "Pfad-Hinweis"
+        - `-v ${PWD}:/workspace` bleibt unverändert.
+        - Für Download zeigt `--path` auf den Zielordner im Container (z. B. `/workspace/output`).
+        - `${PWD}` ist Ihr aktueller lokaler Ordner.
+
+=== "PowerShell"
+
+    ```powershell
+    docker run --rm -it `
+      -e CONFLUENCE__BASEURL=https://yoursite.atlassian.net `
+      -e CONFLUENCE__AUTHMODE=Basic `
+      -e CONFLUENCE__USEREMAIL=user@example.com `
+      -e CONFLUENCE__APITOKEN=ihr-token `
+      -v ${PWD}:/workspace `
+      confluencesynkmd `
+      --mode Download `
+      --path /workspace/output `
+      --conf-space DEV `
+      --conf-parent-id 12345
+    ```
+
+    ???+ tip "Pfad-Hinweis"
+        - `-v ${PWD}:/workspace` bleibt unverändert.
+        - Für Download zeigt `--path` auf den Zielordner im Container (z. B. `/workspace/output`).
+        - `${PWD}` ist Ihr aktueller lokaler Ordner.
+
+=== "CMD"
+
+    ```cmd
+    docker run --rm -it ^
+      -e CONFLUENCE__BASEURL=https://yoursite.atlassian.net ^
+      -e CONFLUENCE__AUTHMODE=Basic ^
+      -e CONFLUENCE__USEREMAIL=user@example.com ^
+      -e CONFLUENCE__APITOKEN=ihr-token ^
+      -v %cd%:/workspace ^
+      confluencesynkmd ^
+      --mode Download ^
+      --path /workspace/output ^
+      --conf-space DEV ^
+      --conf-parent-id 12345
+    ```
+
+    ???+ tip "Pfad-Hinweis"
+        - `-v %cd%:/workspace` bleibt unverändert.
+        - Für Download zeigt `--path` auf den Zielordner im Container (z. B. `/workspace/output`).
+        - `%cd%` ist Ihr aktueller lokaler Ordner.
+
 ---
 
 ## Download per Root-Page-Titel

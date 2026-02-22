@@ -21,6 +21,19 @@ public class ConfluenceLoadStepTests
         _api = Substitute.For<IConfluenceApiClient>();
         var logger = Substitute.For<ILogger>();
         _sut = new ConfluenceLoadStep(_api, logger);
+
+        // Default parent-page resolution for root-parent preflight checks.
+        _api.GetPageByIdAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .Returns(callInfo =>
+            {
+                var pageId = callInfo.ArgAt<string>(0);
+                return pageId switch
+                {
+                    "hp-1" => new ConfluencePage("hp-1", "Home", "space-1", null, null, new ConfluenceVersion(1)),
+                    "hp-other" => new ConfluencePage("hp-other", "Home", "space-other", null, null, new ConfluenceVersion(1)),
+                    _ => null
+                };
+            });
     }
 
     private static TranslationBatchContext CreateContext()
@@ -310,6 +323,66 @@ public class ConfluenceLoadStepTests
         // Assert — dedup throws inside the outer try, caught as CriticalError
         result.Status.Should().Be(PipelineResultStatus.CriticalError);
         result.Message.Should().Contain("Duplicate page title");
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_Should_ReturnCriticalError_When_ConfiguredParentPageNotFound()
+    {
+        // Arrange
+        var context = new TranslationBatchContext
+        {
+            Options = new SyncOptions(
+                SyncMode.Upload,
+                "/tmp",
+                "TEST",
+                ConfluenceParentId: "missing-parent")
+        };
+        context.ResolvedSpace = TestSpace;
+        context.TransformedDocuments.Add(CreateDoc("Any Page"));
+
+        _api.GetPageByIdAsync("missing-parent", Arg.Any<CancellationToken>())
+            .Returns((ConfluencePage?)null);
+
+        // Act
+        var result = await _sut.ExecuteAsync(context);
+
+        // Assert
+        result.Status.Should().Be(PipelineResultStatus.CriticalError);
+        result.Message.Should().Contain("was not found");
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_Should_ReturnCriticalError_When_ConfiguredParentInDifferentSpace()
+    {
+        // Arrange
+        var context = new TranslationBatchContext
+        {
+            Options = new SyncOptions(
+                SyncMode.Upload,
+                "/tmp",
+                "TEST",
+                ConfluenceParentId: "foreign-parent")
+        };
+        context.ResolvedSpace = TestSpace;
+        context.TransformedDocuments.Add(CreateDoc("Any Page"));
+
+        var foreignParent = new ConfluencePage(
+            "foreign-parent",
+            "Foreign Parent",
+            "space-foreign",
+            null,
+            null,
+            new ConfluenceVersion(1));
+
+        _api.GetPageByIdAsync("foreign-parent", Arg.Any<CancellationToken>())
+            .Returns(foreignParent);
+
+        // Act
+        var result = await _sut.ExecuteAsync(context);
+
+        // Assert
+        result.Status.Should().Be(PipelineResultStatus.CriticalError);
+        result.Message.Should().Contain("belongs to space");
     }
 
     [Fact]
