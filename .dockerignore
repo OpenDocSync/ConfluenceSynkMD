@@ -9,8 +9,12 @@
 **/__pycache__
 **/output-download
 **/logs
+*.md
+docs/
+tests/
 *.user
 *.env
+.env*
 .dockerignore
 Dockerfile
 README.md

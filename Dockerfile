@@ -54,11 +54,14 @@ RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
 RUN npm install -g @mermaid-js/mermaid-cli \
     && npx puppeteer browsers install chrome
 
-# Create puppeteer config for container (no-sandbox required when running as root)
+# Create puppeteer config for container
 WORKDIR /app
 RUN echo '{"args": ["--no-sandbox", "--disable-setuid-sandbox"]}' > /app/puppeteer-config.json
 
 COPY --from=build /app/publish .
+
+RUN useradd -m -u 1001 appuser && chown -R appuser:appuser /app
+USER appuser
 
 # Default entrypoint
 ENTRYPOINT ["dotnet", "ConfluentSynkMD.dll"]
