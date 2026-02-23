@@ -58,3 +58,7 @@ site/
 
 # Environment secrets
 .env
+
+# Local Test Data
+TestData/
+download-test-docker/

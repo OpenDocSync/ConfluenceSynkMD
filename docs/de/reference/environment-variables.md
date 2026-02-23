@@ -51,6 +51,21 @@ Vollständige Referenz aller von ConfluenceSynkMD verwendeten Umgebungsvariablen
 
 ---
 
+## Mermaid-Rendering
+
+| Variable | Erforderlich | Standard | Beschreibung |
+|---|---|---|---|
+| `MERMAID_MMDC_COMMAND` | | auto (`mmdc` / `mmdc.cmd`) | Optionaler Pfad/Name für lokale Mermaid CLI. Wenn verfügbar, wird lokales Rendering gegenüber Docker bevorzugt. |
+| `MERMAID_DOCKER_IMAGE` | Nur Docker-Fallback | `ghcr.io/mermaid-js/mermaid-cli/mermaid-cli` | Docker-Image für den Fallback, wenn lokales `mmdc` nicht verfügbar ist. |
+| `MERMAID_DOCKER_VOLUME` | Bei Docker-Fallback im Container | — | Host-sichtbarer Shared-Temp-Pfad/Volume für Sibling-Container-Rendering. |
+| `MERMAID_USE_PUPPETEER_CONFIG` | | `false` | Wenn `true`, wird im Docker-Fallback eine erzeugte Puppeteer-Konfiguration übergeben. |
+
+!!! note "Sicherheitsempfehlung"
+    Bevorzuge lokales `mmdc`-Rendering, um das Mounten von `/var/run/docker.sock` zu vermeiden.
+    Falls lokales `mmdc` nicht verfügbar ist, kann Mermaid-Rendering mit `--no-render-mermaid` deaktiviert werden.
+
+---
+
 ## Namenskonvention
 
 Umgebungsvariablen verwenden `__` (doppelter Unterstrich) als Trennzeichen:

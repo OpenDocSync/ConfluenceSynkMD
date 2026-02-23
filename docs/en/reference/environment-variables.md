@@ -51,6 +51,21 @@ Complete reference of all environment variables used by ConfluenceSynkMD.
 
 ---
 
+## Mermaid Rendering
+
+| Variable | Required | Default | Description |
+|---|---|---|---|
+| `MERMAID_MMDC_COMMAND` | | auto (`mmdc` / `mmdc.cmd`) | Optional executable path/name for local Mermaid CLI. If available, local rendering is preferred over Docker. |
+| `MERMAID_DOCKER_IMAGE` | Docker fallback only | `ghcr.io/mermaid-js/mermaid-cli/mermaid-cli` | Docker image used when local `mmdc` is unavailable. |
+| `MERMAID_DOCKER_VOLUME` | In-container Docker fallback | — | Host-visible shared temp path/volume for sibling container rendering. |
+| `MERMAID_USE_PUPPETEER_CONFIG` | | `false` | When `true`, passes a generated Puppeteer config in Docker fallback mode. |
+
+!!! note "Security recommendation"
+    Prefer local `mmdc` rendering to avoid mounting `/var/run/docker.sock`.
+    If local `mmdc` is not available, you can disable Mermaid rendering with `--no-render-mermaid`.
+
+---
+
 ## Naming Convention
 
 Environment variables use `__` (double underscore) as a section separator, following the .NET configuration pattern:
