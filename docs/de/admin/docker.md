@@ -7,6 +7,11 @@ Für den vollen Funktionsumfang (inklusive Diagramm-Rendering) wird **Docker Com
 !!! danger "Sicherheit: Docker Socket ist host-privilegiert"
     Das Mounten von `/var/run/docker.sock` gibt diesem Container Zugriff auf den Docker-Daemon des Hosts und ist damit effektiv root-äquivalent auf dem Host.
     Diese Betriebsart ist als privilegiert zu behandeln und nur in vertrauenswürdigen Umgebungen zu verwenden.
+  Wenn das in Ihrer Umgebung nicht akzeptabel ist, bevorzugen Sie eine dieser Optionen:
+
+  - ConfluenceSynkMD direkt auf dem Host ausführen (ohne Mount von host-seitigem docker.sock in einen Container).
+  - Einen isolierten Docker-Daemon verwenden statt den Host-Daemon-Socket zu binden.
+  - Mermaid-Rendering deaktivieren (`--no-render-mermaid`) und keinen docker.sock mounten.
 
 !!! tip "Non-Root bevorzugen und Socket-Zugriff per Gruppe freigeben"
     Statt den App-Prozess als root zu starten, den Container als festen Benutzer ausführen und die Host-GID des Docker-Sockets via `--group-add` ergänzen.
@@ -75,6 +80,11 @@ Für den vollen Funktionsumfang (inklusive Diagramm-Rendering) wird **Docker Com
 
 Wenn Ihre Umgebung Docker-Socket-Mounts verbietet, Mermaid-Rendering deaktivieren (`--no-render-mermaid`) und `/var/run/docker.sock` nicht mounten.
 
+!!! note "Warum sowohl `TMPDIR` als auch `MERMAID_DOCKER_VOLUME` erforderlich sind"
+  `TMPDIR` ist der In-Container-Pfad, den ConfluenceSynkMD verwendet (z. B. `/app/mermaid_temp`).
+  `MERMAID_DOCKER_VOLUME` ist das Volume/der Pfad, den der sibling `docker run` in den Mermaid-Container mountet.
+  Beide müssen auf dieselbe physische Datenablage zeigen.
+
 ---
 
 ## Ausführen mit Docker Compose (Empfohlen)
@@ -85,7 +95,7 @@ version: '3.8'
 
 services:
   confluencesynk:
-    image: confluentsynkmd
+    image: confluencesynkmd
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ${PWD}/docs:/workspace/docs:ro

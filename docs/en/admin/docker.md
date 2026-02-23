@@ -7,6 +7,11 @@ For full features including diagram rendering, using **Docker Compose** is recom
 !!! danger "Security: Docker socket is host-level privileged"
     Mounting `/var/run/docker.sock` gives this container access to the host Docker daemon, which is effectively root-equivalent on the host.
     Treat this deployment as privileged and only use it in trusted environments.
+  If this is not acceptable in your environment, prefer one of these options:
+
+  - Run ConfluenceSynkMD directly on the host (without mounting host docker.sock into a container).
+  - Use an isolated Docker daemon setup instead of binding the host daemon socket.
+  - Disable Mermaid rendering (`--no-render-mermaid`) and avoid docker.sock mounts.
 
 !!! tip "Prefer non-root runtime with group-based socket access"
     Instead of running the app process as root, run as a fixed user and add the host docker-socket GID with `--group-add`.
@@ -74,6 +79,11 @@ For full features including diagram rendering, using **Docker Compose** is recom
     ```
 
 If your environment disallows docker socket mounts, disable Mermaid rendering (`--no-render-mermaid`) and do not mount `/var/run/docker.sock`.
+
+!!! note "Why both `TMPDIR` and `MERMAID_DOCKER_VOLUME` are needed"
+  `TMPDIR` is the in-container path used by ConfluenceSynkMD (for example `/app/mermaid_temp`).
+  `MERMAID_DOCKER_VOLUME` is what the sibling `docker run` command mounts into the Mermaid container.
+  Both must reference the same physical data location.
 
 ---
 
