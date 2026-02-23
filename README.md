@@ -217,6 +217,43 @@ ConfluenceSynkMD uses a **sibling-container architecture** for diagram rendering
 
 For full features including diagram rendering, using **Docker Compose** is recommended as it automatically mounts the Docker socket and shares volumes.
 
+> [!WARNING]
+> Mounting `/var/run/docker.sock` gives the container Docker daemon access, which is effectively root-equivalent on the host. Treat this setup as privileged.
+>
+> Prefer running the app process as non-root and grant socket access via `--group-add` instead of defaulting to root.
+
+### Non-Root Runtime with Docker Socket Access
+
+```bash
+# Linux/macOS: resolve docker socket group id from host
+DOCKER_GID=$(stat -c '%g' /var/run/docker.sock)
+
+docker run --rm -it \
+  --user 1001:1001 \
+  --group-add ${DOCKER_GID} \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  -v $(pwd)/mermaid_tmp:/app/mermaid_temp \
+  -e TMPDIR=/app/mermaid_temp \
+  -e MERMAID_DOCKER_VOLUME=$(pwd)/mermaid_tmp \
+  confluencesynkmd --mode Upload --path /workspace/docs
+```
+
+```powershell
+# PowerShell (Linux host):
+$DOCKER_GID = (stat -c '%g' /var/run/docker.sock)
+
+docker run --rm -it `
+  --user 1001:1001 `
+  --group-add $DOCKER_GID `
+  -v /var/run/docker.sock:/var/run/docker.sock `
+  -v ${PWD}/mermaid_tmp:/app/mermaid_temp `
+  -e TMPDIR=/app/mermaid_temp `
+  -e MERMAID_DOCKER_VOLUME=${PWD}/mermaid_tmp `
+  confluencesynkmd --mode Upload --path /workspace/docs
+```
+
+If your security baseline forbids Docker socket mounts, disable Mermaid rendering with `--no-render-mermaid` and do not mount `/var/run/docker.sock`.
+
 ### Using Docker Compose (Recommended)
 
 ```bash

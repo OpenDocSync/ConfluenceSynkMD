@@ -4,6 +4,77 @@ The Docker image comes pre-packaged with .NET and the Docker CLI. It uses a **si
 
 For full features including diagram rendering, using **Docker Compose** is recommended as it automatically mounts the Docker socket and shares volumes.
 
+!!! danger "Security: Docker socket is host-level privileged"
+    Mounting `/var/run/docker.sock` gives this container access to the host Docker daemon, which is effectively root-equivalent on the host.
+    Treat this deployment as privileged and only use it in trusted environments.
+
+!!! tip "Prefer non-root runtime with group-based socket access"
+    Instead of running the app process as root, run as a fixed user and add the host docker-socket GID with `--group-add`.
+    This is the recommended default when docker socket access is required.
+
+## Non-Root Container with Docker Socket Access
+
+=== "Bash"
+
+    ```bash
+    # Resolve host docker socket group id
+    DOCKER_GID=$(stat -c '%g' /var/run/docker.sock)
+
+    docker run --rm -it \
+      --user 1001:1001 \
+      --group-add ${DOCKER_GID} \
+      -v /var/run/docker.sock:/var/run/docker.sock \
+      -v $(pwd)/docs:/workspace/docs:ro \
+      -v $(pwd)/mermaid_tmp:/app/mermaid_temp \
+      -e TMPDIR=/app/mermaid_temp \
+      -e MERMAID_DOCKER_VOLUME=$(pwd)/mermaid_tmp \
+      confluencesynkmd \
+      --mode Upload \
+      --path /workspace/docs \
+      --conf-space YOUR_SPACE_KEY \
+      --conf-parent-id YOUR_PAGE_ID
+    ```
+
+=== "PowerShell"
+
+    ```powershell
+    # Linux host with PowerShell shell
+    $DOCKER_GID = (stat -c '%g' /var/run/docker.sock)
+
+    docker run --rm -it `
+      --user 1001:1001 `
+      --group-add $DOCKER_GID `
+      -v /var/run/docker.sock:/var/run/docker.sock `
+      -v ${PWD}/docs:/workspace/docs:ro `
+      -v ${PWD}/mermaid_tmp:/app/mermaid_temp `
+      -e TMPDIR=/app/mermaid_temp `
+      -e MERMAID_DOCKER_VOLUME=${PWD}/mermaid_tmp `
+      confluencesynkmd `
+      --mode Upload `
+      --path /workspace/docs `
+      --conf-space YOUR_SPACE_KEY `
+      --conf-parent-id YOUR_PAGE_ID
+    ```
+
+=== "Docker Compose"
+
+    ```bash
+    export DOCKER_GID=$(stat -c '%g' /var/run/docker.sock)
+    docker compose up
+    ```
+
+    ```yaml
+    services:
+      confluencesynk:
+        user: "1001:1001"
+        group_add:
+          - "${DOCKER_GID}"
+        volumes:
+          - /var/run/docker.sock:/var/run/docker.sock
+    ```
+
+If your environment disallows docker socket mounts, disable Mermaid rendering (`--no-render-mermaid`) and do not mount `/var/run/docker.sock`.
+
 ---
 
 ## Run with Docker Compose (Recommended)

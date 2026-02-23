@@ -43,8 +43,9 @@ public sealed class MermaidRenderer : IMermaidRenderer
             await File.WriteAllTextAsync(inputFile, mermaidSource, ct);
 
             // Determine how to invoke Mermaid CLI via Docker.
-            var (command, args) = await ResolveDockerMermaidCliAsync(tempDir, hash, ct);
+            var (command, args, dockerImage) = await ResolveDockerMermaidCliAsync(tempDir, hash, ct);
             var argsForLog = string.Join(" ", args.Select(EscapeArgForLog));
+            _logger.Debug("Using Mermaid Docker image: {DockerImage}", dockerImage);
 
             var psi = new ProcessStartInfo
             {
@@ -77,8 +78,10 @@ public sealed class MermaidRenderer : IMermaidRenderer
                 _logger.Error(
                     "Mermaid CLI docker run failed (exit {Code}):\ncommand: {Cmd} {Args}\nstdout: {Out}\nstderr: {Err}",
                     process.ExitCode, command, argsForLog, stdout.Trim(), stderr.Trim());
+
+                var dockerHint = BuildDockerFailureHint(stderr);
                 throw new InvalidOperationException(
-                    $"Mermaid CLI rendering failed (exit {process.ExitCode}): {stderr.Trim()}");
+                    $"Mermaid CLI rendering failed (exit {process.ExitCode}): {stderr.Trim()}{dockerHint}");
             }
 
             if (!File.Exists(outputFile))
@@ -113,7 +116,7 @@ public sealed class MermaidRenderer : IMermaidRenderer
     /// Resolves the correct way to invoke Mermaid CLI via Docker depending on the environment.
     /// Uses Docker to run the official Mermaid CLI image.
     /// </summary>
-    private static async Task<(string Command, string[] Args)> ResolveDockerMermaidCliAsync(
+    private static async Task<(string Command, string[] Args, string DockerImage)> ResolveDockerMermaidCliAsync(
         string tempDir, string hash, CancellationToken ct)
     {
         var runningInContainer = IsRunningInContainer();
@@ -129,7 +132,8 @@ public sealed class MermaidRenderer : IMermaidRenderer
                 throw new InvalidOperationException(
                     "MERMAID_DOCKER_VOLUME must be set when running inside a container. " +
                     "Set MERMAID_DOCKER_VOLUME to the host-visible shared temp directory that is mounted into this container, and set TMPDIR to the corresponding in-container mount path so both refer to the same physical directory. " +
-                    "For example: MERMAID_DOCKER_VOLUME=/host/path/temp and TMPDIR=/app/mermaid_temp (where /host/path/temp is mounted into the container at /app/mermaid_temp).",
+                    "For example: MERMAID_DOCKER_VOLUME=/host/path/temp and TMPDIR=/app/mermaid_temp (where /host/path/temp is mounted into the container at /app/mermaid_temp). " +
+                    "See the Docker section in README.md or docs/en/admin/docker.md for a working setup.",
                     innerException: null);
             }
 
@@ -137,6 +141,12 @@ public sealed class MermaidRenderer : IMermaidRenderer
         }
 
         var dockerImage = Environment.GetEnvironmentVariable("MERMAID_DOCKER_IMAGE") ?? "ghcr.io/mermaid-js/mermaid-cli/mermaid-cli";
+        if (string.IsNullOrWhiteSpace(dockerImage) || dockerImage.Any(char.IsWhiteSpace))
+        {
+            throw new InvalidOperationException(
+                "MERMAID_DOCKER_IMAGE is invalid. Provide a Docker image reference without whitespace.",
+                innerException: null);
+        }
 
         // Map the volume to /data in the mermaid container
         // -i /data/{hash}.mmd -o /data/{hash}.png
@@ -171,7 +181,7 @@ public sealed class MermaidRenderer : IMermaidRenderer
 
         if (IsCommandAvailable("docker"))
         {
-            return ("docker", dockerArgs.ToArray());
+            return ("docker", dockerArgs.ToArray(), dockerImage);
         }
 
         throw new InvalidOperationException(
@@ -222,12 +232,36 @@ public sealed class MermaidRenderer : IMermaidRenderer
 
     private static string EscapeArgForLog(string arg)
     {
-        if (string.IsNullOrWhiteSpace(arg) || arg.Contains('"') || arg.Contains(' '))
+        if (arg is null)
+        {
+            return "\"\"";
+        }
+
+        if (arg.Length == 0 || arg.Contains('"') || arg.Contains(' '))
         {
             var escaped = arg.Replace("\"", "\\\"");
             return $"\"{escaped}\"";
         }
 
         return arg;
+    }
+
+    private static string BuildDockerFailureHint(string stderr)
+    {
+        if (string.IsNullOrWhiteSpace(stderr))
+        {
+            return string.Empty;
+        }
+
+        var normalized = stderr.ToLowerInvariant();
+        if (normalized.Contains("cannot connect to the docker daemon") ||
+            normalized.Contains("is the docker daemon running") ||
+            normalized.Contains("permission denied while trying to connect") ||
+            normalized.Contains("got permission denied"))
+        {
+            return " Ensure the Docker daemon is running and this process can access /var/run/docker.sock. For non-root containers, pass --group-add <docker-gid> (see docs/en/admin/docker.md).";
+        }
+
+        return string.Empty;
     }
 }

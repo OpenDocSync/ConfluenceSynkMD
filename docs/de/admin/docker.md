@@ -4,6 +4,77 @@ Das Docker-Image enthält .NET und das Docker CLI. Es nutzt eine **Sibling-Conta
 
 Für den vollen Funktionsumfang (inklusive Diagramm-Rendering) wird **Docker Compose** empfohlen, da es den Docker Socket und die Volumes automatisch richtig einbindet.
 
+!!! danger "Sicherheit: Docker Socket ist host-privilegiert"
+    Das Mounten von `/var/run/docker.sock` gibt diesem Container Zugriff auf den Docker-Daemon des Hosts und ist damit effektiv root-äquivalent auf dem Host.
+    Diese Betriebsart ist als privilegiert zu behandeln und nur in vertrauenswürdigen Umgebungen zu verwenden.
+
+!!! tip "Non-Root bevorzugen und Socket-Zugriff per Gruppe freigeben"
+    Statt den App-Prozess als root zu starten, den Container als festen Benutzer ausführen und die Host-GID des Docker-Sockets via `--group-add` ergänzen.
+    Das ist die empfohlene Standardeinstellung, wenn Docker-Socket-Zugriff erforderlich ist.
+
+## Non-Root Container mit Docker-Socket-Zugriff
+
+=== "Bash"
+
+    ```bash
+    # Host-GID des Docker-Sockets ermitteln
+    DOCKER_GID=$(stat -c '%g' /var/run/docker.sock)
+
+    docker run --rm -it \
+      --user 1001:1001 \
+      --group-add ${DOCKER_GID} \
+      -v /var/run/docker.sock:/var/run/docker.sock \
+      -v $(pwd)/docs:/workspace/docs:ro \
+      -v $(pwd)/mermaid_tmp:/app/mermaid_temp \
+      -e TMPDIR=/app/mermaid_temp \
+      -e MERMAID_DOCKER_VOLUME=$(pwd)/mermaid_tmp \
+      confluencesynkmd \
+      --mode Upload \
+      --path /workspace/docs \
+      --conf-space IHR_SPACE_KEY \
+      --conf-parent-id IHRE_PAGE_ID
+    ```
+
+=== "PowerShell"
+
+    ```powershell
+    # Linux-Host mit PowerShell
+    $DOCKER_GID = (stat -c '%g' /var/run/docker.sock)
+
+    docker run --rm -it `
+      --user 1001:1001 `
+      --group-add $DOCKER_GID `
+      -v /var/run/docker.sock:/var/run/docker.sock `
+      -v ${PWD}/docs:/workspace/docs:ro `
+      -v ${PWD}/mermaid_tmp:/app/mermaid_temp `
+      -e TMPDIR=/app/mermaid_temp `
+      -e MERMAID_DOCKER_VOLUME=${PWD}/mermaid_tmp `
+      confluencesynkmd `
+      --mode Upload `
+      --path /workspace/docs `
+      --conf-space IHR_SPACE_KEY `
+      --conf-parent-id IHRE_PAGE_ID
+    ```
+
+=== "Docker Compose"
+
+    ```bash
+    export DOCKER_GID=$(stat -c '%g' /var/run/docker.sock)
+    docker compose up
+    ```
+
+    ```yaml
+    services:
+      confluencesynk:
+        user: "1001:1001"
+        group_add:
+          - "${DOCKER_GID}"
+        volumes:
+          - /var/run/docker.sock:/var/run/docker.sock
+    ```
+
+Wenn Ihre Umgebung Docker-Socket-Mounts verbietet, Mermaid-Rendering deaktivieren (`--no-render-mermaid`) und `/var/run/docker.sock` nicht mounten.
+
 ---
 
 ## Ausführen mit Docker Compose (Empfohlen)

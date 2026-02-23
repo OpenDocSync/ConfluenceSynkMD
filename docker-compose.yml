@@ -7,6 +7,9 @@ services:
       dockerfile: Dockerfile
     # To allow ConfluenceSynkMD to spawn sibling containers (like mermaid-cli)
     # we mount the docker socket from the host system.
+    # SECURITY WARNING:
+    # Mounting /var/run/docker.sock grants this container host-level Docker daemon control
+    # (effectively root-equivalent access on the host). Use only in trusted environments.
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       # We map a named volume or a host path here for shared temp data.
