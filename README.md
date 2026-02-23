@@ -213,46 +213,14 @@ ConfluenceSynkMD – Markdown ↔ Confluence Synchronization Tool
 
 ## Docker Usage
 
-ConfluenceSynkMD uses a **sibling-container architecture** for diagram rendering. The main `.NET` container spawns an official `mermaid-cli` Docker container on demand to render Mermaid diagrams.
+ConfluenceSynkMD now uses a **local Mermaid CLI (`mmdc`) approach inside the same container** (md2conf-like).
 
-For full features including diagram rendering, using **Docker Compose** is recommended as it automatically mounts the Docker socket and shares volumes.
+- Mermaid rendering works without mounting `/var/run/docker.sock`.
+- The image ships Chromium + fonts + `mmdc` for local rendering.
+- Docker socket mounting is optional legacy fallback only.
 
-> [!WARNING]
-> Mounting `/var/run/docker.sock` gives the container Docker daemon access, which is effectively root-equivalent on the host. Treat this setup as privileged.
->
-> Prefer running the app process as non-root and grant socket access via `--group-add` instead of defaulting to root.
-
-### Non-Root Runtime with Docker Socket Access
-
-```bash
-# Linux/macOS: resolve docker socket group id from host
-DOCKER_GID=$(stat -c '%g' /var/run/docker.sock)
-
-docker run --rm -it \
-  --user 1001:1001 \
-  --group-add ${DOCKER_GID} \
-  -v /var/run/docker.sock:/var/run/docker.sock \
-  -v $(pwd)/mermaid_tmp:/app/mermaid_temp \
-  -e TMPDIR=/app/mermaid_temp \
-  -e MERMAID_DOCKER_VOLUME=$(pwd)/mermaid_tmp \
-  confluencesynkmd --mode Upload --path /workspace/docs
-```
-
-```powershell
-# PowerShell (Linux host):
-$DOCKER_GID = (stat -c '%g' /var/run/docker.sock)
-
-docker run --rm -it `
-  --user 1001:1001 `
-  --group-add $DOCKER_GID `
-  -v /var/run/docker.sock:/var/run/docker.sock `
-  -v ${PWD}/mermaid_tmp:/app/mermaid_temp `
-  -e TMPDIR=/app/mermaid_temp `
-  -e MERMAID_DOCKER_VOLUME=${PWD}/mermaid_tmp `
-  confluencesynkmd --mode Upload --path /workspace/docs
-```
-
-If your security baseline forbids Docker socket mounts, disable Mermaid rendering with `--no-render-mermaid` and do not mount `/var/run/docker.sock`.
+> [!TIP]
+> If your environment does not need Mermaid rendering, disable it via `--no-render-mermaid`.
 
 ### Using Docker Compose (Recommended)
 
@@ -261,7 +229,7 @@ If your security baseline forbids Docker socket mounts, disable Mermaid renderin
 docker compose up
 ```
 
-Alternatively, you can run the Docker container directly. If your documentation contains Mermaid diagrams, you **must** mount the Docker socket and a shared volume for the temporary rendering files.
+Alternatively, you can run the Docker container directly. Mermaid rendering works locally with no docker socket mount.
 
 ### Build (Manual)
 
@@ -279,10 +247,7 @@ docker run --rm -it `
   -e CONFLUENCE__USEREMAIL `
   -e CONFLUENCE__APITOKEN `
   -v ${PWD}/docs:/workspace/docs:ro `
-  -v /var/run/docker.sock:/var/run/docker.sock `
-  -v ${PWD}/mermaid_tmp:/app/mermaid_temp `
-  -e TMPDIR=/app/mermaid_temp `
-  -e MERMAID_DOCKER_VOLUME=${PWD}/mermaid_tmp `
+  -e MERMAID_MMDC_COMMAND=mmdc `
   confluencesynkmd `
   --mode Upload `
   --path /workspace/docs `
@@ -296,10 +261,7 @@ docker run --rm -it `
   -e CONFLUENCE__USEREMAIL `
   -e CONFLUENCE__APITOKEN `
   -v ${PWD}/output:/workspace/output `
-  -v /var/run/docker.sock:/var/run/docker.sock `
-  -v ${PWD}/mermaid_tmp:/app/mermaid_temp `
-  -e TMPDIR=/app/mermaid_temp `
-  -e MERMAID_DOCKER_VOLUME=${PWD}/mermaid_tmp `
+  -e MERMAID_MMDC_COMMAND=mmdc `
   confluencesynkmd `
   --mode Download `
   --path /workspace/output `
@@ -314,10 +276,7 @@ docker run --rm -it `
   -e CONFLUENCE__USEREMAIL `
   -e CONFLUENCE__APITOKEN `
   -v ${PWD}/docs:/workspace/docs:ro `
-  -v /var/run/docker.sock:/var/run/docker.sock `
-  -v ${PWD}/mermaid_tmp:/app/mermaid_temp `
-  -e TMPDIR=/app/mermaid_temp `
-  -e MERMAID_DOCKER_VOLUME=${PWD}/mermaid_tmp `
+  -e MERMAID_MMDC_COMMAND=mmdc `
   confluencesynkmd `
   --mode Upload `
   --path /workspace/docs `
@@ -331,10 +290,7 @@ docker run --rm -it `
   -e CONFLUENCE__USEREMAIL `
   -e CONFLUENCE__APITOKEN `
   -v ${PWD}/output:/workspace/output `
-  -v /var/run/docker.sock:/var/run/docker.sock `
-  -v ${PWD}/mermaid_tmp:/app/mermaid_temp `
-  -e TMPDIR=/app/mermaid_temp `
-  -e MERMAID_DOCKER_VOLUME=${PWD}/mermaid_tmp `
+  -e MERMAID_MMDC_COMMAND=mmdc `
   confluencesynkmd `
   --mode Download `
   --path /workspace/output `
