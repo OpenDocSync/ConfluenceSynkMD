@@ -44,18 +44,15 @@ Common issues and solutions when using ConfluenceSynkMD.
 
 ## Diagram Rendering Issues
 
-### `mmdc not found` / Mermaid fails
+### `docker not found` / Mermaid fails
 
-**Cause**: mermaid-cli is not installed or not on PATH.
+**Cause**: Docker CLI is not installed or not on PATH.
 
 **Solutions**:
 
 ```bash
-# Install globally
-npm install -g @mermaid-js/mermaid-cli
-
 # Verify
-mmdc --version
+docker --version
 ```
 
 ### Diagrams blank or error

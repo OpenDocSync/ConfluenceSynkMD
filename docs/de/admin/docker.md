@@ -1,6 +1,120 @@
 # Docker-Deployment
 
-Das Docker-Image enthält .NET, Node.js und mermaid-cli — eine konsistente, portable Laufzeitumgebung.
+Das Docker-Image enthält .NET und das Docker CLI. Es nutzt eine **Sibling-Container Architektur**, um bei Bedarf einen offiziellen `mermaid-cli` Docker-Container für das Rendering von Mermaid-Diagrammen zu starten.
+
+Für den vollen Funktionsumfang (inklusive Diagramm-Rendering) wird **Docker Compose** empfohlen, da es den Docker Socket und die Volumes automatisch richtig einbindet.
+
+!!! danger "Sicherheit: Docker Socket ist host-privilegiert"
+    Das Mounten von `/var/run/docker.sock` gibt diesem Container Zugriff auf den Docker-Daemon des Hosts und ist damit effektiv root-äquivalent auf dem Host.
+    Diese Betriebsart ist als privilegiert zu behandeln und nur in vertrauenswürdigen Umgebungen zu verwenden.
+  Wenn das in Ihrer Umgebung nicht akzeptabel ist, bevorzugen Sie eine dieser Optionen:
+
+  - ConfluenceSynkMD direkt auf dem Host ausführen (ohne Mount von host-seitigem docker.sock in einen Container).
+  - Einen isolierten Docker-Daemon verwenden statt den Host-Daemon-Socket zu binden.
+  - Mermaid-Rendering deaktivieren (`--no-render-mermaid`) und keinen docker.sock mounten.
+
+!!! tip "Non-Root bevorzugen und Socket-Zugriff per Gruppe freigeben"
+    Statt den App-Prozess als root zu starten, den Container als festen Benutzer ausführen und die Host-GID des Docker-Sockets via `--group-add` ergänzen.
+    Das ist die empfohlene Standardeinstellung, wenn Docker-Socket-Zugriff erforderlich ist.
+
+## Non-Root Container mit Docker-Socket-Zugriff
+
+=== "Bash"
+
+    ```bash
+    # Host-GID des Docker-Sockets ermitteln
+    DOCKER_GID=$(stat -c '%g' /var/run/docker.sock)
+
+    docker run --rm -it \
+      --user 1001:1001 \
+      --group-add ${DOCKER_GID} \
+      -v /var/run/docker.sock:/var/run/docker.sock \
+      -v $(pwd)/docs:/workspace/docs:ro \
+      -v $(pwd)/mermaid_tmp:/app/mermaid_temp \
+      -e TMPDIR=/app/mermaid_temp \
+      -e MERMAID_DOCKER_VOLUME=$(pwd)/mermaid_tmp \
+      confluencesynkmd \
+      --mode Upload \
+      --path /workspace/docs \
+      --conf-space IHR_SPACE_KEY \
+      --conf-parent-id IHRE_PAGE_ID
+    ```
+
+=== "PowerShell"
+
+    ```powershell
+    # Linux-Host mit PowerShell
+    $DOCKER_GID = (stat -c '%g' /var/run/docker.sock)
+
+    docker run --rm -it `
+      --user 1001:1001 `
+      --group-add $DOCKER_GID `
+      -v /var/run/docker.sock:/var/run/docker.sock `
+      -v ${PWD}/docs:/workspace/docs:ro `
+      -v ${PWD}/mermaid_tmp:/app/mermaid_temp `
+      -e TMPDIR=/app/mermaid_temp `
+      -e MERMAID_DOCKER_VOLUME=${PWD}/mermaid_tmp `
+      confluencesynkmd `
+      --mode Upload `
+      --path /workspace/docs `
+      --conf-space IHR_SPACE_KEY `
+      --conf-parent-id IHRE_PAGE_ID
+    ```
+
+=== "Docker Compose"
+
+    ```bash
+    export DOCKER_GID=$(stat -c '%g' /var/run/docker.sock)
+    docker compose up
+    ```
+
+    ```yaml
+    services:
+      confluencesynk:
+        user: "1001:1001"
+        group_add:
+          - "${DOCKER_GID}"
+        volumes:
+          - /var/run/docker.sock:/var/run/docker.sock
+    ```
+
+Wenn Ihre Umgebung Docker-Socket-Mounts verbietet, Mermaid-Rendering deaktivieren (`--no-render-mermaid`) und `/var/run/docker.sock` nicht mounten.
+
+!!! note "Warum sowohl `TMPDIR` als auch `MERMAID_DOCKER_VOLUME` erforderlich sind"
+  `TMPDIR` ist der In-Container-Pfad, den ConfluenceSynkMD verwendet (z. B. `/app/mermaid_temp`).
+  `MERMAID_DOCKER_VOLUME` ist das Volume/der Pfad, den der sibling `docker run` in den Mermaid-Container mountet.
+  Beide müssen auf dieselbe physische Datenablage zeigen.
+
+---
+
+## Ausführen mit Docker Compose (Empfohlen)
+
+```yaml
+# docker-compose.yml Beispiel
+version: '3.8'
+
+services:
+  confluencesynk:
+    image: confluencesynkmd
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ${PWD}/docs:/workspace/docs:ro
+      - mermaid_data:/app/mermaid_temp
+    environment:
+      - CONFLUENCE__BASEURL=...
+      - CONFLUENCE__AUTHMODE=Basic
+      - CONFLUENCE__USEREMAIL=...
+      - CONFLUENCE__APITOKEN=...
+      - TMPDIR=/app/mermaid_temp
+      - MERMAID_DOCKER_VOLUME=mermaid_data
+
+volumes:
+  mermaid_data:
+```
+
+```bash
+docker compose up
+```
 
 ---
 
@@ -38,6 +152,10 @@ Das Docker-Image enthält .NET, Node.js und mermaid-cli — eine konsistente, po
       -e CONFLUENCE__USEREMAIL \
       -e CONFLUENCE__APITOKEN \
       -v $(pwd)/docs:/workspace/docs:ro \
+      -v /var/run/docker.sock:/var/run/docker.sock \
+      -v $(pwd)/mermaid_tmp:/app/mermaid_temp \
+      -e TMPDIR=/app/mermaid_temp \
+      -e MERMAID_DOCKER_VOLUME=$(pwd)/mermaid_tmp \
       confluencesynkmd \
       --mode Upload \
       --path /workspace/docs \
@@ -51,6 +169,10 @@ Das Docker-Image enthält .NET, Node.js und mermaid-cli — eine konsistente, po
       -e CONFLUENCE__USEREMAIL \
       -e CONFLUENCE__APITOKEN \
       -v $(pwd)/output:/workspace/output \
+      -v /var/run/docker.sock:/var/run/docker.sock \
+      -v $(pwd)/mermaid_tmp:/app/mermaid_temp \
+      -e TMPDIR=/app/mermaid_temp \
+      -e MERMAID_DOCKER_VOLUME=$(pwd)/mermaid_tmp \
       confluencesynkmd \
       --mode Download \
       --path /workspace/output \
@@ -64,6 +186,10 @@ Das Docker-Image enthält .NET, Node.js und mermaid-cli — eine konsistente, po
       -e CONFLUENCE__USEREMAIL \
       -e CONFLUENCE__APITOKEN \
       -v $(pwd)/docs:/workspace/docs:ro \
+      -v /var/run/docker.sock:/var/run/docker.sock \
+      -v $(pwd)/mermaid_tmp:/app/mermaid_temp \
+      -e TMPDIR=/app/mermaid_temp \
+      -e MERMAID_DOCKER_VOLUME=$(pwd)/mermaid_tmp \
       confluencesynkmd \
       --mode Upload \
       --path /workspace/docs \
@@ -77,6 +203,10 @@ Das Docker-Image enthält .NET, Node.js und mermaid-cli — eine konsistente, po
       -e CONFLUENCE__USEREMAIL \
       -e CONFLUENCE__APITOKEN \
       -v $(pwd)/output:/workspace/output \
+      -v /var/run/docker.sock:/var/run/docker.sock \
+      -v $(pwd)/mermaid_tmp:/app/mermaid_temp \
+      -e TMPDIR=/app/mermaid_temp \
+      -e MERMAID_DOCKER_VOLUME=$(pwd)/mermaid_tmp \
       confluencesynkmd \
       --mode Download \
       --path /workspace/output \
@@ -94,6 +224,10 @@ Das Docker-Image enthält .NET, Node.js und mermaid-cli — eine konsistente, po
       -e CONFLUENCE__USEREMAIL `
       -e CONFLUENCE__APITOKEN `
       -v ${PWD}/docs:/workspace/docs:ro `
+      -v /var/run/docker.sock:/var/run/docker.sock `
+      -v ${PWD}/mermaid_tmp:/app/mermaid_temp `
+      -e TMPDIR=/app/mermaid_temp `
+      -e MERMAID_DOCKER_VOLUME=${PWD}/mermaid_tmp `
       confluencesynkmd `
       --mode Upload `
       --path /workspace/docs `
@@ -107,6 +241,10 @@ Das Docker-Image enthält .NET, Node.js und mermaid-cli — eine konsistente, po
       -e CONFLUENCE__USEREMAIL `
       -e CONFLUENCE__APITOKEN `
       -v ${PWD}/output:/workspace/output `
+      -v /var/run/docker.sock:/var/run/docker.sock `
+      -v ${PWD}/mermaid_tmp:/app/mermaid_temp `
+      -e TMPDIR=/app/mermaid_temp `
+      -e MERMAID_DOCKER_VOLUME=${PWD}/mermaid_tmp `
       confluencesynkmd `
       --mode Download `
       --path /workspace/output `
@@ -120,6 +258,10 @@ Das Docker-Image enthält .NET, Node.js und mermaid-cli — eine konsistente, po
       -e CONFLUENCE__USEREMAIL `
       -e CONFLUENCE__APITOKEN `
       -v ${PWD}/docs:/workspace/docs:ro `
+      -v /var/run/docker.sock:/var/run/docker.sock `
+      -v ${PWD}/mermaid_tmp:/app/mermaid_temp `
+      -e TMPDIR=/app/mermaid_temp `
+      -e MERMAID_DOCKER_VOLUME=${PWD}/mermaid_tmp `
       confluencesynkmd `
       --mode Upload `
       --path /workspace/docs `
@@ -133,6 +275,10 @@ Das Docker-Image enthält .NET, Node.js und mermaid-cli — eine konsistente, po
       -e CONFLUENCE__USEREMAIL `
       -e CONFLUENCE__APITOKEN `
       -v ${PWD}/output:/workspace/output `
+      -v /var/run/docker.sock:/var/run/docker.sock `
+      -v ${PWD}/mermaid_tmp:/app/mermaid_temp `
+      -e TMPDIR=/app/mermaid_temp `
+      -e MERMAID_DOCKER_VOLUME=${PWD}/mermaid_tmp `
       confluencesynkmd `
       --mode Download `
       --path /workspace/output `
@@ -150,6 +296,10 @@ Das Docker-Image enthält .NET, Node.js und mermaid-cli — eine konsistente, po
       -e CONFLUENCE__USEREMAIL ^
       -e CONFLUENCE__APITOKEN ^
       -v %cd%/docs:/workspace/docs:ro ^
+      -v /var/run/docker.sock:/var/run/docker.sock ^
+      -v %cd%/mermaid_tmp:/app/mermaid_temp ^
+      -e TMPDIR=/app/mermaid_temp ^
+      -e MERMAID_DOCKER_VOLUME=%cd%/mermaid_tmp ^
       confluencesynkmd ^
       --mode Upload ^
       --path /workspace/docs ^
@@ -163,6 +313,10 @@ Das Docker-Image enthält .NET, Node.js und mermaid-cli — eine konsistente, po
       -e CONFLUENCE__USEREMAIL ^
       -e CONFLUENCE__APITOKEN ^
       -v %cd%/output:/workspace/output ^
+      -v /var/run/docker.sock:/var/run/docker.sock ^
+      -v %cd%/mermaid_tmp:/app/mermaid_temp ^
+      -e TMPDIR=/app/mermaid_temp ^
+      -e MERMAID_DOCKER_VOLUME=%cd%/mermaid_tmp ^
       confluencesynkmd ^
       --mode Download ^
       --path /workspace/output ^
@@ -176,6 +330,10 @@ Das Docker-Image enthält .NET, Node.js und mermaid-cli — eine konsistente, po
       -e CONFLUENCE__USEREMAIL ^
       -e CONFLUENCE__APITOKEN ^
       -v %cd%/docs:/workspace/docs:ro ^
+      -v /var/run/docker.sock:/var/run/docker.sock ^
+      -v %cd%/mermaid_tmp:/app/mermaid_temp ^
+      -e TMPDIR=/app/mermaid_temp ^
+      -e MERMAID_DOCKER_VOLUME=%cd%/mermaid_tmp ^
       confluencesynkmd ^
       --mode Upload ^
       --path /workspace/docs ^
@@ -189,6 +347,10 @@ Das Docker-Image enthält .NET, Node.js und mermaid-cli — eine konsistente, po
       -e CONFLUENCE__USEREMAIL ^
       -e CONFLUENCE__APITOKEN ^
       -v %cd%/output:/workspace/output ^
+      -v /var/run/docker.sock:/var/run/docker.sock ^
+      -v %cd%/mermaid_tmp:/app/mermaid_temp ^
+      -e TMPDIR=/app/mermaid_temp ^
+      -e MERMAID_DOCKER_VOLUME=%cd%/mermaid_tmp ^
       confluencesynkmd ^
       --mode Download ^
       --path /workspace/output ^
@@ -252,6 +414,10 @@ Das Docker-Image enthält .NET, Node.js und mermaid-cli — eine konsistente, po
                 -e CONFLUENCE__USEREMAIL \
                 -e CONFLUENCE__APITOKEN \
                 -v "$PWD/docs:/workspace/docs:ro" \
+                -v /var/run/docker.sock:/var/run/docker.sock \
+                -v "$PWD/mermaid_tmp:/app/mermaid_temp" \
+                -e TMPDIR=/app/mermaid_temp \
+                -e MERMAID_DOCKER_VOLUME="$PWD/mermaid_tmp" \
                 confluencesynkmd \
                 --mode Upload \
                 --path /workspace/docs \
@@ -281,6 +447,10 @@ Das Docker-Image enthält .NET, Node.js und mermaid-cli — eine konsistente, po
             -e CONFLUENCE__USEREMAIL \
             -e CONFLUENCE__APITOKEN \
             -v "$CI_PROJECT_DIR/docs:/workspace/docs:ro" \
+            -v /var/run/docker.sock:/var/run/docker.sock \
+            -v "$CI_PROJECT_DIR/mermaid_tmp:/app/mermaid_temp" \
+            -e TMPDIR=/app/mermaid_temp \
+            -e MERMAID_DOCKER_VOLUME="$CI_PROJECT_DIR/mermaid_tmp" \
             confluencesynkmd \
             --mode Upload \
             --path /workspace/docs \

@@ -31,7 +31,7 @@ public sealed class MermaidRendererTests
     }
 
     [Fact]
-    public async Task RenderToPngAsync_WithoutMmdcOnPath_ThrowsClearErrorAndCleansTempFiles()
+    public async Task RenderToPngAsync_WithoutDockerOnPath_ThrowsClearErrorAndCleansTempFiles()
     {
         const string source = "graph TD\n  A --> B";
         var logger = Substitute.For<ILogger>();
@@ -66,7 +66,7 @@ public sealed class MermaidRendererTests
         }
 
         exception.Should().NotBeNull();
-        exception!.Message.Should().Contain("mmdc is not available on PATH");
+        exception!.Message.Should().Contain("'docker' executable is not available on PATH");
 
         File.Exists(inputFile).Should().BeFalse();
         File.Exists(outputFile).Should().BeFalse();

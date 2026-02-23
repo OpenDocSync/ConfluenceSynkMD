@@ -108,7 +108,7 @@ public sealed class ConfluenceXhtmlTransformStepTests
 
         // Force mermaid renderer to throw
         _mermaid.RenderToPngAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
-            .Returns<(byte[], string)>(_ => throw new InvalidOperationException("mmdc not found"));
+            .Returns<(byte[], string)>(_ => throw new InvalidOperationException("docker not found"));
 
         // The step catches diagram rendering failures with a Warning log and continues,
         // so this won't produce CriticalError. Let's instead test with an invalid

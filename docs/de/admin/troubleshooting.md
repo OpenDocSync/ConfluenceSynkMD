@@ -43,11 +43,10 @@ Häufige Probleme und Lösungen bei der Verwendung von ConfluenceSynkMD.
 
 ## Diagramm-Rendering-Probleme
 
-### `mmdc not found`
+### `docker not found`
 
 ```bash
-npm install -g @mermaid-js/mermaid-cli
-mmdc --version
+docker --version
 ```
 
 ### Diagramme leer oder fehlerhaft
