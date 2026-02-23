@@ -42,8 +42,8 @@ public sealed class MermaidRenderer : IMermaidRenderer
             // Write Mermaid source to temp file
             await File.WriteAllTextAsync(inputFile, mermaidSource, ct);
 
-            // Determine how to invoke mmdc via Docker.
-            var (command, args) = await ResolveMmdcAsync(tempDir, hash, ct);
+            // Determine how to invoke Mermaid CLI via Docker.
+            var (command, args) = await ResolveDockerMermaidCliAsync(tempDir, hash, ct);
             var argsForLog = string.Join(" ", args.Select(EscapeArgForLog));
 
             var psi = new ProcessStartInfo
@@ -75,10 +75,10 @@ public sealed class MermaidRenderer : IMermaidRenderer
             if (process.ExitCode != 0)
             {
                 _logger.Error(
-                    "mmdc failed (exit {Code}):\ncommand: {Cmd} {Args}\nstdout: {Out}\nstderr: {Err}",
+                    "Mermaid CLI docker run failed (exit {Code}):\ncommand: {Cmd} {Args}\nstdout: {Out}\nstderr: {Err}",
                     process.ExitCode, command, argsForLog, stdout.Trim(), stderr.Trim());
                 throw new InvalidOperationException(
-                    $"mmdc rendering failed (exit {process.ExitCode}): {stderr.Trim()}");
+                    $"Mermaid CLI rendering failed (exit {process.ExitCode}): {stderr.Trim()}");
             }
 
             if (!File.Exists(outputFile))
@@ -110,10 +110,10 @@ public sealed class MermaidRenderer : IMermaidRenderer
     }
 
     /// <summary>
-    /// Resolves the correct way to invoke mmdc depending on the environment.
+    /// Resolves the correct way to invoke Mermaid CLI via Docker depending on the environment.
     /// Uses Docker to run the official Mermaid CLI image.
     /// </summary>
-    private static async Task<(string Command, string[] Args)> ResolveMmdcAsync(
+    private static async Task<(string Command, string[] Args)> ResolveDockerMermaidCliAsync(
         string tempDir, string hash, CancellationToken ct)
     {
         var runningInContainer = IsRunningInContainer();
@@ -140,7 +140,7 @@ public sealed class MermaidRenderer : IMermaidRenderer
 
         // Map the volume to /data in the mermaid container
         // -i /data/{hash}.mmd -o /data/{hash}.png
-        var mmdcArgs = new List<string>
+        var dockerArgs = new List<string>
         {
             "run",
             "--rm",
@@ -165,13 +165,13 @@ public sealed class MermaidRenderer : IMermaidRenderer
                 puppeteerConfig,
                 _puppeteerConfigJson,
                 ct);
-            mmdcArgs.Add("-p");
-            mmdcArgs.Add("/data/puppeteer-config.json");
+            dockerArgs.Add("-p");
+            dockerArgs.Add("/data/puppeteer-config.json");
         }
 
         if (IsCommandAvailable("docker"))
         {
-            return ("docker", mmdcArgs.ToArray());
+            return ("docker", dockerArgs.ToArray());
         }
 
         throw new InvalidOperationException(

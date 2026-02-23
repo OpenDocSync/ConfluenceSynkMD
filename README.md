@@ -450,7 +450,7 @@ dotnet test
 dotnet test --verbosity normal
 ```
 
-The test suite includes unit and integration tests. Diagram rendering integration tests that require external tools (`mmdc`, `plantuml`) are skipped by default.
+The test suite includes unit and integration tests. Diagram rendering integration tests that require external tools (Docker with Mermaid CLI image, `plantuml`) are skipped by default.
 
 ### Round-Trip / Integration Tests
 
