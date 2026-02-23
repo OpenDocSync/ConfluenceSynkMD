@@ -9,8 +9,7 @@ ConfluenceSynkMD kann durch Bauen aus dem Quellcode mit dem .NET SDK installiert
 | Anforderung | Version | Zweck |
 |---|---|---|
 | **.NET SDK** | 10.0+ | CLI-Tool bauen und ausführen |
-| **Node.js** | 22+ | Für Mermaid-Diagramm-Rendering |
-| **npm** | Aktuell | mermaid-cli installieren |
+| **Docker** | Aktuell | Für Mermaid-Diagramm-Rendering |
 
 ---
 
@@ -88,28 +87,13 @@ ConfluenceSynkMD kann durch Bauen aus dem Quellcode mit dem .NET SDK installiert
 
 ---
 
-## Mermaid CLI installieren
+## Docker-Voraussetzung für Mermaid
 
-=== "Bash"
+Das Rendering von Mermaid-Diagrammen verwendet das offizielle Mermaid CLI Docker-Image (`ghcr.io/mermaid-js/mermaid-cli/mermaid-cli`). ConfluenceSynkMD startet dynamisch einen temporären Docker-Container für diese Aufgabe.
 
-    ```bash
-    npm install -g @mermaid-js/mermaid-cli
-    mmdc --version
-    ```
+Stellen Sie sicher, dass die **Docker Engine** installiert ist und der Befehl `docker` in Ihrem `PATH` verfügbar ist.
 
-=== "PowerShell"
-
-    ```powershell
-    npm install -g @mermaid-js/mermaid-cli
-    mmdc --version
-    ```
-
-=== "CMD"
-
-    ```cmd
-    npm install -g @mermaid-js/mermaid-cli
-    mmdc --version
-    ```
+Überprüfen: `docker --version`
 
 ---
 

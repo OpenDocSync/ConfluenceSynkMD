@@ -7,13 +7,13 @@ namespace ConfluenceSynkMD.Services;
 
 /// <summary>
 /// Renders Mermaid diagram source code to PNG images using
-/// @mermaid-js/mermaid-cli (mmdc).
+/// the official Mermaid CLI Docker container (ghcr.io/mermaid-js/mermaid-cli/mermaid-cli).
 ///
-/// Requires mmdc to be installed and available on PATH.
-/// In containers, Puppeteer sandbox is disabled via generated config.
+/// Requires the Docker engine to be accessible (either locally or via mapped /var/run/docker.sock).
 /// </summary>
 public sealed class MermaidRenderer : IMermaidRenderer
 {
+    private const string _puppeteerConfigJson = """{"args": ["--no-sandbox", "--disable-setuid-sandbox"]}""";
     private readonly ILogger _logger;
 
     public MermaidRenderer(ILogger logger)
@@ -42,32 +42,30 @@ public sealed class MermaidRenderer : IMermaidRenderer
             // Write Mermaid source to temp file
             await File.WriteAllTextAsync(inputFile, mermaidSource, ct);
 
-            // Create puppeteer config (no-sandbox only when running in container)
-            var puppeteerConfig = Path.Combine(tempDir, "puppeteer-config.json");
-            var puppeteerConfigJson = IsRunningInContainer()
-                ? """{"args": ["--no-sandbox", "--disable-setuid-sandbox"]}"""
-                : "{}";
-            await File.WriteAllTextAsync(puppeteerConfig, puppeteerConfigJson, ct);
-
-            // Determine how to invoke mmdc from PATH.
-            var (command, args) = ResolveMmdc(inputFile, outputFile, puppeteerConfig);
+            // Determine how to invoke mmdc via Docker.
+            var (command, args) = await ResolveMmdcAsync(tempDir, hash, ct);
+            var argsForLog = string.Join(" ", args.Select(EscapeArgForLog));
 
             var psi = new ProcessStartInfo
             {
                 FileName = command,
-                Arguments = args,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
                 UseShellExecute = false,
                 CreateNoWindow = true,
             };
 
+            foreach (var arg in args)
+            {
+                psi.ArgumentList.Add(arg);
+            }
+
             _logger.Debug("Rendering Mermaid diagram '{FileName}': {Cmd} {Args}",
-                fileName, command, args);
+                fileName, command, argsForLog);
 
             using var process = Process.Start(psi)
                 ?? throw new InvalidOperationException(
-                    "Failed to start mmdc process. Ensure @mermaid-js/mermaid-cli is installed and available on PATH.");
+                    "Failed to start docker process. Ensure docker is installed and available on PATH or the docker socket is mounted.");
 
             var stdout = await process.StandardOutput.ReadToEndAsync(ct);
             var stderr = await process.StandardError.ReadToEndAsync(ct);
@@ -78,7 +76,7 @@ public sealed class MermaidRenderer : IMermaidRenderer
             {
                 _logger.Error(
                     "mmdc failed (exit {Code}):\ncommand: {Cmd} {Args}\nstdout: {Out}\nstderr: {Err}",
-                    process.ExitCode, command, args, stdout.Trim(), stderr.Trim());
+                    process.ExitCode, command, argsForLog, stdout.Trim(), stderr.Trim());
                 throw new InvalidOperationException(
                     $"mmdc rendering failed (exit {process.ExitCode}): {stderr.Trim()}");
             }
@@ -86,7 +84,7 @@ public sealed class MermaidRenderer : IMermaidRenderer
             if (!File.Exists(outputFile))
             {
                 throw new FileNotFoundException(
-                    $"mmdc did not produce output file: {outputFile}");
+                    $"Docker mermaid-cli did not produce output file: {outputFile}. Check volume mounts.");
             }
 
             var pngBytes = await File.ReadAllBytesAsync(outputFile, ct);
@@ -113,20 +111,71 @@ public sealed class MermaidRenderer : IMermaidRenderer
 
     /// <summary>
     /// Resolves the correct way to invoke mmdc depending on the environment.
+    /// Uses Docker to run the official Mermaid CLI image.
     /// </summary>
-    private static (string Command, string Args) ResolveMmdc(
-        string inputFile, string outputFile, string puppeteerConfig)
+    private static async Task<(string Command, string[] Args)> ResolveMmdcAsync(
+        string tempDir, string hash, CancellationToken ct)
     {
-        var mmdcArgs = $"-i \"{inputFile}\" -o \"{outputFile}\" -b transparent --scale 2 -p \"{puppeteerConfig}\"";
+        var runningInContainer = IsRunningInContainer();
 
-        // mmdc must be available on PATH.
-        if (IsCommandAvailable("mmdc"))
+        // In a Docker-in-Docker scenario via docker-compose, the container's /tmp path
+        // might not be the same as the host's volume path.
+        // We use an environment variable to allow mapping a named volume or host path.
+        var dockerVolume = Environment.GetEnvironmentVariable("MERMAID_DOCKER_VOLUME");
+        if (string.IsNullOrWhiteSpace(dockerVolume))
         {
-            return ("mmdc", mmdcArgs);
+            if (runningInContainer)
+            {
+                throw new InvalidOperationException(
+                    "MERMAID_DOCKER_VOLUME must be set when running inside a container. " +
+                    "Set MERMAID_DOCKER_VOLUME to the host-visible shared temp directory that is mounted into this container, and set TMPDIR to the corresponding in-container mount path so both refer to the same physical directory. " +
+                    "For example: MERMAID_DOCKER_VOLUME=/host/path/temp and TMPDIR=/app/mermaid_temp (where /host/path/temp is mounted into the container at /app/mermaid_temp).",
+                    innerException: null);
+            }
+
+            dockerVolume = tempDir;
+        }
+
+        var dockerImage = Environment.GetEnvironmentVariable("MERMAID_DOCKER_IMAGE") ?? "ghcr.io/mermaid-js/mermaid-cli/mermaid-cli";
+
+        // Map the volume to /data in the mermaid container
+        // -i /data/{hash}.mmd -o /data/{hash}.png
+        var mmdcArgs = new List<string>
+        {
+            "run",
+            "--rm",
+            "-v",
+            $"{dockerVolume}:/data",
+            dockerImage,
+            "-i",
+            $"/data/{hash}.mmd",
+            "-o",
+            $"/data/{hash}.png",
+            "-b",
+            "transparent",
+            "--scale",
+            "2",
+        };
+
+        // When running in container, we might also want to pass puppeteer config
+        if (runningInContainer)
+        {
+            var puppeteerConfig = Path.Combine(tempDir, "puppeteer-config.json");
+            await File.WriteAllTextAsync(
+                puppeteerConfig,
+                _puppeteerConfigJson,
+                ct);
+            mmdcArgs.Add("-p");
+            mmdcArgs.Add("/data/puppeteer-config.json");
+        }
+
+        if (IsCommandAvailable("docker"))
+        {
+            return ("docker", mmdcArgs.ToArray());
         }
 
         throw new InvalidOperationException(
-            "mmdc is not available on PATH. Install @mermaid-js/mermaid-cli first (for example: npm install -g @mermaid-js/mermaid-cli).",
+            "The 'docker' executable is not available on PATH. This tool now uses the official Mermaid CLI Docker image to render Mermaid diagrams.",
             innerException: null);
     }
 
@@ -169,5 +218,16 @@ public sealed class MermaidRenderer : IMermaidRenderer
     {
         try { if (File.Exists(path)) File.Delete(path); }
         catch { /* best-effort cleanup */ }
+    }
+
+    private static string EscapeArgForLog(string arg)
+    {
+        if (string.IsNullOrWhiteSpace(arg) || arg.Contains('"') || arg.Contains(' '))
+        {
+            var escaped = arg.Replace("\"", "\\\"");
+            return $"\"{escaped}\"";
+        }
+
+        return arg;
     }
 }

@@ -8,7 +8,7 @@ ConfluenceSynkMD kann Code-Blöcke verschiedener Diagramm-Sprachen in Bild-Anhä
 
 | Typ | Flag | Standard | Externes Tool |
 |---|---|---|---|
-| **Mermaid** | `--render-mermaid` | ✅ Aktiviert | `@mermaid-js/mermaid-cli` (Node.js) |
+| **Mermaid** | `--render-mermaid` | ✅ Aktiviert | Docker Engine (`mermaid-cli` Container) |
 | **Draw.io** | `--render-drawio` | ❌ Deaktiviert | `drawio-export` |
 | **PlantUML** | `--render-plantuml` | ❌ Deaktiviert | `plantuml`-Binary |
 | **LaTeX** | `--render-latex` | ❌ Deaktiviert | LaTeX-Distribution |
@@ -30,8 +30,8 @@ graph TD
 
 ### Voraussetzungen
 
-- Node.js 22+
-- mermaid-cli installieren: `npm install -g @mermaid-js/mermaid-cli`
+- Docker Engine installiert und ausgeführt
+- `docker` Befehl im `PATH` verfügbar
 
 ### Mermaid deaktivieren
 

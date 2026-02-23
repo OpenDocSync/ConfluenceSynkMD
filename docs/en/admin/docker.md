@@ -1,6 +1,39 @@
 # Docker Deployment
 
-The Docker image comes pre-packaged with .NET, Node.js, and mermaid-cli — providing a consistent, portable runtime environment.
+The Docker image comes pre-packaged with .NET and the Docker CLI. It uses a **sibling-container architecture** to spawn an official `mermaid-cli` Docker container on demand for rendering Mermaid diagrams.
+
+For full features including diagram rendering, using **Docker Compose** is recommended as it automatically mounts the Docker socket and shares volumes.
+
+---
+
+## Run with Docker Compose (Recommended)
+
+```yaml
+# docker-compose.yml example
+version: '3.8'
+
+services:
+  confluencesynk:
+    image: confluencesynkmd
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ${PWD}/docs:/workspace/docs:ro
+      - mermaid_data:/app/mermaid_temp
+    environment:
+      - CONFLUENCE__BASEURL=...
+      - CONFLUENCE__AUTHMODE=Basic
+      - CONFLUENCE__USEREMAIL=...
+      - CONFLUENCE__APITOKEN=...
+      - TMPDIR=/app/mermaid_temp
+      - MERMAID_DOCKER_VOLUME=mermaid_data
+
+volumes:
+  mermaid_data:
+```
+
+```bash
+docker compose up
+```
 
 ---
 
@@ -27,7 +60,7 @@ The Docker image comes pre-packaged with .NET, Node.js, and mermaid-cli — prov
 The Dockerfile uses a **multi-stage build**:
 
 1. **Build stage** — .NET SDK compiles the application
-2. **Runtime stage** — Slim image with .NET runtime, Node.js 22, and mermaid-cli
+2. **Runtime stage** — Slim image with .NET runtime and Docker CLI
 
 ---
 
@@ -43,6 +76,10 @@ The Dockerfile uses a **multi-stage build**:
       -e CONFLUENCE__USEREMAIL \
       -e CONFLUENCE__APITOKEN \
       -v $(pwd)/docs:/workspace/docs:ro \
+      -v /var/run/docker.sock:/var/run/docker.sock \
+      -v $(pwd)/mermaid_tmp:/app/mermaid_temp \
+      -e TMPDIR=/app/mermaid_temp \
+      -e MERMAID_DOCKER_VOLUME=$(pwd)/mermaid_tmp \
       confluencesynkmd \
       --mode Upload \
       --path /workspace/docs \
@@ -56,6 +93,10 @@ The Dockerfile uses a **multi-stage build**:
       -e CONFLUENCE__USEREMAIL \
       -e CONFLUENCE__APITOKEN \
       -v $(pwd)/output:/workspace/output \
+      -v /var/run/docker.sock:/var/run/docker.sock \
+      -v $(pwd)/mermaid_tmp:/app/mermaid_temp \
+      -e TMPDIR=/app/mermaid_temp \
+      -e MERMAID_DOCKER_VOLUME=$(pwd)/mermaid_tmp \
       confluencesynkmd \
       --mode Download \
       --path /workspace/output \
@@ -69,6 +110,10 @@ The Dockerfile uses a **multi-stage build**:
       -e CONFLUENCE__USEREMAIL \
       -e CONFLUENCE__APITOKEN \
       -v $(pwd)/docs:/workspace/docs:ro \
+      -v /var/run/docker.sock:/var/run/docker.sock \
+      -v $(pwd)/mermaid_tmp:/app/mermaid_temp \
+      -e TMPDIR=/app/mermaid_temp \
+      -e MERMAID_DOCKER_VOLUME=$(pwd)/mermaid_tmp \
       confluencesynkmd \
       --mode Upload \
       --path /workspace/docs \
@@ -82,6 +127,10 @@ The Dockerfile uses a **multi-stage build**:
       -e CONFLUENCE__USEREMAIL \
       -e CONFLUENCE__APITOKEN \
       -v $(pwd)/output:/workspace/output \
+      -v /var/run/docker.sock:/var/run/docker.sock \
+      -v $(pwd)/mermaid_tmp:/app/mermaid_temp \
+      -e TMPDIR=/app/mermaid_temp \
+      -e MERMAID_DOCKER_VOLUME=$(pwd)/mermaid_tmp \
       confluencesynkmd \
       --mode Download \
       --path /workspace/output \
@@ -99,6 +148,10 @@ The Dockerfile uses a **multi-stage build**:
       -e CONFLUENCE__USEREMAIL `
       -e CONFLUENCE__APITOKEN `
       -v ${PWD}/docs:/workspace/docs:ro `
+      -v /var/run/docker.sock:/var/run/docker.sock `
+      -v ${PWD}/mermaid_tmp:/app/mermaid_temp `
+      -e TMPDIR=/app/mermaid_temp `
+      -e MERMAID_DOCKER_VOLUME=${PWD}/mermaid_tmp `
       confluencesynkmd `
       --mode Upload `
       --path /workspace/docs `
@@ -112,6 +165,10 @@ The Dockerfile uses a **multi-stage build**:
       -e CONFLUENCE__USEREMAIL `
       -e CONFLUENCE__APITOKEN `
       -v ${PWD}/output:/workspace/output `
+      -v /var/run/docker.sock:/var/run/docker.sock `
+      -v ${PWD}/mermaid_tmp:/app/mermaid_temp `
+      -e TMPDIR=/app/mermaid_temp `
+      -e MERMAID_DOCKER_VOLUME=${PWD}/mermaid_tmp `
       confluencesynkmd `
       --mode Download `
       --path /workspace/output `
@@ -125,6 +182,10 @@ The Dockerfile uses a **multi-stage build**:
       -e CONFLUENCE__USEREMAIL `
       -e CONFLUENCE__APITOKEN `
       -v ${PWD}/docs:/workspace/docs:ro `
+      -v /var/run/docker.sock:/var/run/docker.sock `
+      -v ${PWD}/mermaid_tmp:/app/mermaid_temp `
+      -e TMPDIR=/app/mermaid_temp `
+      -e MERMAID_DOCKER_VOLUME=${PWD}/mermaid_tmp `
       confluencesynkmd `
       --mode Upload `
       --path /workspace/docs `
@@ -138,6 +199,10 @@ The Dockerfile uses a **multi-stage build**:
       -e CONFLUENCE__USEREMAIL `
       -e CONFLUENCE__APITOKEN `
       -v ${PWD}/output:/workspace/output `
+      -v /var/run/docker.sock:/var/run/docker.sock `
+      -v ${PWD}/mermaid_tmp:/app/mermaid_temp `
+      -e TMPDIR=/app/mermaid_temp `
+      -e MERMAID_DOCKER_VOLUME=${PWD}/mermaid_tmp `
       confluencesynkmd `
       --mode Download `
       --path /workspace/output `
@@ -155,6 +220,10 @@ The Dockerfile uses a **multi-stage build**:
       -e CONFLUENCE__USEREMAIL ^
       -e CONFLUENCE__APITOKEN ^
       -v %cd%/docs:/workspace/docs:ro ^
+      -v /var/run/docker.sock:/var/run/docker.sock ^
+      -v %cd%/mermaid_tmp:/app/mermaid_temp ^
+      -e TMPDIR=/app/mermaid_temp ^
+      -e MERMAID_DOCKER_VOLUME=%cd%/mermaid_tmp ^
       confluencesynkmd ^
       --mode Upload ^
       --path /workspace/docs ^
@@ -168,6 +237,10 @@ The Dockerfile uses a **multi-stage build**:
       -e CONFLUENCE__USEREMAIL ^
       -e CONFLUENCE__APITOKEN ^
       -v %cd%/output:/workspace/output ^
+      -v /var/run/docker.sock:/var/run/docker.sock ^
+      -v %cd%/mermaid_tmp:/app/mermaid_temp ^
+      -e TMPDIR=/app/mermaid_temp ^
+      -e MERMAID_DOCKER_VOLUME=%cd%/mermaid_tmp ^
       confluencesynkmd ^
       --mode Download ^
       --path /workspace/output ^
@@ -181,6 +254,10 @@ The Dockerfile uses a **multi-stage build**:
       -e CONFLUENCE__USEREMAIL ^
       -e CONFLUENCE__APITOKEN ^
       -v %cd%/docs:/workspace/docs:ro ^
+      -v /var/run/docker.sock:/var/run/docker.sock ^
+      -v %cd%/mermaid_tmp:/app/mermaid_temp ^
+      -e TMPDIR=/app/mermaid_temp ^
+      -e MERMAID_DOCKER_VOLUME=%cd%/mermaid_tmp ^
       confluencesynkmd ^
       --mode Upload ^
       --path /workspace/docs ^
@@ -194,6 +271,10 @@ The Dockerfile uses a **multi-stage build**:
       -e CONFLUENCE__USEREMAIL ^
       -e CONFLUENCE__APITOKEN ^
       -v %cd%/output:/workspace/output ^
+      -v /var/run/docker.sock:/var/run/docker.sock ^
+      -v %cd%/mermaid_tmp:/app/mermaid_temp ^
+      -e TMPDIR=/app/mermaid_temp ^
+      -e MERMAID_DOCKER_VOLUME=%cd%/mermaid_tmp ^
       confluencesynkmd ^
       --mode Download ^
       --path /workspace/output ^
@@ -257,6 +338,10 @@ The Dockerfile uses a **multi-stage build**:
                 -e CONFLUENCE__USEREMAIL \
                 -e CONFLUENCE__APITOKEN \
                 -v "$PWD/docs:/workspace/docs:ro" \
+                -v /var/run/docker.sock:/var/run/docker.sock \
+                -v "$PWD/mermaid_tmp:/app/mermaid_temp" \
+                -e TMPDIR=/app/mermaid_temp \
+                -e MERMAID_DOCKER_VOLUME="$PWD/mermaid_tmp" \
                 confluencesynkmd \
                 --mode Upload \
                 --path /workspace/docs \
@@ -286,6 +371,10 @@ The Dockerfile uses a **multi-stage build**:
             -e CONFLUENCE__USEREMAIL \
             -e CONFLUENCE__APITOKEN \
             -v "$CI_PROJECT_DIR/docs:/workspace/docs:ro" \
+            -v /var/run/docker.sock:/var/run/docker.sock \
+            -v "$CI_PROJECT_DIR/mermaid_tmp:/app/mermaid_temp" \
+            -e TMPDIR=/app/mermaid_temp \
+            -e MERMAID_DOCKER_VOLUME="$CI_PROJECT_DIR/mermaid_tmp" \
             confluencesynkmd \
             --mode Upload \
             --path /workspace/docs \

@@ -185,7 +185,7 @@ ConfluenceSynkMD – Markdown ↔ Confluence Synchronization Tool
 | `--force-valid-language` | `false` | Validate code block languages against Confluence-supported set |
 | `--code-line-numbers` | `false` | Show line numbers in Confluence code block macros (alias: `--line-numbers`) |
 | `--debug-line-markers` | `false` | Include source line numbers in conversion error messages for debugging |
-| `--title-prefix <prefix>` | — | Prefix prepended to all page titles (e.g. `[AUTO] `) |
+| `--title-prefix <prefix>` | — | Prefix prepended to all page titles (e.g. `[AUTO]`) |
 | `--generated-by <value>` | `MARKDOWN` | Generated-by marker rendered as Confluence info macro. Supports template placeholders: `%{filepath}`, `%{filename}`, `%{filedir}`, `%{filestem}`. Can be overridden per-document via frontmatter. Set to empty to disable |
 
 ### Diagram Rendering
@@ -213,9 +213,20 @@ ConfluenceSynkMD – Markdown ↔ Confluence Synchronization Tool
 
 ## Docker Usage
 
-The Docker image comes pre-packaged with .NET, Node.js, and mermaid-cli.
+ConfluenceSynkMD uses a **sibling-container architecture** for diagram rendering. The main `.NET` container spawns an official `mermaid-cli` Docker container on demand to render Mermaid diagrams.
 
-### Build
+For full features including diagram rendering, using **Docker Compose** is recommended as it automatically mounts the Docker socket and shares volumes.
+
+### Using Docker Compose (Recommended)
+
+```bash
+# Start the full stack (builds the image and runs the sync)
+docker compose up
+```
+
+Alternatively, you can run the Docker container directly. If your documentation contains Mermaid diagrams, you **must** mount the Docker socket and a shared volume for the temporary rendering files.
+
+### Build (Manual)
 
 ```bash
 docker build -t confluencesynkmd .
@@ -231,6 +242,10 @@ docker run --rm -it `
   -e CONFLUENCE__USEREMAIL `
   -e CONFLUENCE__APITOKEN `
   -v ${PWD}/docs:/workspace/docs:ro `
+  -v /var/run/docker.sock:/var/run/docker.sock `
+  -v ${PWD}/mermaid_tmp:/app/mermaid_temp `
+  -e TMPDIR=/app/mermaid_temp `
+  -e MERMAID_DOCKER_VOLUME=${PWD}/mermaid_tmp `
   confluencesynkmd `
   --mode Upload `
   --path /workspace/docs `
@@ -244,6 +259,10 @@ docker run --rm -it `
   -e CONFLUENCE__USEREMAIL `
   -e CONFLUENCE__APITOKEN `
   -v ${PWD}/output:/workspace/output `
+  -v /var/run/docker.sock:/var/run/docker.sock `
+  -v ${PWD}/mermaid_tmp:/app/mermaid_temp `
+  -e TMPDIR=/app/mermaid_temp `
+  -e MERMAID_DOCKER_VOLUME=${PWD}/mermaid_tmp `
   confluencesynkmd `
   --mode Download `
   --path /workspace/output `
@@ -258,6 +277,10 @@ docker run --rm -it `
   -e CONFLUENCE__USEREMAIL `
   -e CONFLUENCE__APITOKEN `
   -v ${PWD}/docs:/workspace/docs:ro `
+  -v /var/run/docker.sock:/var/run/docker.sock `
+  -v ${PWD}/mermaid_tmp:/app/mermaid_temp `
+  -e TMPDIR=/app/mermaid_temp `
+  -e MERMAID_DOCKER_VOLUME=${PWD}/mermaid_tmp `
   confluencesynkmd `
   --mode Upload `
   --path /workspace/docs `
@@ -271,6 +294,10 @@ docker run --rm -it `
   -e CONFLUENCE__USEREMAIL `
   -e CONFLUENCE__APITOKEN `
   -v ${PWD}/output:/workspace/output `
+  -v /var/run/docker.sock:/var/run/docker.sock `
+  -v ${PWD}/mermaid_tmp:/app/mermaid_temp `
+  -e TMPDIR=/app/mermaid_temp `
+  -e MERMAID_DOCKER_VOLUME=${PWD}/mermaid_tmp `
   confluencesynkmd `
   --mode Download `
   --path /workspace/output `
@@ -327,6 +354,7 @@ By default, all pages are uploaded to the space specified via `--conf-space`.
 You can override this per document using YAML frontmatter or inline HTML comments:
 
 **YAML frontmatter:**
+
 ```yaml
 ---
 space_key: TEAM
@@ -334,6 +362,7 @@ space_key: TEAM
 ```
 
 **Inline HTML comment:**
+
 ```html
 <!-- confluence-space-key: TEAM -->
 ```

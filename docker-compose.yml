@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  confluencesynk:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    # To allow ConfluenceSynkMD to spawn sibling containers (like mermaid-cli)
+    # we mount the docker socket from the host system.
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      # We map a named volume or a host path here for shared temp data.
+      # By default we map a named volume 'mermaid_data' to '/app/mermaid_temp' inside this container
+      # and we tell MermaidRenderer to use this same volume name when spawning the sibling container.
+      - mermaid_data:/app/mermaid_temp
+    environment:
+      # Tell the app where it is internally saving files
+      - TMPDIR=/app/mermaid_temp
+      # Tell the app which volume name the sibling container should mount
+      - MERMAID_DOCKER_VOLUME=mermaid_data
+      # Your configuration variables here
+      # - ConfluenceConfig__BaseUrl=https://your-domain.atlassian.net
+      # - ConfluenceConfig__Username=...
+      # - ConfluenceConfig__ApiToken=...
+
+volumes:
+  # Named volume for sharing rendered mermaid images between confluencesynk and mermaid-cli
+  mermaid_data:
