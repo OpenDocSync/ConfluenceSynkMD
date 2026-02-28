@@ -13,7 +13,8 @@
     <CollectCoverage>false</CollectCoverage>
     <CoverletOutputFormat>cobertura</CoverletOutputFormat>
     <ThresholdType>line</ThresholdType>
-    <Threshold>60</Threshold>
+    <Threshold>65</Threshold>
+    <ThresholdStat>total</ThresholdStat>
   </PropertyGroup>
 
   <ItemGroup>
