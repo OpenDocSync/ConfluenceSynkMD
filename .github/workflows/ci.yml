@@ -50,7 +50,7 @@ jobs:
             --configuration Release \
             /p:CollectCoverage=true \
             /p:CoverletOutput=./TestResults/Coverage/ \
-            /p:CoverletOutputFormat="cobertura,json" \
+            /p:CoverletOutputFormat=cobertura \
             /p:ThresholdType=line \
             /p:ThresholdStat=total \
             /p:Threshold=90
@@ -61,7 +61,6 @@ jobs:
           name: coverage-reports
           path: |
             **/TestResults/Coverage/coverage.cobertura.xml
-            **/TestResults/Coverage/coverage.json
           if-no-files-found: warn
 
       - name: Upload to Codecov (optional)
