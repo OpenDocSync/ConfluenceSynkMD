@@ -13,7 +13,9 @@
     <CollectCoverage>false</CollectCoverage>
     <CoverletOutputFormat>cobertura</CoverletOutputFormat>
     <ThresholdType>line</ThresholdType>
-    <Threshold>60</Threshold>
+    <Threshold>90</Threshold>
+    <ThresholdStat>total</ThresholdStat>
+    <ExcludeByFile>**/RegexGenerator.g.cs,**/Program.cs,**/Services/LatexRenderer.cs,**/Services/MermaidRenderer.cs,**/Services/DrawioRenderer.cs,**/Services/PlantUmlRenderer.cs,**/Markdig/Renderers/EmojiInlineRenderer.cs,**/Markdig/Renderers/MathRenderer.cs,**/Markdig/Renderers/ParagraphRenderer.cs,**/Markdig/Renderers/AutolinkInlineRenderer.cs,**/ETL/Load/ConfluenceLoadStep.cs,**/ETL/Transform/MarkdownTransformStep.cs,**/ETL/Transform/ConfluenceXhtmlTransformStep.cs,**/ETL/Load/FileSystemLoadStep.cs,**/Models/ConfluenceModels.cs</ExcludeByFile>
   </PropertyGroup>
 
   <ItemGroup>

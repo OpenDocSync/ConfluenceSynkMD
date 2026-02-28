@@ -43,19 +43,29 @@ jobs:
           path: build.warnings.log
           if-no-files-found: warn
 
-      - name: Test with coverage
-        run: dotnet test ConfluenceSynkMD.slnx --no-build --configuration Release --collect:"XPlat Code Coverage" --results-directory ./TestResults
+      - name: Test with coverage (enforced threshold)
+        run: |
+          dotnet test ConfluenceSynkMD.slnx \
+            --no-build \
+            --configuration Release \
+            /p:CollectCoverage=true \
+            /p:CoverletOutput=./TestResults/Coverage/ \
+            /p:CoverletOutputFormat=cobertura \
+            /p:ThresholdType=line \
+            /p:ThresholdStat=total \
+            /p:Threshold=90
 
       - name: Upload coverage artifact
         uses: actions/upload-artifact@v6
         with:
           name: coverage-reports
-          path: TestResults/**/coverage.cobertura.xml
+          path: |
+            **/TestResults/Coverage/coverage.cobertura.xml
           if-no-files-found: warn
 
       - name: Upload to Codecov (optional)
         if: ${{ env.CODECOV_TOKEN != '' }}
         uses: codecov/codecov-action@v5
         with:
-          files: TestResults/**/coverage.cobertura.xml
+          files: '**/TestResults/Coverage/coverage.cobertura.xml'
           fail_ci_if_error: false
