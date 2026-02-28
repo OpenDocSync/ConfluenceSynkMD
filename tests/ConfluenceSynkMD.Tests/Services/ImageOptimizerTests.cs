@@ -85,7 +85,7 @@ public sealed class ImageOptimizerTests : IDisposable
         }
     }
 
-    private ImageOptimizer CreateSut(bool optimizeImages, int maxWidth)
+    private static ImageOptimizer CreateSut(bool optimizeImages, int maxWidth)
     {
         var settings = Options.Create(new ConfluenceSettings
         {

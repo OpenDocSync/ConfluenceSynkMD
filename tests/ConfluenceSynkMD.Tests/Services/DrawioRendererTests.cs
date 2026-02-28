@@ -7,7 +7,7 @@ namespace ConfluenceSynkMD.Tests.Services;
 
 public class DrawioRendererTests
 {
-    private static readonly Lock EnvLock = new();
+    private static readonly SemaphoreSlim EnvLock = new(1, 1);
 
     [Fact]
     public void Constructor_Should_NotThrow()
@@ -27,7 +27,8 @@ public class DrawioRendererTests
 
         InvalidOperationException? exception;
 
-        lock (EnvLock)
+        await EnvLock.WaitAsync();
+        try
         {
             var originalPath = Environment.GetEnvironmentVariable("PATH");
             var originalDrawio = Environment.GetEnvironmentVariable("DRAWIO_CMD");
@@ -36,14 +37,18 @@ public class DrawioRendererTests
                 Environment.SetEnvironmentVariable("PATH", string.Empty);
                 Environment.SetEnvironmentVariable("DRAWIO_CMD", @"Z:\\does-not-exist\\drawio.exe");
 
-                exception = Assert.ThrowsAsync<InvalidOperationException>(
-                    () => renderer.RenderAsync("<mxfile></mxfile>")).GetAwaiter().GetResult();
+                exception = await Assert.ThrowsAsync<InvalidOperationException>(
+                    () => renderer.RenderAsync("<mxfile></mxfile>"));
             }
             finally
             {
                 Environment.SetEnvironmentVariable("PATH", originalPath);
                 Environment.SetEnvironmentVariable("DRAWIO_CMD", originalDrawio);
             }
+        }
+        finally
+        {
+            EnvLock.Release();
         }
 
         exception.Should().NotBeNull();

@@ -13,8 +13,9 @@
     <CollectCoverage>false</CollectCoverage>
     <CoverletOutputFormat>cobertura</CoverletOutputFormat>
     <ThresholdType>line</ThresholdType>
-    <Threshold>70</Threshold>
+    <Threshold>75</Threshold>
     <ThresholdStat>total</ThresholdStat>
+    <ExcludeByFile>**/RegexGenerator.g.cs,**/Program.cs</ExcludeByFile>
   </PropertyGroup>
 
   <ItemGroup>

@@ -49,7 +49,7 @@ public static class ConfluenceSettingsValidator
         }
     }
 
-    private static void NormalizeBaseUrlAndApiPath(ConfluenceSettings settings, ICollection<string> errors)
+    private static void NormalizeBaseUrlAndApiPath(ConfluenceSettings settings, List<string> errors)
     {
         if (!Uri.TryCreate(settings.BaseUrl.Trim(), UriKind.Absolute, out var baseUri)
             || !string.Equals(baseUri.Scheme, Uri.UriSchemeHttps, StringComparison.OrdinalIgnoreCase))

@@ -53,7 +53,7 @@ jobs:
             /p:CoverletOutputFormat="cobertura,json" \
             /p:ThresholdType=line \
             /p:ThresholdStat=total \
-            /p:Threshold=70
+            /p:Threshold=75
 
       - name: Upload coverage artifact
         uses: actions/upload-artifact@v6

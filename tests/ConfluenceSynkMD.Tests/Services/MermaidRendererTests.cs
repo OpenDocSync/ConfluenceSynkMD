@@ -7,7 +7,7 @@ namespace ConfluenceSynkMD.Tests.Services;
 
 public sealed class MermaidRendererTests
 {
-    private static readonly Lock _envLock = new();
+    private static readonly SemaphoreSlim _envLock = new(1, 1);
 
     [Fact]
     public void GenerateFileName_IsDeterministic()
@@ -49,20 +49,23 @@ public sealed class MermaidRendererTests
 
         InvalidOperationException? exception;
 
-        lock (_envLock)
+        await _envLock.WaitAsync();
+        try
         {
             var originalPath = Environment.GetEnvironmentVariable("PATH");
             try
             {
                 Environment.SetEnvironmentVariable("PATH", string.Empty);
-                exception = Assert.ThrowsAsync<InvalidOperationException>(() => sut.RenderToPngAsync(source))
-                    .GetAwaiter()
-                    .GetResult();
+                exception = await Assert.ThrowsAsync<InvalidOperationException>(() => sut.RenderToPngAsync(source));
             }
             finally
             {
                 Environment.SetEnvironmentVariable("PATH", originalPath);
             }
+        }
+        finally
+        {
+            _envLock.Release();
         }
 
         exception.Should().NotBeNull();
