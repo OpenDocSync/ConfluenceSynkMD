@@ -16,7 +16,7 @@ RUN dotnet publish src/ConfluenceSynkMD/ConfluenceSynkMD.csproj -c Release -o /a
 # ──────────────────────────────────────────────────────────────────────────────
 # Stage 2: Runtime image with Node.js + mermaid-cli
 # ──────────────────────────────────────────────────────────────────────────────
-FROM mcr.microsoft.com/dotnet/aspnet:10.0@sha256:52dcfb4225fda614c38ba5997a4ec72cbd5260a624125174416e547ff9eb9b8c AS runtime
+FROM mcr.microsoft.com/dotnet/aspnet:10.0@sha256:aec87aa74ddf129da573fa69f42f229a23c953a1c6fdecedea1aa6b1fe147d76 AS runtime
 
 ARG NODEJS_MAJOR=22
 ARG MERMAID_CLI_VERSION=11.12.0
