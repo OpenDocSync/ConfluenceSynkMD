@@ -37,7 +37,7 @@ jobs:
 
       - name: Upload build warnings artifact
         if: always()
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: build-warnings-log
           path: build.warnings.log
@@ -56,7 +56,7 @@ jobs:
             /p:Threshold=90
 
       - name: Upload coverage artifact
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: coverage-reports
           path: |
