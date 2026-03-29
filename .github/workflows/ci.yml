@@ -65,7 +65,7 @@ jobs:
 
       - name: Upload to Codecov (optional)
         if: ${{ env.CODECOV_TOKEN != '' }}
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v6
         with:
           files: '**/TestResults/Coverage/coverage.cobertura.xml'
           fail_ci_if_error: false
