@@ -58,38 +58,64 @@ Full documentation is available at **[opendocsync.github.io/ConfluenceSynkMD](ht
 
 ## Quick Start
 
+The fastest path is the published Docker image — Mermaid, Draw.io, PlantUML, LaTeX, and the .NET runtime are all pre-installed. Three commands and your docs are live in Confluence:
+
 ```bash
-# Clone and build
+# 1. Pre-flight: every renderer + Confluence auth in 30 seconds
+docker run --rm \
+  -e CONFLUENCE__BASEURL=https://yoursite.atlassian.net \
+  -e CONFLUENCE__USEREMAIL=you@example.com \
+  -e CONFLUENCE__APITOKEN=your-token \
+  ghcr.io/opendocsync/confluencesynkmd:0.1 doctor
+
+# 2. Upload your Markdown
+docker run --rm \
+  -e CONFLUENCE__BASEURL -e CONFLUENCE__USEREMAIL -e CONFLUENCE__APITOKEN \
+  -v "$PWD/docs:/workspace/docs:ro" \
+  ghcr.io/opendocsync/confluencesynkmd:0.1 \
+  upload --path /workspace/docs --conf-space YOUR_SPACE_KEY --conf-parent-id YOUR_PAGE_ID
+```
+
+That's it. The default `:0.1` image ships every renderer, so a Markdown file with `mermaid`, `drawio`, `plantuml`, and `latex` code blocks just works.
+
+### What ships in the default image
+
+| Renderer | Engine | Preinstalled |
+|---|---|---|
+| Mermaid | mermaid-cli + Chromium (Puppeteer) | ✅ |
+| Draw.io | drawio-desktop (Electron, headless via Xvfb) | ✅ |
+| PlantUML | plantuml + JRE | ✅ |
+| LaTeX | TeX Live + Ghostscript (no ImageMagick) | ✅ |
+
+### Other ways to run
+
+```bash
+# Build from source (.NET 10 SDK required)
 git clone https://github.com/OpenDocSync/ConfluenceSynkMD.git
 cd ConfluenceSynkMD
 dotnet build
 
-# Upload a documentation folder to Confluence
-dotnet run --project src/ConfluenceSynkMD -- \
-  upload \
-  --path ./docs \
-  --conf-space YOUR_SPACE_KEY \
-  --conf-parent-id YOUR_PAGE_ID
+# Local sync subcommands (no Docker)
+dotnet run --project src/ConfluenceSynkMD -- upload   --path ./docs --conf-space SPACE --conf-parent-id 12345
+dotnet run --project src/ConfluenceSynkMD -- download --path ./out  --conf-space SPACE --conf-parent-id 12345
+dotnet run --project src/ConfluenceSynkMD -- local    --path ./docs --conf-space SPACE
+dotnet run --project src/ConfluenceSynkMD -- doctor
+dotnet run --project src/ConfluenceSynkMD -- init
+```
 
-# Download Confluence pages back to Markdown
-dotnet run --project src/ConfluenceSynkMD -- \
-  download \
-  --path ./output \
-  --conf-space YOUR_SPACE_KEY \
-  --conf-parent-id YOUR_PAGE_ID
+### As a GitHub Action
 
-# Download a specific subtree by root page title
-dotnet run --project src/ConfluenceSynkMD -- \
-  download \
-  --path ./output \
-  --conf-space YOUR_SPACE_KEY \
-  --root-page "My Documentation"
-
-# Local export only (no API calls)
-dotnet run --project src/ConfluenceSynkMD -- \
-  local \
-  --path ./docs \
-  --conf-space YOUR_SPACE_KEY
+```yaml
+- uses: OpenDocSync/ConfluenceSynkMD@v1
+  with:
+    subcommand: upload
+    path: docs
+    conf-space: ${{ vars.CONFLUENCE_SPACE }}
+    conf-parent-id: ${{ vars.CONFLUENCE_PARENT_ID }}
+  env:
+    CONFLUENCE__BASEURL: ${{ secrets.CONFLUENCE_URL }}
+    CONFLUENCE__USEREMAIL: ${{ secrets.CONFLUENCE_EMAIL }}
+    CONFLUENCE__APITOKEN: ${{ secrets.CONFLUENCE_TOKEN }}
 ```
 
 ---

@@ -10,7 +10,7 @@ Upload converts your local Markdown files into Confluence Storage Format (XHTML)
 
     ```bash
     dotnet run --project src/ConfluenceSynkMD -- \
-      --mode Upload \
+      upload \
       --path ./docs \
       --conf-space DEV \
       --conf-parent-id 12345
@@ -20,7 +20,7 @@ Upload converts your local Markdown files into Confluence Storage Format (XHTML)
 
     ```powershell
     dotnet run --project src/ConfluenceSynkMD -- `
-      --mode Upload `
+      upload `
       --path ./docs `
       --conf-space DEV `
       --conf-parent-id 12345
@@ -30,7 +30,7 @@ Upload converts your local Markdown files into Confluence Storage Format (XHTML)
 
     ```cmd
     dotnet run --project src/ConfluenceSynkMD -- ^
-      --mode Upload ^
+      upload ^
       --path .\docs ^
       --conf-space DEV ^
       --conf-parent-id 12345
@@ -50,7 +50,7 @@ This uploads all `.md` files from `./docs` as child pages under page `12345` in 
             -e CONFLUENCE__APITOKEN=your-token \
             -v ${PWD}:/workspace \
             confluencesynkmd \
-            --mode Upload \
+            upload \
             --path /workspace/docs \
             --conf-space DEV \
             --conf-parent-id 12345
@@ -71,7 +71,7 @@ This uploads all `.md` files from `./docs` as child pages under page `12345` in 
             -e CONFLUENCE__APITOKEN=your-token `
             -v ${PWD}:/workspace `
             confluencesynkmd `
-            --mode Upload `
+            upload `
             --path /workspace/docs `
             --conf-space DEV `
             --conf-parent-id 12345
@@ -92,7 +92,7 @@ This uploads all `.md` files from `./docs` as child pages under page `12345` in 
             -e CONFLUENCE__APITOKEN=your-token ^
             -v %cd%:/workspace ^
             confluencesynkmd ^
-            --mode Upload ^
+            upload ^
             --path /workspace/docs ^
             --conf-space DEV ^
             --conf-parent-id 12345
@@ -149,7 +149,7 @@ Instead of `--conf-parent-id`, you can specify a root page by title. If the page
 
     ```bash
     dotnet run --project src/ConfluenceSynkMD -- \
-      --mode Upload \
+      upload \
       --path ./docs \
       --conf-space DEV \
       --root-page "My Documentation"
@@ -159,7 +159,7 @@ Instead of `--conf-parent-id`, you can specify a root page by title. If the page
 
     ```powershell
     dotnet run --project src/ConfluenceSynkMD -- `
-      --mode Upload `
+      upload `
       --path ./docs `
       --conf-space DEV `
       --root-page "My Documentation"
@@ -169,7 +169,7 @@ Instead of `--conf-parent-id`, you can specify a root page by title. If the page
 
     ```cmd
     dotnet run --project src/ConfluenceSynkMD -- ^
-      --mode Upload ^
+      upload ^
       --path .\docs ^
       --conf-space DEV ^
       --root-page "My Documentation"

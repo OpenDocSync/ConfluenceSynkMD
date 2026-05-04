@@ -4,11 +4,26 @@ Vollständige Referenz aller ConfluenceSynkMD-Kommandozeilenoptionen.
 
 ---
 
+## Subkommandos
+
+ConfluenceSynkMD wählt die Synchronisationsrichtung über ein Top-Level-Subkommando:
+
+| Subkommando | Beschreibung |
+|---|---|
+| `upload` | Markdown-Dokumente nach Confluence hochladen |
+| `download` | Confluence-Seiten zurück nach Markdown laden |
+| `local` | Lokale Confluence-Storage-Format-Ausgabe ohne API-Aufrufe |
+| `doctor` | Laufzeit-Selbsttest (Renderer + Confluence-Auth) |
+| `init` | Erst-Run-Wizard: Confluence-Credentials abfragen, validieren, Konfig schreiben |
+
+> Das alte `--mode <Upload\|Download\|LocalExport>`-Flag und das eigenständige `--local`-Flag wurden in v0.1.0 entfernt. Die Binary gibt einen Migrationshinweis aus, wenn sie die alte Syntax sieht.
+
 ## Kern-Optionen
+
+Diese Optionen gelten für jedes Sync-Subkommando (`upload` / `download` / `local`):
 
 | Option | Erforderlich | Standard | Beschreibung |
 |---|---|---|---|
-| `--mode <Upload\|Download\|LocalExport>` | ✅ | — | Synchronisationsrichtung |
 | `--path <Pfad>` | ✅ | — | Lokaler Dateisystempfad zu Markdown-Dateien |
 | `--conf-space <Key>` | ✅ | — | Confluence Space Key (z.B. `DEV`) |
 | `--conf-parent-id <ID>` | | — | Elternseiten-ID für Unterbaum-Operationen |
@@ -37,7 +52,6 @@ Vollständige Referenz aller ConfluenceSynkMD-Kommandozeilenoptionen.
 | `--keep-hierarchy` | `true` | Lokale Verzeichnishierarchie in Confluence beibehalten |
 | `--skip-hierarchy` | `false` | Alle Seiten flach unter die Wurzelseite legen |
 | `--skip-update` | `false` | Unveränderte Seiten nicht erneut hochladen |
-| `--local` | `false` | Nur lokale CSF-Ausgabe, keine API-Aufrufe |
 | `--no-write-back` | `false` | Keine Page-ID-Kommentare in Markdown zurückschreiben |
 | `--loglevel <Level>` | `info` | Log-Verbosität: `debug`, `info`, `warning`, `error`, `critical` |
 
@@ -104,7 +118,7 @@ Vollständige Referenz aller ConfluenceSynkMD-Kommandozeilenoptionen.
 
     ```bash
     dotnet run --project src/ConfluenceSynkMD -- \
-      --mode Upload \
+      upload \
       --path ./docs \
       --conf-space DEV \
       --root-page "Meine Dokumentation" \
@@ -123,7 +137,7 @@ Vollständige Referenz aller ConfluenceSynkMD-Kommandozeilenoptionen.
 
     ```powershell
     dotnet run --project src/ConfluenceSynkMD -- `
-      --mode Upload `
+      upload `
       --path ./docs `
       --conf-space DEV `
       --root-page "Meine Dokumentation" `
@@ -142,7 +156,7 @@ Vollständige Referenz aller ConfluenceSynkMD-Kommandozeilenoptionen.
 
     ```cmd
     dotnet run --project src/ConfluenceSynkMD -- ^
-      --mode Upload ^
+      upload ^
       --path .\docs ^
       --conf-space DEV ^
       --root-page "Meine Dokumentation" ^
@@ -163,7 +177,7 @@ Vollständige Referenz aller ConfluenceSynkMD-Kommandozeilenoptionen.
 
     ```bash
     dotnet run --project src/ConfluenceSynkMD -- \
-      --mode Download --path ./output \
+      download --path ./output \
       --conf-space DEV --conf-parent-id 12345
     ```
 
@@ -171,7 +185,7 @@ Vollständige Referenz aller ConfluenceSynkMD-Kommandozeilenoptionen.
 
     ```powershell
     dotnet run --project src/ConfluenceSynkMD -- `
-      --mode Download --path ./output `
+      download --path ./output `
       --conf-space DEV --conf-parent-id 12345
     ```
 
@@ -179,7 +193,7 @@ Vollständige Referenz aller ConfluenceSynkMD-Kommandozeilenoptionen.
 
     ```cmd
     dotnet run --project src/ConfluenceSynkMD -- ^
-      --mode Download --path .\output ^
+      download --path .\output ^
       --conf-space DEV --conf-parent-id 12345
     ```
 
@@ -189,10 +203,10 @@ Vollständige Referenz aller ConfluenceSynkMD-Kommandozeilenoptionen.
 
     ```bash
     dotnet run --project src/ConfluenceSynkMD -- \
-      --mode Upload \
+      upload \
       --path ./docs \
       --conf-space DEV \
-      --local \
+
       --debug-line-markers \
       --loglevel debug
     ```
@@ -201,10 +215,10 @@ Vollständige Referenz aller ConfluenceSynkMD-Kommandozeilenoptionen.
 
     ```powershell
     dotnet run --project src/ConfluenceSynkMD -- `
-      --mode Upload `
+      upload `
       --path ./docs `
       --conf-space DEV `
-      --local `
+
       --debug-line-markers `
       --loglevel debug
     ```
@@ -213,10 +227,10 @@ Vollständige Referenz aller ConfluenceSynkMD-Kommandozeilenoptionen.
 
     ```cmd
     dotnet run --project src/ConfluenceSynkMD -- ^
-      --mode Upload ^
+      upload ^
       --path .\docs ^
       --conf-space DEV ^
-      --local ^
+
       --debug-line-markers ^
       --loglevel debug
     ```

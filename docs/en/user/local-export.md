@@ -10,34 +10,31 @@ Local Export converts Markdown to Confluence Storage Format (XHTML) on your loca
 
     ```bash
     dotnet run --project src/ConfluenceSynkMD -- \
-      --mode Upload \
+      upload \
       --path ./docs \
       --conf-space DEV \
-      --local
     ```
 
 === "PowerShell"
 
     ```powershell
     dotnet run --project src/ConfluenceSynkMD -- `
-      --mode Upload `
+      upload `
       --path ./docs `
       --conf-space DEV `
-      --local
     ```
 
 === "CMD"
 
     ```cmd
     dotnet run --project src/ConfluenceSynkMD -- ^
-      --mode Upload ^
+      upload ^
       --path .\docs ^
       --conf-space DEV ^
-      --local
     ```
 
 !!! note
-    The `--local` flag overrides the mode to `LocalExport` regardless of the `--mode` value. The `--conf-space` is still required for link resolution but no API calls are made.
+    The `local` subcommand flag overrides the mode to `LocalExport` regardless of the `<subcommand>` value. The `--conf-space` is still required for link resolution but no API calls are made.
 
 ---
 
@@ -57,21 +54,21 @@ Run a local export to inspect the generated XHTML before pushing to Confluence:
 
     ```bash
     dotnet run --project src/ConfluenceSynkMD -- \
-      --mode Upload --path ./docs --conf-space DEV --local
+      local --path ./docs --conf-space DEV
     ```
 
 === "PowerShell"
 
     ```powershell
     dotnet run --project src/ConfluenceSynkMD -- `
-      --mode Upload --path ./docs --conf-space DEV --local
+      local --path ./docs --conf-space DEV
     ```
 
 === "CMD"
 
     ```cmd
     dotnet run --project src/ConfluenceSynkMD -- ^
-      --mode Upload --path .\docs --conf-space DEV --local
+      local --path .\docs --conf-space DEV
     ```
 
 ### CI Pipeline Validation
@@ -82,7 +79,7 @@ Add a local export step to your CI pipeline to verify that all Markdown files co
 - name: Validate Confluence conversion
   run: |
     dotnet run --project src/ConfluenceSynkMD -- \
-      --mode Upload --path ./docs --conf-space DEV --local
+      local --path ./docs --conf-space DEV
 ```
 
 ### Debugging Conversion Issues
@@ -93,22 +90,22 @@ Combine with `--debug-line-markers` and `--loglevel debug` for detailed output:
 
     ```bash
     dotnet run --project src/ConfluenceSynkMD -- \
-      --mode Upload --path ./docs --conf-space DEV \
-      --local --debug-line-markers --loglevel debug
+      local --path ./docs --conf-space DEV \
+      --debug-line-markers --loglevel debug
     ```
 
 === "PowerShell"
 
     ```powershell
     dotnet run --project src/ConfluenceSynkMD -- `
-      --mode Upload --path ./docs --conf-space DEV `
-      --local --debug-line-markers --loglevel debug
+      local --path ./docs --conf-space DEV `
+      --debug-line-markers --loglevel debug
     ```
 
 === "CMD"
 
     ```cmd
     dotnet run --project src/ConfluenceSynkMD -- ^
-      --mode Upload --path .\docs --conf-space DEV ^
-      --local --debug-line-markers --loglevel debug
+      local --path .\docs --conf-space DEV ^
+      --debug-line-markers --loglevel debug
     ```

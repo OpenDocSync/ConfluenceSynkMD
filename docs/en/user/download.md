@@ -10,7 +10,7 @@ Download fetches Confluence pages and converts them back into Markdown files on 
 
     ```bash
     dotnet run --project src/ConfluenceSynkMD -- \
-      --mode Download \
+      download \
       --path ./output \
       --conf-space DEV \
       --conf-parent-id 12345
@@ -20,7 +20,7 @@ Download fetches Confluence pages and converts them back into Markdown files on 
 
     ```powershell
     dotnet run --project src/ConfluenceSynkMD -- `
-      --mode Download `
+      download `
       --path ./output `
       --conf-space DEV `
       --conf-parent-id 12345
@@ -30,7 +30,7 @@ Download fetches Confluence pages and converts them back into Markdown files on 
 
     ```cmd
     dotnet run --project src/ConfluenceSynkMD -- ^
-      --mode Download ^
+      download ^
       --path .\output ^
       --conf-space DEV ^
       --conf-parent-id 12345
@@ -50,7 +50,7 @@ This downloads all child pages under page `12345` in space `DEV` and saves them 
       -e CONFLUENCE__APITOKEN=your-token \
       -v ${PWD}:/workspace \
       confluencesynkmd \
-      --mode Download \
+      download \
       --path /workspace/output \
       --conf-space DEV \
       --conf-parent-id 12345
@@ -71,7 +71,7 @@ This downloads all child pages under page `12345` in space `DEV` and saves them 
       -e CONFLUENCE__APITOKEN=your-token `
       -v ${PWD}:/workspace `
       confluencesynkmd `
-      --mode Download `
+      download `
       --path /workspace/output `
       --conf-space DEV `
       --conf-parent-id 12345
@@ -92,7 +92,7 @@ This downloads all child pages under page `12345` in space `DEV` and saves them 
       -e CONFLUENCE__APITOKEN=your-token ^
       -v %cd%:/workspace ^
       confluencesynkmd ^
-      --mode Download ^
+      download ^
       --path /workspace/output ^
       --conf-space DEV ^
       --conf-parent-id 12345
@@ -113,7 +113,7 @@ Instead of using a numeric page ID, you can specify the root page by title:
 
     ```bash
     dotnet run --project src/ConfluenceSynkMD -- \
-      --mode Download \
+      download \
       --path ./output \
       --conf-space DEV \
       --root-page "My Documentation"
@@ -123,7 +123,7 @@ Instead of using a numeric page ID, you can specify the root page by title:
 
     ```powershell
     dotnet run --project src/ConfluenceSynkMD -- `
-      --mode Download `
+      download `
       --path ./output `
       --conf-space DEV `
       --root-page "My Documentation"
@@ -133,7 +133,7 @@ Instead of using a numeric page ID, you can specify the root page by title:
 
     ```cmd
     dotnet run --project src/ConfluenceSynkMD -- ^
-      --mode Download ^
+      download ^
       --path .\output ^
       --conf-space DEV ^
       --root-page "My Documentation"
@@ -177,7 +177,7 @@ output/
     ```bash
     # Download all pages from a Confluence space
     dotnet run --project src/ConfluenceSynkMD -- \
-      --mode Download \
+      download \
       --path ./migrated-docs \
       --conf-space TEAM \
       --conf-parent-id 98765
@@ -188,7 +188,7 @@ output/
     ```powershell
     # Download all pages from a Confluence space
     dotnet run --project src/ConfluenceSynkMD -- `
-      --mode Download `
+      download `
       --path ./migrated-docs `
       --conf-space TEAM `
       --conf-parent-id 98765
@@ -199,7 +199,7 @@ output/
     ```cmd
     REM Download all pages from a Confluence space
     dotnet run --project src/ConfluenceSynkMD -- ^
-      --mode Download ^
+      download ^
       --path .\migrated-docs ^
       --conf-space TEAM ^
       --conf-parent-id 98765
@@ -216,7 +216,7 @@ If someone edits a page directly in Confluence:
     ```bash
     # Download the latest state
     dotnet run --project src/ConfluenceSynkMD -- \
-      --mode Download \
+      download \
       --path ./docs \
       --conf-space DEV \
       --root-page "My Documentation"
@@ -227,7 +227,7 @@ If someone edits a page directly in Confluence:
     ```powershell
     # Download the latest state
     dotnet run --project src/ConfluenceSynkMD -- `
-      --mode Download `
+      download `
       --path ./docs `
       --conf-space DEV `
       --root-page "My Documentation"
@@ -238,7 +238,7 @@ If someone edits a page directly in Confluence:
     ```cmd
     REM Download the latest state
     dotnet run --project src/ConfluenceSynkMD -- ^
-      --mode Download ^
+      download ^
       --path .\docs ^
       --conf-space DEV ^
       --root-page "My Documentation"
