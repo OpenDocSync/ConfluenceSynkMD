@@ -32,24 +32,48 @@ jobs:
 
           node_major = re.search(r"^ARG\s+NODEJS_MAJOR=([^\s]+)$", dockerfile, re.MULTILINE)
           mermaid = re.search(r"^ARG\s+MERMAID_CLI_VERSION=([^\s]+)$", dockerfile, re.MULTILINE)
+          drawio = re.search(r"^ARG\s+DRAWIO_VERSION=([^\s]+)$", dockerfile, re.MULTILINE)
 
-          if not node_major or not mermaid:
-              raise SystemExit("Could not parse required Dockerfile args (NODEJS_MAJOR / MERMAID_CLI_VERSION)")
+          if not node_major or not mermaid or not drawio:
+              raise SystemExit("Could not parse required Dockerfile args (NODEJS_MAJOR / MERMAID_CLI_VERSION / DRAWIO_VERSION)")
 
           with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as out:
               out.write(f"node_major={node_major.group(1)}\n")
               out.write(f"mermaid_current={mermaid.group(1)}\n")
+              out.write(f"drawio_current={drawio.group(1)}\n")
           PY
 
       - name: Resolve latest dependency versions
         id: latest
         shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
 
           MERMAID_LATEST=$(docker run --rm node:22-alpine sh -lc "npm view @mermaid-js/mermaid-cli version")
 
+          # Resolve latest drawio-desktop release that ships an amd64 .deb asset.
+          # We require an amd64 .deb to exist on the release before bumping the pin —
+          # if upstream skipped a release for amd64, hold on the current pin.
+          DRAWIO_LATEST=$(gh api repos/jgraph/drawio-desktop/releases \
+            --jq '[.[] | select(.draft==false and .prerelease==false) | select(.assets | map(.name) | any(test("^drawio-amd64-.*\\.deb$"))) | .tag_name] | .[0]' \
+            | sed 's/^v//')
+
+          if [ -z "${DRAWIO_LATEST}" ]; then
+            echo "ERROR: could not resolve latest drawio-desktop release with amd64 .deb asset" >&2
+            exit 1
+          fi
+
           echo "mermaid_latest=${MERMAID_LATEST}" >> "${GITHUB_OUTPUT}"
+          echo "drawio_latest=${DRAWIO_LATEST}" >> "${GITHUB_OUTPUT}"
+
+          # Check whether the same release also has an arm64 .deb. We do NOT
+          # block the bump when arm64 is missing, but we surface it in the PR
+          # body so reviewers can decide whether to land amd64-only or wait.
+          DRAWIO_ARM64_AVAILABLE=$(gh api "repos/jgraph/drawio-desktop/releases/tags/v${DRAWIO_LATEST}" \
+            --jq '.assets | map(.name) | any(test("^drawio-arm64-.*\\.deb$"))')
+          echo "drawio_arm64_available=${DRAWIO_ARM64_AVAILABLE}" >> "${GITHUB_OUTPUT}"
 
       - name: Update Dockerfile when drift detected
         id: update
@@ -57,10 +81,22 @@ jobs:
         env:
           MERMAID_CURRENT: ${{ steps.parse.outputs.mermaid_current }}
           MERMAID_LATEST: ${{ steps.latest.outputs.mermaid_latest }}
+          DRAWIO_CURRENT: ${{ steps.parse.outputs.drawio_current }}
+          DRAWIO_LATEST: ${{ steps.latest.outputs.drawio_latest }}
         run: |
           set -euo pipefail
 
-          if [ "${MERMAID_CURRENT}" = "${MERMAID_LATEST}" ]; then
+          MERMAID_CHANGED=false
+          DRAWIO_CHANGED=false
+
+          if [ "${MERMAID_CURRENT}" != "${MERMAID_LATEST}" ]; then
+            MERMAID_CHANGED=true
+          fi
+          if [ "${DRAWIO_CURRENT}" != "${DRAWIO_LATEST}" ]; then
+            DRAWIO_CHANGED=true
+          fi
+
+          if [ "${MERMAID_CHANGED}" = "false" ] && [ "${DRAWIO_CHANGED}" = "false" ]; then
             echo "needs_update=false" >> "${GITHUB_OUTPUT}"
             echo "No dependency drift detected."
             exit 0
@@ -74,39 +110,49 @@ jobs:
           path = Path("Dockerfile")
           content = path.read_text(encoding="utf-8")
 
-          updated = re.sub(
-              r"^ARG\s+MERMAID_CLI_VERSION=.*$",
-              f"ARG MERMAID_CLI_VERSION={os.environ['MERMAID_LATEST']}",
-              content,
-              flags=re.MULTILINE,
-          )
+          if os.environ["MERMAID_CURRENT"] != os.environ["MERMAID_LATEST"]:
+              content = re.sub(
+                  r"^ARG\s+MERMAID_CLI_VERSION=.*$",
+                  f"ARG MERMAID_CLI_VERSION={os.environ['MERMAID_LATEST']}",
+                  content,
+                  flags=re.MULTILINE,
+              )
+          if os.environ["DRAWIO_CURRENT"] != os.environ["DRAWIO_LATEST"]:
+              content = re.sub(
+                  r"^ARG\s+DRAWIO_VERSION=.*$",
+                  f"ARG DRAWIO_VERSION={os.environ['DRAWIO_LATEST']}",
+                  content,
+                  flags=re.MULTILINE,
+              )
 
-          if updated == content:
-              raise SystemExit("Failed to update MERMAID_CLI_VERSION in Dockerfile")
-
-          path.write_text(updated, encoding="utf-8")
+          path.write_text(content, encoding="utf-8")
           PY
 
           echo "needs_update=true" >> "${GITHUB_OUTPUT}"
+          echo "mermaid_changed=${MERMAID_CHANGED}" >> "${GITHUB_OUTPUT}"
+          echo "drawio_changed=${DRAWIO_CHANGED}" >> "${GITHUB_OUTPUT}"
 
       - name: Create pull request for dependency refresh
         if: steps.update.outputs.needs_update == 'true'
         uses: peter-evans/create-pull-request@v7
         with:
-          commit-message: "chore(docker): refresh mermaid-cli pin"
+          commit-message: "chore(docker): refresh image dependency pins"
           branch: "chore/docker-dependency-refresh"
           delete-branch: true
-          title: "chore(docker): refresh mermaid-cli pin"
+          title: "chore(docker): refresh image dependency pins"
           body: |
             Automated Docker dependency refresh.
 
             - `MERMAID_CLI_VERSION`: `${{ steps.parse.outputs.mermaid_current }}` → `${{ steps.latest.outputs.mermaid_latest }}`
+            - `DRAWIO_VERSION`: `${{ steps.parse.outputs.drawio_current }}` → `${{ steps.latest.outputs.drawio_latest }}`
             - `NODEJS_MAJOR`: `${{ steps.parse.outputs.node_major }}` (tracked major channel)
+            - drawio-desktop arm64 .deb available on latest tag: `${{ steps.latest.outputs.drawio_arm64_available }}`
 
             Notes:
             - Ubuntu APT packages are intentionally unpinned in `Dockerfile` to receive security updates during regular rebuilds.
             - Base images remain digest-pinned for supply-chain integrity.
             - This PR updates only intentional app-level pinning.
+            - If `drawio_arm64_available` is `false`, hold this PR until upstream publishes an arm64 `.deb`, or land amd64-only and reopen when arm64 lands.
 
       - name: Job summary
         shell: bash
@@ -115,4 +161,7 @@ jobs:
           echo "- Node major: \`${{ steps.parse.outputs.node_major }}\`" >> "${GITHUB_STEP_SUMMARY}"
           echo "- Mermaid current: \`${{ steps.parse.outputs.mermaid_current }}\`" >> "${GITHUB_STEP_SUMMARY}"
           echo "- Mermaid latest: \`${{ steps.latest.outputs.mermaid_latest }}\`" >> "${GITHUB_STEP_SUMMARY}"
+          echo "- Drawio current: \`${{ steps.parse.outputs.drawio_current }}\`" >> "${GITHUB_STEP_SUMMARY}"
+          echo "- Drawio latest: \`${{ steps.latest.outputs.drawio_latest }}\`" >> "${GITHUB_STEP_SUMMARY}"
+          echo "- Drawio arm64 available: \`${{ steps.latest.outputs.drawio_arm64_available }}\`" >> "${GITHUB_STEP_SUMMARY}"
           echo "- Update required: \`${{ steps.update.outputs.needs_update || 'false' }}\`" >> "${GITHUB_STEP_SUMMARY}"
