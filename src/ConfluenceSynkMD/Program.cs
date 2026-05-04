@@ -1,5 +1,6 @@
 using System.CommandLine;
 using System.CommandLine.Parsing;
+using ConfluenceSynkMD.Commands;
 using ConfluenceSynkMD.Configuration;
 using ConfluenceSynkMD.ETL.Core;
 using ConfluenceSynkMD.ETL.Extract;
@@ -54,6 +55,20 @@ builder.Services.AddSingleton<Serilog.ILogger>(_ => Log.Logger);
 
 // Confluence API client (typed HttpClient)
 builder.Services.AddHttpClient<IConfluenceApiClient, ConfluenceApiClient>();
+
+// Confluence health check (separate typed HttpClient — independent connection
+// pool and request headers from the main API client; consumed by `doctor`).
+builder.Services.AddHttpClient<IConfluenceHealthCheck, ConfluenceHealthCheck>();
+
+// Doctor command (resolves all four renderers + the health check).
+builder.Services.AddTransient<DoctorCommand>(sp => new DoctorCommand(
+    sp.GetRequiredService<IMermaidRenderer>(),
+    sp.GetRequiredService<DrawioRenderer>(),
+    sp.GetRequiredService<PlantUmlRenderer>(),
+    sp.GetRequiredService<ILatexRenderer>(),
+    sp.GetRequiredService<IConfluenceHealthCheck>(),
+    Console.Out,
+    sp.GetRequiredService<Serilog.ILogger>()));
 
 // Shared services
 builder.Services.AddSingleton<FrontmatterParser>();
@@ -302,9 +317,26 @@ var localCommand = new Command("local", "Produce local Confluence Storage Format
 AddSharedOptions(localCommand);
 localCommand.SetAction((parseResult, ct) => RunPipelineAsync(parseResult, ct, SyncMode.LocalExport, localOnly: true));
 
+// `doctor` does not share the sync-pipeline options — its surface is just
+// `--renderers-only`. It runs renderer canaries and the Confluence health
+// probe, then prints a green/red checklist. The release-container.yml smoke
+// step calls this with `--renderers-only` against the freshly-built image.
+var renderersOnlyOption = new Option<bool>("--renderers-only");
+renderersOnlyOption.Description = "Skip the Confluence auth probe; only validate renderer health.";
+
+var doctorCommand = new Command("doctor", "Runtime self-test: render canaries via every renderer and probe Confluence auth.");
+doctorCommand.Options.Add(renderersOnlyOption);
+doctorCommand.SetAction(async (parseResult, ct) =>
+{
+    var renderersOnly = parseResult.GetValue(renderersOnlyOption);
+    var doctor = host.Services.GetRequiredService<DoctorCommand>();
+    return await doctor.RunAsync(renderersOnly, ct);
+});
+
 rootCommand.Subcommands.Add(uploadCommand);
 rootCommand.Subcommands.Add(downloadCommand);
 rootCommand.Subcommands.Add(localCommand);
+rootCommand.Subcommands.Add(doctorCommand);
 
 // -- Pipeline runner (shared by all three subcommands) -----------------------
 
