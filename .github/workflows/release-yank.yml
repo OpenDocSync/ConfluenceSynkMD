@@ -1,0 +1,87 @@
+name: Release Yank (emergency)
+
+# Manually-triggered last-resort workflow that deletes a *tag* (not a digest)
+# from the GHCR container registry. Use only for security-grade incidents
+# where a published release contains an actively dangerous bug or leaked
+# credential. For routine bugs, ship a forward-only patch (`:0.1.x+1`) and
+# let the moving `:0.1` tag advance.
+#
+# CRITICAL: Pinned digest pulls (e.g. `confluencesynkmd@sha256:...`) remain
+# valid after a yank. Only the *named* tag is removed. This is intentional —
+# users who pinned by digest pinned for a reason; ripping the digest out of
+# the registry would break their CI.
+#
+# Decision criteria for invoking this workflow:
+#   - The release exposes a security regression that no forward patch fixes.
+#   - The image layers contain a leaked secret/key/credential.
+#   - The release is otherwise actively harmful when pulled.
+# If none apply, ship a forward-only patch instead.
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Image tag to delete (e.g. 0.1.3 — without the v-prefix). Digest pulls remain pullable.'
+        required: true
+        type: string
+      reason:
+        description: 'Why is this release being yanked? (Required — appears in audit log.)'
+        required: true
+        type: string
+
+permissions:
+  packages: write
+
+jobs:
+  yank:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Confirm intent
+        run: |
+          echo "Yanking ghcr.io/${{ github.repository_owner }}/confluencesynkmd:${{ inputs.tag }}"
+          echo "Reason: ${{ inputs.reason }}"
+          echo "Triggered by: ${{ github.actor }}"
+          echo "::warning ::This deletes the *tag* only. Pinned digest pulls remain valid."
+
+      - name: Resolve and delete container tag
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OWNER: ${{ github.repository_owner }}
+          TAG: ${{ inputs.tag }}
+        run: |
+          set -euo pipefail
+
+          # OpenDocSync is an org. If this repo is ever forked under a user
+          # account, swap `/orgs/${OWNER}` for `/users/${OWNER}` below.
+          PKG_PATH="/orgs/${OWNER}/packages/container/confluencesynkmd"
+
+          # Find the version ID whose tags include the requested tag.
+          VERSION_ID=$(gh api --paginate "${PKG_PATH}/versions" \
+            --jq "[.[] | select(.metadata.container.tags[]? == \"${TAG}\") | .id] | first")
+
+          if [ -z "${VERSION_ID}" ] || [ "${VERSION_ID}" = "null" ]; then
+            echo "::error ::No container version found with tag '${TAG}'."
+            echo "Available tags (first page):"
+            gh api "${PKG_PATH}/versions" \
+              --jq '.[] | {id, tags: .metadata.container.tags}' \
+              | head -50
+            exit 1
+          fi
+
+          echo "Resolved tag '${TAG}' to version id ${VERSION_ID}."
+          gh api -X DELETE "${PKG_PATH}/versions/${VERSION_ID}"
+          echo "::notice ::Tag '${TAG}' deleted. Pinned digest pulls for the same image remain valid."
+
+      - name: Audit log entry
+        run: |
+          {
+            echo "## Release tag yanked"
+            echo ""
+            echo "- **Tag:** ${{ inputs.tag }}"
+            echo "- **Triggered by:** ${{ github.actor }}"
+            echo "- **Reason:** ${{ inputs.reason }}"
+            echo ""
+            echo "Pinned digest pulls remain valid. Forward-only patch should follow."
+          } >> "${GITHUB_STEP_SUMMARY}"
