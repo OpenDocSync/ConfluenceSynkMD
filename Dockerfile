@@ -33,7 +33,7 @@ ARG TARGETARCH
 
 ENV PUPPETEER_CACHE_DIR=/app/.cache/puppeteer \
     DISPLAY=:99 \
-    DRAWIO_CMD="drawio --no-sandbox --disable-gpu"
+    DRAWIO_CMD=drawio-headless
 
 # System packages.
 # - Chromium runtime libs for Puppeteer (Mermaid renderer).
@@ -117,6 +117,15 @@ RUN echo '{"args": ["--no-sandbox", "--disable-setuid-sandbox"]}' > /app/puppete
 # xvfb-run startup cost. See entrypoint.sh for the full startup contract.
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
+
+# drawio-desktop invocation wrapper. Electron flags (--no-sandbox /
+# --disable-gpu / --disable-dev-shm-usage) MUST appear before drawio's own
+# CLI options or commander.js mis-parses them as positional input paths
+# and exits with "Error: input file/directory not found". The shim exec's
+# drawio with the Electron flags, then "$@" forwards the renderer's export
+# args. ENV DRAWIO_CMD=drawio-headless points DrawioRenderer here.
+COPY drawio-headless.sh /usr/local/bin/drawio-headless
+RUN chmod +x /usr/local/bin/drawio-headless
 
 COPY --from=build /app/publish .
 
