@@ -5,53 +5,107 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.1.0] - 2026-05-05
 
-This section tracks work toward the upcoming `v0.1.0` release: a portable
-Confluence publishing engine packaged as a single multi-arch Docker image
-with the full diagram toolchain (Mermaid, Draw.io, PlantUML, LaTeX) baked in.
+The first published, signed, multi-arch release. ConfluenceSynkMD now ships
+as a single Docker image with the full diagram toolchain preinstalled — no
+host-side Node, Java, TeX Live, or drawio installs required.
 
 ### Added
-- **Full diagram toolchain in the runtime image.** The Docker image now ships
-  Java + PlantUML, TeX Live + Ghostscript, and drawio-desktop alongside the
-  existing Node + mermaid-cli + Chromium. `--render-drawio`, `--render-plantuml`,
-  and `--render-latex` work out of the box without host-side installs.
+
+- **Full diagram toolchain in the runtime image.** The Docker image ships
+  Node.js 22 + `@mermaid-js/mermaid-cli` + Chromium (Mermaid), Java +
+  `plantuml` (PlantUML), TeX Live + Ghostscript (LaTeX), and drawio-desktop
+  + Xvfb (Draw.io). `--render-mermaid`, `--render-drawio`, `--render-plantuml`,
+  and `--render-latex` work out of the box.
 - **Container entrypoint with shared Xvfb display server.** `entrypoint.sh`
   starts a single `Xvfb :99` for the container's lifetime so drawio-desktop
-  (Electron) can run headlessly without restarting the display server per
-  diagram.
+  (Electron) can run headless without restarting the display server per
+  diagram. Polls `xdpyinfo` for up to 5 seconds before exec'ing dotnet to
+  close the startup race.
+- **`doctor` subcommand.** Runtime self-test that renders a small canary
+  diagram via every external-process renderer and probes the configured
+  Confluence instance via `IConfluenceHealthCheck`. Prints a green/red
+  checklist; exits 0 if every check passed, 1 otherwise. The release
+  workflow uses `doctor --renderers-only` as the smoke gate before pushing
+  any tag to GHCR.
+- **`init` subcommand.** First-run wizard. Reads `CONFLUENCE__*` env vars,
+  prompts for whatever is missing (refusing under `--non-interactive` or
+  when stdin is redirected, with a single-line error naming the missing
+  vars), validates against Confluence via `IConfluenceHealthCheck`, and
+  writes `.confluencesynkmd.json` (or `--config-out PATH`).
+- **`IConfluenceHealthCheck` service.** Lightweight reachability + auth
+  probe. Hits `GET /wiki/api/v2/spaces?limit=1` with a 10s default timeout;
+  falls back to v1 on 404; classifies responses into Healthy / NotConfigured
+  / AuthError / UpstreamError / NetworkError. Consumed by both `doctor`
+  and `init`.
+- **`RendererCommandResolver` shared helper.** Parses renderer command
+  env vars (`DRAWIO_CMD`, `PLANTUML_CMD`, `LATEX_PDFLATEX_CMD`,
+  `LATEX_GHOSTSCRIPT_CMD`) as shell-style command-plus-args strings.
+  Single-binary names (the previous contract) and multi-token invocations
+  (e.g. `xvfb-run -a drawio --no-sandbox --disable-gpu`) are both supported.
+- **Release workflow** at `.github/workflows/release-container.yml`.
+  Triggered on `v*.*.*` tag push: builds amd64 with `--load`, smoke-tests
+  via `doctor --renderers-only` BEFORE pushing, then builds + pushes
+  multi-arch (linux/amd64 + linux/arm64) to GHCR with provenance + SBOM
+  attestations. Signs the manifest list with cosign keyless OIDC and
+  immediately re-runs `cosign verify` to prove the user-facing
+  verification snippet works against the signed bytes.
+- **Emergency yank workflow** at `.github/workflows/release-yank.yml`.
+  Manual `workflow_dispatch` only; requires a written `reason` input that
+  lands in the step summary as an audit-log entry. Tag-only delete via
+  `gh api`; pinned digest pulls remain valid.
+- **GitHub Action wrapper** at `action.yml`. Composite action consuming
+  the published image. Inputs: `subcommand`, `path`, `conf-space`,
+  `conf-parent-id`, `keep-hierarchy`, `skip-update`, `image`, `extra-args`.
+  Mounts the workspace read-only for `upload`, writable for
+  `download`/`local`. Forwards `CONFLUENCE__*` env vars to the container.
 - **`DRAWIO_VERSION` Dockerfile pin** tracked monthly by
   `.github/workflows/docker-manual-pin-check.yml` alongside the existing
-  `MERMAID_CLI_VERSION` and `NODEJS_MAJOR` pins. The refresh PR body surfaces
-  arm64 `.deb` availability for the candidate version.
-- **Renderer cmd-args parsing.** `DRAWIO_CMD`, `PLANTUML_CMD`,
-  `LATEX_PDFLATEX_CMD`, and `LATEX_GHOSTSCRIPT_CMD` env vars now accept
-  multi-token values (e.g. `xvfb-run -a drawio --no-sandbox`) via a shared
-  `RendererCommandResolver` helper. Single-binary names (the previous contract)
-  remain valid.
-- **`.gitattributes`** forcing LF line endings on `.sh`, `Dockerfile`, and YAML
-  files so contributors on Windows do not accidentally introduce CRLF in
+  `MERMAID_CLI_VERSION` and `NODEJS_MAJOR` pins. The refresh PR body
+  surfaces arm64 `.deb` availability for the candidate version.
+- **`CliMigrationCheck`** detects users running the legacy `--mode <Value>`,
+  `--mode=Value`, `--mode:Value`, or bare `--local` syntax at startup and
+  prints an inline migration table before exiting with code 2. No silent
+  failures for users on the v0 CLI shape.
+- **`.gitattributes`** forcing LF line endings on `.sh`, `Dockerfile`, and
+  YAML files so Windows contributors do not introduce CRLF in
   Linux-target files.
 
 ### Changed
-- **CLI shape: subcommand tree.** `--mode Upload|Download|LocalExport` was
-  replaced by three top-level subcommands: `upload`, `download`, `local`.
-  This matches the idiomatic System.CommandLine pattern and clears the way
-  for the `doctor` and `init` subcommands shipping later in v0.1.0.
+
+- **CLI shape: subcommand tree.** `--mode Upload|Download|LocalExport`
+  was replaced by three top-level subcommands (`upload`, `download`, `local`)
+  alongside `doctor` and `init`. This matches the idiomatic
+  System.CommandLine pattern. Pre-1.0 makes the breaking change cheap;
+  the migration check above keeps users informed.
 - **`LatexRenderer` calls Ghostscript directly.** The PDF→PNG rasterization
   step previously delegated to ImageMagick's `convert`, which itself wraps
   Ghostscript. Calling `gs` directly drops the ImageMagick dependency from
   the runtime image (~80 MB) and removes the need for the `policy.xml`
-  workaround for PDF read defaults.
-- **Migration error message** for users hitting the legacy `--mode` / `--local`
-  flags now inlines the migration table instead of referencing an external
-  changelog entry.
+  workaround for ImageMagick's PDF read defaults. Adds
+  `LATEX_PDFLATEX_CMD` and `LATEX_GHOSTSCRIPT_CMD` env-var overrides.
+- **README headline** rewritten around the published Docker image. The new
+  Quick Start is three commands (`doctor`, `upload`, done). Also gains a
+  "What ships in the default image" coherence table and a GitHub Action
+  snippet.
 
 ### Removed
+
 - **`--mode` flag** (replaced by subcommands above).
 - **`--local` flag** (replaced by the `local` subcommand).
 - **ImageMagick** from the runtime image (Ghostscript handles PDF→PNG
-  natively; no functionality lost).
+  natively; no functionality lost). The previously documented
+  `policy.xml` workaround is no longer required.
+
+### Security
+
+- **Cosign-signed multi-arch image.** Every `v*.*.*` release publishes a
+  manifest-list digest signed by cosign keyless OIDC against the GitHub
+  Actions workflow that built it. SBOM (`docker/build-push-action`
+  `sbom: true`) and SLSA provenance (`provenance: mode=max`) attestations
+  are attached to the OCI manifest. Verify with the snippet pinned in
+  the release notes.
 
 ### Migration
 
@@ -65,3 +119,18 @@ with the full diagram toolchain (Mermaid, Draw.io, PlantUML, LaTeX) baked in.
 The binary detects the legacy syntax (including `--mode=Upload`,
 `--mode:Upload`, and bare `--local`) at startup and prints the migration
 table before exiting with code `2`. No silent failures.
+
+### Forward-only fix policy
+
+If a published `:0.1.x` release contains a critical bug, the project ships
+a `:0.1.x+1` patch and updates the moving `:0.1` tag. Pinned digest pulls
+(`docker pull ghcr.io/opendocsync/confluencesynkmd@sha256:...`) are never
+deleted. For security-grade incidents only (leaked credentials, actively
+dangerous regressions), the `release-yank.yml` workflow deletes a tag
+(not a digest). Routine bugs are fixed forward.
+
+### Image tag scheme
+
+For pre-1.0 releases, `metadata-action` emits exact-version (`0.1.0`),
+minor-track (`0.1`), and `sha-<short>` tags. `latest`, the major-track
+(`0`), and (`1`) are intentionally NOT created until v1.0.0 ships.

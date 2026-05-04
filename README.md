@@ -106,7 +106,7 @@ dotnet run --project src/ConfluenceSynkMD -- init
 ### As a GitHub Action
 
 ```yaml
-- uses: OpenDocSync/ConfluenceSynkMD@v1
+- uses: OpenDocSync/ConfluenceSynkMD@v0.1.0
   with:
     subcommand: upload
     path: docs
@@ -417,7 +417,7 @@ graph LR
 
 - **Confluence Cloud only** — Tested against Confluence Cloud REST API v2. Data Center / Server may work with `--api-version v1` and `--api-path ""`, but is not officially supported.
 - **No incremental download** — Download always fetches the full subtree; there is no delta sync in download mode.
-- **Diagram rendering requires external tools** — Mermaid needs Node.js + `@mermaid-js/mermaid-cli`, PlantUML needs a `plantuml` binary, Draw.io needs `drawio-export`. The Docker image includes Mermaid only.
+- **Diagram rendering requires external tools when running outside the Docker image** — Mermaid needs Node.js + `@mermaid-js/mermaid-cli`, PlantUML needs Java + the `plantuml` binary, Draw.io needs `drawio-desktop`, LaTeX needs TeX Live + Ghostscript. The published Docker image (`ghcr.io/opendocsync/confluencesynkmd:0.1`) ships every renderer preinstalled.
 - **No concurrent uploads** — Pages are uploaded sequentially to respect Confluence API rate limits and parent–child ordering.
 - **Markdown fidelity** — Not all Confluence macros have a Markdown equivalent. Download mode maps common structures but may lose macro-specific formatting.
 - **Single-space hierarchy** — `--keep-hierarchy` builds the page tree within a single space. Cross-space hierarchies are not supported (though individual documents can target different spaces via frontmatter).

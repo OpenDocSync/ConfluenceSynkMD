@@ -18,7 +18,7 @@
   **A:** Cloud is the primary target. Data Center may partially work but is not officially supported.
 
 - **Q:** Why are some diagrams not rendered?
-  **A:** Some diagram modes require external binaries (for example `mmdc`, `plantuml`, `drawio-export`).
+  **A:** Some diagram modes require external binaries (for example `mmdc`, `plantuml`, `drawio-desktop`, TeX Live + Ghostscript). The published Docker image (`ghcr.io/opendocsync/confluencesynkmd:0.1`) ships every renderer preinstalled — run `docker run --rm ghcr.io/opendocsync/confluencesynkmd:0.1 doctor --renderers-only` to verify.
 
 - **Q:** Why was my page not updated?
   **A:** Check `--skip-update`, content hash behavior, and write-back metadata (`confluence-page-id`).

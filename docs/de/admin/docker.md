@@ -295,16 +295,22 @@ Das Docker-Image enthält .NET, Node.js und mermaid-cli — eine konsistente, po
 
 ---
 
-## Image erweitern
+## Inhalt des Standard-Images
 
-Um zusätzliche Diagramm-Renderer hinzuzufügen:
+Das veröffentlichte `ghcr.io/opendocsync/confluencesynkmd:0.1` Image enthält alle vom Projekt versprochenen Renderer vorinstalliert:
 
-```dockerfile
-FROM confluencesynkmd AS base
+| Renderer | Engine |
+|---|---|
+| Mermaid | `@mermaid-js/mermaid-cli` + Chromium (Puppeteer) |
+| Draw.io | drawio-desktop (Electron, headless via Xvfb-once aus `entrypoint.sh`) |
+| PlantUML | `default-jre-headless` + das `plantuml` Paket |
+| LaTeX | TeX Live (`texlive-latex-base` + `texlive-latex-extra` + fonts-recommended) + Ghostscript direkt (ohne ImageMagick) |
 
-# PlantUML hinzufügen
-RUN apt-get update && apt-get install -y plantuml
+Zur Verifikation der Renderer-Gesundheit:
+`docker run --rm ghcr.io/opendocsync/confluencesynkmd:0.1 doctor --renderers-only`
 
-# Draw.io Export hinzufügen
-RUN npm install -g drawio-export
-```
+## Forward-Only-Fix-Politik
+
+Falls ein veröffentlichtes `:0.1.x` Release einen kritischen Bug enthält, liefert das Projekt einen `:0.1.x+1` Patch und aktualisiert den fortlaufenden `:0.1` Tag. Digest-Pulls (`docker pull ghcr.io/opendocsync/confluencesynkmd@sha256:...`) werden niemals gelöscht — Nutzer, die per Digest pinnen, haben einen Grund dafür.
+
+Nur für sicherheitskritische Vorfälle (geleakte Credentials, aktiv schädliche Regression) löscht der `release-yank.yml` Workflow einen Tag (nicht einen Digest) aus GHCR. Entscheidungskriterien sind in der Workflow-Datei dokumentiert.
