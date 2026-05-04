@@ -5,8 +5,17 @@ namespace ConfluenceSynkMD.Services;
 
 /// <summary>
 /// Renders LaTeX formulas to PNG images.
-/// Can use either a LaTeX distribution (pdflatex + convert) or the
-/// Confluence math-inline/math-display macro as fallback.
+/// Pipeline: <c>pdflatex</c> compiles a wrapper document to PDF, then
+/// <c>gs</c> (Ghostscript) rasterizes the PDF to PNG. ImageMagick is no
+/// longer required — Ghostscript handles PDF rasterization natively, which
+/// drops a dependency from the runtime image and removes the policy.xml
+/// workaround for ImageMagick's PDF-read default-deny policy.
+///
+/// Both binaries are resolved from PATH by default; override either via
+/// the <c>LATEX_PDFLATEX_CMD</c> and <c>LATEX_GHOSTSCRIPT_CMD</c> environment
+/// variables. Each accepts either a bare binary name ("pdflatex") or a
+/// multi-token invocation ("xelatex --shell-escape") parsed via
+/// <see cref="RendererCommandResolver"/>.
 /// </summary>
 public sealed class LatexRenderer : ILatexRenderer
 {
@@ -39,21 +48,32 @@ public sealed class LatexRenderer : ILatexRenderer
             var texContent = WrapInDocument(latexSource);
             await File.WriteAllTextAsync(texFile, texContent, ct);
 
-            // Step 1: Compile LaTeX to PDF
-            await RunProcessAsync("pdflatex",
-                $"-interaction=nonstopmode -output-directory=\"{tempDir}\" \"{texFile}\"", ct);
+            // Step 1: Compile LaTeX to PDF.
+            var pdflatex = ResolvePdflatexCommand();
+            var pdflatexCallArgs = $"-interaction=nonstopmode -output-directory=\"{tempDir}\" \"{texFile}\"";
+            await RunProcessAsync(
+                pdflatex.FileName,
+                RendererCommandResolver.CombineArgs(pdflatex.ArgsPrefix, pdflatexCallArgs),
+                ct);
 
-            // Step 2: Convert PDF to PNG using ImageMagick or Ghostscript
+            // Step 2: Rasterize PDF to PNG via Ghostscript directly.
+            // -sDEVICE=pngalpha keeps formula transparency; -r300 matches the
+            // density the previous ImageMagick pipeline used. Ghostscript reads
+            // PDFs natively, so no ImageMagick policy.xml workaround is needed.
             if (File.Exists(pdfFile))
             {
-                await RunProcessAsync("convert",
-                    $"-density 300 \"{pdfFile}\" -trim -quality 100 \"{pngFile}\"", ct);
+                var gs = ResolveGhostscriptCommand();
+                var gsCallArgs = $"-dNOPAUSE -dBATCH -dQUIET -sDEVICE=pngalpha -r300 -sOutputFile=\"{pngFile}\" \"{pdfFile}\"";
+                await RunProcessAsync(
+                    gs.FileName,
+                    RendererCommandResolver.CombineArgs(gs.ArgsPrefix, gsCallArgs),
+                    ct);
             }
 
             if (!File.Exists(pngFile))
             {
                 throw new InvalidOperationException(
-                    "LaTeX rendering failed. Ensure pdflatex and ImageMagick are installed.");
+                    "LaTeX rendering failed. Ensure pdflatex and ghostscript are installed.");
             }
 
             var imageBytes = await File.ReadAllBytesAsync(pngFile, ct);
@@ -97,6 +117,22 @@ public sealed class LatexRenderer : ILatexRenderer
 \begin{document}
 $" + formula + @"$
 \end{document}";
+    }
+
+    private static (string FileName, string ArgsPrefix) ResolvePdflatexCommand()
+    {
+        var envCmd = Environment.GetEnvironmentVariable("LATEX_PDFLATEX_CMD");
+        return !string.IsNullOrWhiteSpace(envCmd)
+            ? RendererCommandResolver.Parse(envCmd)
+            : ("pdflatex", string.Empty);
+    }
+
+    private static (string FileName, string ArgsPrefix) ResolveGhostscriptCommand()
+    {
+        var envCmd = Environment.GetEnvironmentVariable("LATEX_GHOSTSCRIPT_CMD");
+        return !string.IsNullOrWhiteSpace(envCmd)
+            ? RendererCommandResolver.Parse(envCmd)
+            : ("gs", string.Empty);
     }
 
     private static async Task RunProcessAsync(string command, string arguments, CancellationToken ct)

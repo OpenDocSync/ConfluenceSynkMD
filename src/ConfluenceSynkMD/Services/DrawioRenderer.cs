@@ -36,26 +36,28 @@ public sealed class DrawioRenderer : IDiagramRenderer
         {
             await File.WriteAllTextAsync(inputFile, source, ct);
 
-            // Try drawio CLI (drawio-export or drawio desktop in headless mode)
-            var drawioCmd = FindDrawioCommand();
-            if (drawioCmd is null)
+            // Resolve the drawio invocation — supports DRAWIO_CMD with extra args
+            // (e.g. "drawio --no-sandbox --disable-gpu") via the shared resolver.
+            var resolved = ResolveDrawioCommand();
+            if (resolved is null)
             {
                 throw new InvalidOperationException(
                     "Draw.io CLI not found. Install 'drawio-desktop' or set DRAWIO_CMD environment variable.");
             }
 
+            var perCallArgs = $"--export --format {outputFormat} --output \"{outputFile}\" \"{inputFile}\"";
+
             var psi = new ProcessStartInfo
             {
-                FileName = drawioCmd,
-                Arguments = $"--export --format {outputFormat} --output \"{outputFile}\" \"{inputFile}\"",
+                FileName = resolved.Value.FileName,
+                Arguments = RendererCommandResolver.CombineArgs(resolved.Value.ArgsPrefix, perCallArgs),
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
                 UseShellExecute = false,
                 CreateNoWindow = true,
             };
 
-            using var process = Process.Start(psi)
-                ?? throw new InvalidOperationException("Failed to start Draw.io process.");
+            using var process = StartDrawioProcess(psi);
 
             await process.WaitForExitAsync(ct);
 
@@ -86,14 +88,38 @@ public sealed class DrawioRenderer : IDiagramRenderer
         return await RenderAsync(xml, outputFormat, ct);
     }
 
-    private static string? FindDrawioCommand()
+    private static Process StartDrawioProcess(ProcessStartInfo psi)
     {
-        // Check environment variable first
-        var envCmd = Environment.GetEnvironmentVariable("DRAWIO_CMD");
-        if (!string.IsNullOrEmpty(envCmd) && File.Exists(envCmd))
-            return envCmd;
+        try
+        {
+            return Process.Start(psi)
+                ?? throw new InvalidOperationException("Failed to start Draw.io process.");
+        }
+        catch (System.ComponentModel.Win32Exception ex)
+        {
+            // Process.Start throws Win32Exception when the binary is missing or
+            // unreachable (e.g. DRAWIO_CMD points at a path that does not exist
+            // on this machine, or PATH is empty). Translate to the renderer's
+            // documented "Draw.io CLI not found" contract so callers get the
+            // same error shape regardless of OS-level failure mode.
+            throw new InvalidOperationException(
+                $"Draw.io CLI not found at '{psi.FileName}'. Install 'drawio-desktop' or set DRAWIO_CMD to a valid binary.",
+                ex);
+        }
+    }
 
-        // Common paths
+    private static (string FileName, string ArgsPrefix)? ResolveDrawioCommand()
+    {
+        // Honor DRAWIO_CMD first. Accepts either a bare binary name
+        // ("drawio") or a multi-token invocation
+        // ("drawio --no-sandbox --disable-gpu"), parsed via the shared resolver.
+        var envCmd = Environment.GetEnvironmentVariable("DRAWIO_CMD");
+        if (!string.IsNullOrWhiteSpace(envCmd))
+        {
+            return RendererCommandResolver.Parse(envCmd);
+        }
+
+        // Fall back to common installation paths (single-binary, no extra args).
         var candidates = new[]
         {
             "drawio",
@@ -119,12 +145,12 @@ public sealed class DrawioRenderer : IDiagramRenderer
                 if (p is not null)
                 {
                     p.Kill();
-                    return candidate;
+                    return (candidate, string.Empty);
                 }
             }
             catch
             {
-                // Not found, try next
+                // Not found, try next.
             }
         }
 

@@ -66,31 +66,30 @@ dotnet build
 
 # Upload a documentation folder to Confluence
 dotnet run --project src/ConfluenceSynkMD -- \
-  --mode Upload \
+  upload \
   --path ./docs \
   --conf-space YOUR_SPACE_KEY \
   --conf-parent-id YOUR_PAGE_ID
 
 # Download Confluence pages back to Markdown
 dotnet run --project src/ConfluenceSynkMD -- \
-  --mode Download \
+  download \
   --path ./output \
   --conf-space YOUR_SPACE_KEY \
   --conf-parent-id YOUR_PAGE_ID
 
 # Download a specific subtree by root page title
 dotnet run --project src/ConfluenceSynkMD -- \
-  --mode Download \
+  download \
   --path ./output \
   --conf-space YOUR_SPACE_KEY \
   --root-page "My Documentation"
 
 # Local export only (no API calls)
 dotnet run --project src/ConfluenceSynkMD -- \
-  --mode Upload \
+  local \
   --path ./docs \
-  --conf-space YOUR_SPACE_KEY \
-  --local
+  --conf-space YOUR_SPACE_KEY
 ```
 
 ---
@@ -133,11 +132,24 @@ Credential settings can also be passed via CLI flags (overrides environment vari
 ConfluenceSynkMD – Markdown ↔ Confluence Synchronization Tool
 ```
 
+### Subcommands
+
+ConfluenceSynkMD uses three top-level verbs that pick the synchronization direction:
+
+| Subcommand | Description |
+| :--- | :--- |
+| `upload` | Upload Markdown documents to Confluence |
+| `download` | Download Confluence pages back into Markdown |
+| `local` | Produce local Confluence Storage Format output without API calls |
+
+> **Migrating from earlier builds:** the legacy `--mode Upload\|Download\|LocalExport` flag and the standalone `--local` flag were removed in v0.1.0. Run `confluencesynkmd upload`, `download`, or `local` instead. The binary prints a friendly migration hint if it sees the old syntax.
+
 ### Core Options
+
+These apply to every subcommand:
 
 | Option | Required | Default | Description |
 | :--- | :---: | :---: | :--- |
-| `--mode <Upload\|Download\|LocalExport>` | ✅ | — | Synchronization direction |
 | `--path <path>` | ✅ | — | Local filesystem path to Markdown files |
 | `--conf-space <key>` | ✅ | — | Confluence Space Key (e.g. `DEV`) |
 | `--conf-parent-id <id>` | | — | Parent page ID for subtree operations |
@@ -150,7 +162,6 @@ ConfluenceSynkMD – Markdown ↔ Confluence Synchronization Tool
 | `--keep-hierarchy` | `true` | Preserve local directory hierarchy in Confluence |
 | `--skip-hierarchy` | `false` | Flatten all pages under the root (overrides `--keep-hierarchy`) |
 | `--skip-update` | `false` | Skip uploading pages whose content has not changed |
-| `--local` | `false` | Only produce local Confluence Storage Format output, no API calls |
 | `--no-write-back` | `false` | Don't write `<!-- confluence-page-id -->` / `<!-- confluence-space-key -->` comments back into Markdown sources after upload |
 | `--loglevel <level>` | `info` | Logging verbosity: `debug`, `info`, `warning`, `error`, `critical` |
 
@@ -232,7 +243,7 @@ docker run --rm -it `
   -e CONFLUENCE__APITOKEN `
   -v ${PWD}/docs:/workspace/docs:ro `
   confluencesynkmd `
-  --mode Upload `
+  upload `
   --path /workspace/docs `
   --conf-space YOUR_SPACE_KEY `
   --conf-parent-id YOUR_PAGE_ID
@@ -245,7 +256,7 @@ docker run --rm -it `
   -e CONFLUENCE__APITOKEN `
   -v ${PWD}/output:/workspace/output `
   confluencesynkmd `
-  --mode Download `
+  download `
   --path /workspace/output `
   --conf-space YOUR_SPACE_KEY `
   --conf-parent-id YOUR_PAGE_ID
@@ -259,7 +270,7 @@ docker run --rm -it `
   -e CONFLUENCE__APITOKEN `
   -v ${PWD}/docs:/workspace/docs:ro `
   confluencesynkmd `
-  --mode Upload `
+  upload `
   --path /workspace/docs `
   --conf-space YOUR_SPACE_KEY `
   --conf-parent-id YOUR_PAGE_ID
@@ -272,7 +283,7 @@ docker run --rm -it `
   -e CONFLUENCE__APITOKEN `
   -v ${PWD}/output:/workspace/output `
   confluencesynkmd `
-  --mode Download `
+  download `
   --path /workspace/output `
   --conf-space YOUR_SPACE_KEY `
   --conf-parent-id YOUR_PAGE_ID

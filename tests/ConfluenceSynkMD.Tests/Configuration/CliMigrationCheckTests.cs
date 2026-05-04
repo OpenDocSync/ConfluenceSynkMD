@@ -90,7 +90,23 @@ public class CliMigrationCheckTests
 
         result.Should().NotBeNull();
         result!.Message.Should().Contain("confluencesynkmd upload <other args...>");
-        result.Message.Should().Contain("CHANGELOG");
+    }
+
+    [Fact]
+    public void Migration_message_inlines_the_migration_table_instead_of_pointing_at_CHANGELOG()
+    {
+        var result = CliMigrationCheck.CheckLegacyModeFlag(
+            new[] { "--mode", "Upload" });
+
+        result.Should().NotBeNull();
+        // The earlier draft pointed at a CHANGELOG that didn't exist. The fix
+        // is to inline the migration table directly in the error message.
+        result!.Message.Should().NotContain("CHANGELOG");
+        result.Message.Should().Contain("Migration table:");
+        result.Message.Should().Contain("--mode Upload          ->  upload");
+        result.Message.Should().Contain("--mode Download        ->  download");
+        result.Message.Should().Contain("--mode LocalExport     ->  local");
+        result.Message.Should().Contain("--mode Upload --local  ->  local");
     }
 
     [Fact]
@@ -101,5 +117,77 @@ public class CliMigrationCheckTests
 
         result.Should().NotBeNull();
         result!.SuggestedSubcommand.Should().Be("upload");
+    }
+
+    [Theory]
+    [InlineData("--mode=Upload", "upload")]
+    [InlineData("--mode=Download", "download")]
+    [InlineData("--mode=LocalExport", "local")]
+    [InlineData("--MODE=Upload", "upload")]
+    [InlineData("--Mode=download", "download")]
+    public void Detects_equals_form_of_mode_flag(string equalsArg, string expectedSubcommand)
+    {
+        var result = CliMigrationCheck.CheckLegacyModeFlag(
+            new[] { equalsArg, "--path", "./docs", "--conf-space", "DEV" });
+
+        result.Should().NotBeNull();
+        result!.SuggestedSubcommand.Should().Be(expectedSubcommand);
+    }
+
+    [Theory]
+    [InlineData("--mode:Upload", "upload")]
+    [InlineData("--mode:Download", "download")]
+    [InlineData("--mode:LocalExport", "local")]
+    public void Detects_colon_form_of_mode_flag(string colonArg, string expectedSubcommand)
+    {
+        var result = CliMigrationCheck.CheckLegacyModeFlag(
+            new[] { colonArg, "--path", "./docs", "--conf-space", "DEV" });
+
+        result.Should().NotBeNull();
+        result!.SuggestedSubcommand.Should().Be(expectedSubcommand);
+    }
+
+    [Fact]
+    public void Detects_legacy_local_flag_and_suggests_local_subcommand()
+    {
+        var result = CliMigrationCheck.CheckLegacyModeFlag(
+            new[] { "upload", "--path", "./docs", "--local", "--conf-space", "DEV" });
+
+        result.Should().NotBeNull();
+        result!.SuggestedSubcommand.Should().Be("local");
+        result.Message.Should().Contain("`--local` was removed in v0.1.0");
+        result.Message.Should().Contain("confluencesynkmd local <other args...>");
+    }
+
+    [Fact]
+    public void Local_flag_match_is_case_insensitive()
+    {
+        var result = CliMigrationCheck.CheckLegacyModeFlag(
+            new[] { "--LOCAL" });
+
+        result.Should().NotBeNull();
+        result!.SuggestedSubcommand.Should().Be("local");
+    }
+
+    [Fact]
+    public void Equals_form_with_empty_value_falls_back_to_placeholder()
+    {
+        // `--mode=` with nothing after the equals.
+        var result = CliMigrationCheck.CheckLegacyModeFlag(
+            new[] { "--mode=" });
+
+        result.Should().NotBeNull();
+        result!.SuggestedSubcommand.Should().Be("<upload|download|local>");
+    }
+
+    [Fact]
+    public void New_subcommand_args_are_not_flagged_as_legacy()
+    {
+        // The new `local` subcommand should NOT trigger a migration hint
+        // even though the word "local" appears in args.
+        var result = CliMigrationCheck.CheckLegacyModeFlag(
+            new[] { "local", "--path", "./docs", "--conf-space", "DEV" });
+
+        result.Should().BeNull();
     }
 }
