@@ -8,11 +8,26 @@ ConfluenceSynkMD – Markdown ↔ Confluence Synchronization Tool
 
 ---
 
+## Subcommands
+
+ConfluenceSynkMD picks the synchronization direction via a top-level subcommand:
+
+| Subcommand | Description |
+|---|---|
+| `upload` | Upload Markdown documents to Confluence |
+| `download` | Download Confluence pages back into Markdown |
+| `local` | Produce local Confluence Storage Format output without API calls |
+| `doctor` | Runtime self-test (renderers + Confluence auth) |
+| `init` | First-run wizard: prompt for Confluence credentials, validate, write config |
+
+> The legacy `--mode <Upload\|Download\|LocalExport>` flag and the standalone `--local` flag were removed in v0.1.0. The binary prints a migration hint when it sees the old syntax.
+
 ## Core Options
+
+These apply to every sync subcommand (`upload` / `download` / `local`):
 
 | Option | Required | Default | Description |
 |---|---|---|---|
-| `--mode <Upload\|Download\|LocalExport>` | ✅ | — | Synchronization direction |
 | `--path <path>` | ✅ | — | Local filesystem path to Markdown files |
 | `--conf-space <key>` | ✅ | — | Confluence Space Key (e.g. `DEV`) |
 | `--conf-parent-id <id>` | | — | Parent page ID for subtree operations |
@@ -41,7 +56,6 @@ Override Confluence connection settings (takes priority over environment variabl
 | `--keep-hierarchy` | `true` | Preserve local directory hierarchy in Confluence |
 | `--skip-hierarchy` | `false` | Flatten all pages under the root (overrides `--keep-hierarchy`) |
 | `--skip-update` | `false` | Skip uploading pages whose content has not changed |
-| `--local` | `false` | Only produce local CSF output, no API calls |
 | `--no-write-back` | `false` | Don't write `<!-- confluence-page-id -->` / `<!-- confluence-space-key -->` comments back into Markdown sources |
 | `--loglevel <level>` | `info` | Logging verbosity: `debug`, `info`, `warning`, `error`, `critical` |
 
@@ -108,7 +122,7 @@ Override Confluence connection settings (takes priority over environment variabl
 
     ```bash
     dotnet run --project src/ConfluenceSynkMD -- \
-      --mode Upload \
+      upload \
       --path ./docs \
       --conf-space DEV \
       --root-page "My Documentation" \
@@ -128,7 +142,7 @@ Override Confluence connection settings (takes priority over environment variabl
 
     ```powershell
     dotnet run --project src/ConfluenceSynkMD -- `
-      --mode Upload `
+      upload `
       --path ./docs `
       --conf-space DEV `
       --root-page "My Documentation" `
@@ -148,7 +162,7 @@ Override Confluence connection settings (takes priority over environment variabl
 
     ```cmd
     dotnet run --project src/ConfluenceSynkMD -- ^
-      --mode Upload ^
+      upload ^
       --path .\docs ^
       --conf-space DEV ^
       --root-page "My Documentation" ^
@@ -170,7 +184,7 @@ Override Confluence connection settings (takes priority over environment variabl
 
     ```bash
     dotnet run --project src/ConfluenceSynkMD -- \
-      --mode Download \
+      download \
       --path ./output \
       --conf-space DEV \
       --conf-parent-id 12345
@@ -180,7 +194,7 @@ Override Confluence connection settings (takes priority over environment variabl
 
     ```powershell
     dotnet run --project src/ConfluenceSynkMD -- `
-      --mode Download `
+      download `
       --path ./output `
       --conf-space DEV `
       --conf-parent-id 12345
@@ -190,7 +204,7 @@ Override Confluence connection settings (takes priority over environment variabl
 
     ```cmd
     dotnet run --project src/ConfluenceSynkMD -- ^
-      --mode Download ^
+      download ^
       --path .\output ^
       --conf-space DEV ^
       --conf-parent-id 12345
@@ -202,10 +216,10 @@ Override Confluence connection settings (takes priority over environment variabl
 
     ```bash
     dotnet run --project src/ConfluenceSynkMD -- \
-      --mode Upload \
+      upload \
       --path ./docs \
       --conf-space DEV \
-      --local \
+
       --debug-line-markers \
       --loglevel debug
     ```
@@ -214,10 +228,10 @@ Override Confluence connection settings (takes priority over environment variabl
 
     ```powershell
     dotnet run --project src/ConfluenceSynkMD -- `
-      --mode Upload `
+      upload `
       --path ./docs `
       --conf-space DEV `
-      --local `
+
       --debug-line-markers `
       --loglevel debug
     ```
@@ -226,10 +240,10 @@ Override Confluence connection settings (takes priority over environment variabl
 
     ```cmd
     dotnet run --project src/ConfluenceSynkMD -- ^
-      --mode Upload ^
+      upload ^
       --path .\docs ^
       --conf-space DEV ^
-      --local ^
+
       --debug-line-markers ^
       --loglevel debug
     ```
@@ -240,7 +254,7 @@ Override Confluence connection settings (takes priority over environment variabl
 
     ```bash
     dotnet run --project src/ConfluenceSynkMD -- \
-      --mode Upload \
+      upload \
       --path ./docs \
       --conf-space DEV \
       --conf-parent-id 12345 \
@@ -254,7 +268,7 @@ Override Confluence connection settings (takes priority over environment variabl
 
     ```powershell
     dotnet run --project src/ConfluenceSynkMD -- `
-      --mode Upload `
+      upload `
       --path ./docs `
       --conf-space DEV `
       --conf-parent-id 12345 `
@@ -268,7 +282,7 @@ Override Confluence connection settings (takes priority over environment variabl
 
     ```cmd
     dotnet run --project src/ConfluenceSynkMD -- ^
-      --mode Upload ^
+      upload ^
       --path .\docs ^
       --conf-space DEV ^
       --conf-parent-id 12345 ^

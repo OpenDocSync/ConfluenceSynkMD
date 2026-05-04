@@ -48,7 +48,7 @@ jobs:
           CONFLUENCE__APITOKEN: ${{ secrets.CONFLUENCE_TOKEN }}
         run: |
           dotnet run --project src/ConfluenceSynkMD -- \
-            --mode Upload \
+            upload \
             --path ./docs \
             --conf-space ${{ vars.CONFLUENCE_SPACE }} \
             --root-page "Auto-synchronisierte Dokumentation" \
@@ -68,13 +68,13 @@ jobs:
 
 ## Ohne Upload validieren
 
-Verwenden Sie `--local` in PR-Checks zur Validierung ohne API-Aufrufe:
+Verwenden Sie `local` subcommand in PR-Checks zur Validierung ohne API-Aufrufe:
 
 ```yaml
 - name: Konvertierung validieren
   run: |
     dotnet run --project src/ConfluenceSynkMD -- \
-      --mode Upload --path ./docs --conf-space DUMMY --local
+      local --path ./docs --conf-space DUMMY
 ```
 
 ---

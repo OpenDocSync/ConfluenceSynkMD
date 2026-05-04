@@ -10,7 +10,7 @@ Upload konvertiert Ihre lokalen Markdown-Dateien in das Confluence Storage Forma
 
     ```bash
     dotnet run --project src/ConfluenceSynkMD -- \
-      --mode Upload \
+      upload \
       --path ./docs \
       --conf-space DEV \
       --conf-parent-id 12345
@@ -20,7 +20,7 @@ Upload konvertiert Ihre lokalen Markdown-Dateien in das Confluence Storage Forma
 
     ```powershell
     dotnet run --project src/ConfluenceSynkMD -- `
-      --mode Upload `
+      upload `
       --path ./docs `
       --conf-space DEV `
       --conf-parent-id 12345
@@ -30,7 +30,7 @@ Upload konvertiert Ihre lokalen Markdown-Dateien in das Confluence Storage Forma
 
     ```cmd
     dotnet run --project src/ConfluenceSynkMD -- ^
-      --mode Upload ^
+      upload ^
       --path .\docs ^
       --conf-space DEV ^
       --conf-parent-id 12345
@@ -50,7 +50,7 @@ Dies lädt alle `.md`-Dateien aus `./docs` als Unterseiten der Seite `12345` im 
             -e CONFLUENCE__APITOKEN=ihr-token \
             -v ${PWD}:/workspace \
             confluencesynkmd \
-            --mode Upload \
+            upload \
             --path /workspace/docs \
             --conf-space DEV \
             --conf-parent-id 12345
@@ -71,7 +71,7 @@ Dies lädt alle `.md`-Dateien aus `./docs` als Unterseiten der Seite `12345` im 
             -e CONFLUENCE__APITOKEN=ihr-token `
             -v ${PWD}:/workspace `
             confluencesynkmd `
-            --mode Upload `
+            upload `
             --path /workspace/docs `
             --conf-space DEV `
             --conf-parent-id 12345
@@ -92,7 +92,7 @@ Dies lädt alle `.md`-Dateien aus `./docs` als Unterseiten der Seite `12345` im 
             -e CONFLUENCE__APITOKEN=ihr-token ^
             -v %cd%:/workspace ^
             confluencesynkmd ^
-            --mode Upload ^
+            upload ^
             --path /workspace/docs ^
             --conf-space DEV ^
             --conf-parent-id 12345

@@ -26,21 +26,21 @@ Use **Upload** when you want to publish your Markdown documentation to Confluenc
 
     ```bash
     dotnet run --project src/ConfluenceSynkMD -- \
-      --mode Upload --path ./docs --conf-space DEV
+      upload --path ./docs --conf-space DEV
     ```
 
 === "PowerShell"
 
     ```powershell
     dotnet run --project src/ConfluenceSynkMD -- `
-      --mode Upload --path ./docs --conf-space DEV
+      upload --path ./docs --conf-space DEV
     ```
 
 === "CMD"
 
     ```cmd
     dotnet run --project src/ConfluenceSynkMD -- ^
-      --mode Upload --path .\docs --conf-space DEV
+      upload --path .\docs --conf-space DEV
     ```
 
 ### Download
@@ -54,21 +54,21 @@ Use **Download** when you want to pull existing Confluence pages into your local
 
     ```bash
     dotnet run --project src/ConfluenceSynkMD -- \
-      --mode Download --path ./output --conf-space DEV --conf-parent-id 12345
+      download --path ./output --conf-space DEV --conf-parent-id 12345
     ```
 
 === "PowerShell"
 
     ```powershell
     dotnet run --project src/ConfluenceSynkMD -- `
-      --mode Download --path ./output --conf-space DEV --conf-parent-id 12345
+      download --path ./output --conf-space DEV --conf-parent-id 12345
     ```
 
 === "CMD"
 
     ```cmd
     dotnet run --project src/ConfluenceSynkMD -- ^
-      --mode Download --path .\output --conf-space DEV --conf-parent-id 12345
+      download --path .\output --conf-space DEV --conf-parent-id 12345
     ```
 
 ### LocalExport
@@ -79,21 +79,21 @@ Use **LocalExport** when you want to preview the Confluence Storage Format (XHTM
 
     ```bash
     dotnet run --project src/ConfluenceSynkMD -- \
-      --mode Upload --path ./docs --conf-space DEV --local
+      local --path ./docs --conf-space DEV
     ```
 
 === "PowerShell"
 
     ```powershell
     dotnet run --project src/ConfluenceSynkMD -- `
-      --mode Upload --path ./docs --conf-space DEV --local
+      local --path ./docs --conf-space DEV
     ```
 
 === "CMD"
 
     ```cmd
     dotnet run --project src/ConfluenceSynkMD -- ^
-      --mode Upload --path .\docs --conf-space DEV --local
+      local --path .\docs --conf-space DEV
     ```
 
 ---

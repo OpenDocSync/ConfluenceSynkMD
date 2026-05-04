@@ -10,7 +10,7 @@ Download ruft Confluence-Seiten ab und konvertiert sie zurück in Markdown-Datei
 
     ```bash
     dotnet run --project src/ConfluenceSynkMD -- \
-      --mode Download \
+      download \
       --path ./output \
       --conf-space DEV \
       --conf-parent-id 12345
@@ -20,7 +20,7 @@ Download ruft Confluence-Seiten ab und konvertiert sie zurück in Markdown-Datei
 
     ```powershell
     dotnet run --project src/ConfluenceSynkMD -- `
-      --mode Download `
+      download `
       --path ./output `
       --conf-space DEV `
       --conf-parent-id 12345
@@ -30,7 +30,7 @@ Download ruft Confluence-Seiten ab und konvertiert sie zurück in Markdown-Datei
 
     ```cmd
     dotnet run --project src/ConfluenceSynkMD -- ^
-      --mode Download ^
+      download ^
       --path .\output ^
       --conf-space DEV ^
       --conf-parent-id 12345
@@ -48,7 +48,7 @@ Download ruft Confluence-Seiten ab und konvertiert sie zurück in Markdown-Datei
       -e CONFLUENCE__APITOKEN=ihr-token \
       -v ${PWD}:/workspace \
       confluencesynkmd \
-      --mode Download \
+      download \
       --path /workspace/output \
       --conf-space DEV \
       --conf-parent-id 12345
@@ -69,7 +69,7 @@ Download ruft Confluence-Seiten ab und konvertiert sie zurück in Markdown-Datei
       -e CONFLUENCE__APITOKEN=ihr-token `
       -v ${PWD}:/workspace `
       confluencesynkmd `
-      --mode Download `
+      download `
       --path /workspace/output `
       --conf-space DEV `
       --conf-parent-id 12345
@@ -90,7 +90,7 @@ Download ruft Confluence-Seiten ab und konvertiert sie zurück in Markdown-Datei
       -e CONFLUENCE__APITOKEN=ihr-token ^
       -v %cd%:/workspace ^
       confluencesynkmd ^
-      --mode Download ^
+      download ^
       --path /workspace/output ^
       --conf-space DEV ^
       --conf-parent-id 12345
@@ -109,7 +109,7 @@ Download ruft Confluence-Seiten ab und konvertiert sie zurück in Markdown-Datei
 
     ```bash
     dotnet run --project src/ConfluenceSynkMD -- \
-      --mode Download \
+      download \
       --path ./output \
       --conf-space DEV \
       --root-page "Meine Dokumentation"
@@ -119,7 +119,7 @@ Download ruft Confluence-Seiten ab und konvertiert sie zurück in Markdown-Datei
 
     ```powershell
     dotnet run --project src/ConfluenceSynkMD -- `
-      --mode Download `
+      download `
       --path ./output `
       --conf-space DEV `
       --root-page "Meine Dokumentation"
@@ -129,7 +129,7 @@ Download ruft Confluence-Seiten ab und konvertiert sie zurück in Markdown-Datei
 
     ```cmd
     dotnet run --project src/ConfluenceSynkMD -- ^
-      --mode Download ^
+      download ^
       --path .\output ^
       --conf-space DEV ^
       --root-page "Meine Dokumentation"
@@ -160,7 +160,7 @@ Wenn Seiten ursprünglich mit `--keep-hierarchy` hochgeladen wurden, stellt Conf
 
     ```bash
     dotnet run --project src/ConfluenceSynkMD -- \
-      --mode Download \
+      download \
       --path ./migrated-docs \
       --conf-space TEAM \
       --conf-parent-id 98765
@@ -170,7 +170,7 @@ Wenn Seiten ursprünglich mit `--keep-hierarchy` hochgeladen wurden, stellt Conf
 
     ```powershell
     dotnet run --project src/ConfluenceSynkMD -- `
-      --mode Download `
+      download `
       --path ./migrated-docs `
       --conf-space TEAM `
       --conf-parent-id 98765
@@ -180,7 +180,7 @@ Wenn Seiten ursprünglich mit `--keep-hierarchy` hochgeladen wurden, stellt Conf
 
     ```cmd
     dotnet run --project src/ConfluenceSynkMD -- ^
-      --mode Download ^
+      download ^
       --path .\migrated-docs ^
       --conf-space TEAM ^
       --conf-parent-id 98765
@@ -192,7 +192,7 @@ Wenn Seiten ursprünglich mit `--keep-hierarchy` hochgeladen wurden, stellt Conf
 
     ```bash
     dotnet run --project src/ConfluenceSynkMD -- \
-      --mode Download \
+      download \
       --path ./docs \
       --conf-space DEV \
       --root-page "Meine Dokumentation"
@@ -202,7 +202,7 @@ Wenn Seiten ursprünglich mit `--keep-hierarchy` hochgeladen wurden, stellt Conf
 
     ```powershell
     dotnet run --project src/ConfluenceSynkMD -- `
-      --mode Download `
+      download `
       --path ./docs `
       --conf-space DEV `
       --root-page "Meine Dokumentation"
@@ -212,7 +212,7 @@ Wenn Seiten ursprünglich mit `--keep-hierarchy` hochgeladen wurden, stellt Conf
 
     ```cmd
     dotnet run --project src/ConfluenceSynkMD -- ^
-      --mode Download ^
+      download ^
       --path .\docs ^
       --conf-space DEV ^
       --root-page "Meine Dokumentation"

@@ -48,7 +48,7 @@ jobs:
           CONFLUENCE__APITOKEN: ${{ secrets.CONFLUENCE_TOKEN }}
         run: |
           dotnet run --project src/ConfluenceSynkMD -- \
-            --mode Upload \
+            upload \
             --path ./docs \
             --conf-space ${{ vars.CONFLUENCE_SPACE }} \
             --root-page "Auto-Synced Documentation" \
@@ -90,7 +90,7 @@ Use the Docker image directly for simpler CI setups:
           CONFLUENCE__APITOKEN: ${{ secrets.CONFLUENCE_TOKEN }}
         run: |
           dotnet ConfluenceSynkMD.dll \
-            --mode Upload --path ./docs \
+            upload --path ./docs \
             --conf-space ${{ vars.CONFLUENCE_SPACE }}
 ```
 
@@ -98,7 +98,7 @@ Use the Docker image directly for simpler CI setups:
 
 ## Validate Without Uploading
 
-Use `--local` mode in PR checks to validate that Markdown files convert successfully without making API calls:
+Use `local` subcommand mode in PR checks to validate that Markdown files convert successfully without making API calls:
 
 ```yaml
   validate:
@@ -112,8 +112,8 @@ Use `--local` mode in PR checks to validate that Markdown files convert successf
       - name: Validate conversion
         run: |
           dotnet run --project src/ConfluenceSynkMD -- \
-            --mode Upload --path ./docs \
-            --conf-space DUMMY --local
+            upload --path ./docs \
+            --conf-space DUMMY
 ```
 
 ---
