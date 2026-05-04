@@ -17,6 +17,17 @@ using Serilog.Formatting.Json;
 
 
 
+// --- Pre-parse migration check (v0.1.0 breaking change) ---------------------
+// `--mode Upload|Download|Local` was replaced by `upload|download|local` subcommands.
+// If a user runs the old syntax, surface a clear migration message instead of
+// the bare "Unrecognized option --mode" from System.CommandLine.
+var migrationHint = CliMigrationCheck.CheckLegacyModeFlag(args);
+if (migrationHint is not null)
+{
+    Console.Error.WriteLine(migrationHint.Message);
+    return 2;
+}
+
 // --- Build Host -------------------------------------------------------------
 
 var builder = Host.CreateApplicationBuilder(args);
@@ -83,15 +94,15 @@ builder.Services.AddTransient<LocalOnlyLoadStep>();
 
 var host = builder.Build();
 
-// --- CLI Definition (System.CommandLine 2.0.3 API) --------------------
+// --- CLI Definition (System.CommandLine 2.0.3 API) --------------------------
+//
+// v0.1.0 shape: subcommand tree with three top-level verbs that mirror the old
+// SyncMode enum values. `--mode` and `--local` flags were removed in this
+// release; the migration message above catches users on the old syntax.
 
 var rootCommand = new RootCommand("ConfluenceSynkMD: Markdown to Confluence Synchronization Tool");
 
 // -- Core options ------------------------------------------------------------
-
-var modeOption = new Option<SyncMode>("--mode");
-modeOption.Description = "Synchronization direction: Upload, Download, or LocalExport.";
-modeOption.Required = true;
 
 var pathOption = new Option<string>("--path");
 pathOption.Description = "Local filesystem path to a Markdown repository root or subfolder.";
@@ -118,9 +129,6 @@ skipHierarchyOption.Description = "Flatten all pages under the root (inverse of 
 
 var skipUpdateOption = new Option<bool>("--skip-update");
 skipUpdateOption.Description = "Skip uploading pages whose content has not changed.";
-
-var localOption = new Option<bool>("--local");
-localOption.Description = "Only produce local CSF output without API calls.";
 
 var noWriteBackOption = new Option<bool>("--no-write-back");
 noWriteBackOption.Description = "Do not write Confluence Page-ID back into Markdown frontmatter after upload.";
@@ -233,73 +241,89 @@ tableDisplayModeOption.DefaultValueFactory = _ => "responsive";
 var contentAlignmentOption = new Option<string?>("--layout-alignment");
 contentAlignmentOption.Description = "Content alignment: center, left, right, or None.";
 
-// -- Register all options ----------------------------------------------------
+// -- Helper: register every option on a subcommand ---------------------------
+// Each subcommand accepts the same surface — keeps the per-mode CLI parity
+// the regression test R1 covers, and avoids per-subcommand option drift.
 
-rootCommand.Options.Add(modeOption);
-rootCommand.Options.Add(pathOption);
-rootCommand.Options.Add(spaceOption);
-rootCommand.Options.Add(parentIdOption);
-rootCommand.Options.Add(rootPageOption);
-rootCommand.Options.Add(keepHierarchyOption);
-rootCommand.Options.Add(skipHierarchyOption);
-rootCommand.Options.Add(skipUpdateOption);
-rootCommand.Options.Add(localOption);
-rootCommand.Options.Add(noWriteBackOption);
-rootCommand.Options.Add(logLevelOption);
-rootCommand.Options.Add(apiVersionOption);
-rootCommand.Options.Add(headersOption);
-rootCommand.Options.Add(confBaseUrlOption);
-rootCommand.Options.Add(confAuthModeOption);
-rootCommand.Options.Add(confUserEmailOption);
-rootCommand.Options.Add(confApiTokenOption);
-rootCommand.Options.Add(confBearerTokenOption);
-rootCommand.Options.Add(headingAnchorsOption);
-rootCommand.Options.Add(forceValidUrlOption);
-rootCommand.Options.Add(skipTitleHeadingOption);
-rootCommand.Options.Add(preferRasterOption);
-rootCommand.Options.Add(renderDrawioOption);
-rootCommand.Options.Add(renderMermaidOption);
-rootCommand.Options.Add(noRenderMermaidOption);
-rootCommand.Options.Add(renderPlantumlOption);
-rootCommand.Options.Add(renderLatexOption);
-rootCommand.Options.Add(diagramFormatOption);
-rootCommand.Options.Add(webUiLinksOption);
-rootCommand.Options.Add(webUiLinkStrategyOption);
-rootCommand.Options.Add(usePanelOption);
-rootCommand.Options.Add(forceValidLanguageOption);
-rootCommand.Options.Add(codeLineNumbersOption);
-rootCommand.Options.Add(debugLineMarkersOption);
-rootCommand.Options.Add(titlePrefixOption);
-rootCommand.Options.Add(generatedByOption);
-rootCommand.Options.Add(imageAlignmentOption);
-rootCommand.Options.Add(imageMaxWidthOption);
-rootCommand.Options.Add(tableWidthOption);
-rootCommand.Options.Add(tableDisplayModeOption);
-rootCommand.Options.Add(contentAlignmentOption);
-
-// -- Action handler ----------------------------------------------------------
-
-rootCommand.SetAction(async (parseResult, ct) =>
+void AddSharedOptions(Command cmd)
 {
-    var mode = parseResult.GetValue(modeOption);
+    cmd.Options.Add(pathOption);
+    cmd.Options.Add(spaceOption);
+    cmd.Options.Add(parentIdOption);
+    cmd.Options.Add(rootPageOption);
+    cmd.Options.Add(keepHierarchyOption);
+    cmd.Options.Add(skipHierarchyOption);
+    cmd.Options.Add(skipUpdateOption);
+    cmd.Options.Add(noWriteBackOption);
+    cmd.Options.Add(logLevelOption);
+    cmd.Options.Add(apiVersionOption);
+    cmd.Options.Add(headersOption);
+    cmd.Options.Add(confBaseUrlOption);
+    cmd.Options.Add(confAuthModeOption);
+    cmd.Options.Add(confUserEmailOption);
+    cmd.Options.Add(confApiTokenOption);
+    cmd.Options.Add(confBearerTokenOption);
+    cmd.Options.Add(headingAnchorsOption);
+    cmd.Options.Add(forceValidUrlOption);
+    cmd.Options.Add(skipTitleHeadingOption);
+    cmd.Options.Add(preferRasterOption);
+    cmd.Options.Add(renderDrawioOption);
+    cmd.Options.Add(renderMermaidOption);
+    cmd.Options.Add(noRenderMermaidOption);
+    cmd.Options.Add(renderPlantumlOption);
+    cmd.Options.Add(renderLatexOption);
+    cmd.Options.Add(diagramFormatOption);
+    cmd.Options.Add(webUiLinksOption);
+    cmd.Options.Add(webUiLinkStrategyOption);
+    cmd.Options.Add(usePanelOption);
+    cmd.Options.Add(forceValidLanguageOption);
+    cmd.Options.Add(codeLineNumbersOption);
+    cmd.Options.Add(debugLineMarkersOption);
+    cmd.Options.Add(titlePrefixOption);
+    cmd.Options.Add(generatedByOption);
+    cmd.Options.Add(imageAlignmentOption);
+    cmd.Options.Add(imageMaxWidthOption);
+    cmd.Options.Add(tableWidthOption);
+    cmd.Options.Add(tableDisplayModeOption);
+    cmd.Options.Add(contentAlignmentOption);
+}
+
+// -- Subcommands -------------------------------------------------------------
+
+var uploadCommand = new Command("upload", "Upload Markdown documents to Confluence.");
+AddSharedOptions(uploadCommand);
+uploadCommand.SetAction((parseResult, ct) => RunPipelineAsync(parseResult, ct, SyncMode.Upload, localOnly: false));
+
+var downloadCommand = new Command("download", "Download Confluence pages back into Markdown.");
+AddSharedOptions(downloadCommand);
+downloadCommand.SetAction((parseResult, ct) => RunPipelineAsync(parseResult, ct, SyncMode.Download, localOnly: false));
+
+var localCommand = new Command("local", "Produce local Confluence Storage Format output without API calls.");
+AddSharedOptions(localCommand);
+localCommand.SetAction((parseResult, ct) => RunPipelineAsync(parseResult, ct, SyncMode.LocalExport, localOnly: true));
+
+rootCommand.Subcommands.Add(uploadCommand);
+rootCommand.Subcommands.Add(downloadCommand);
+rootCommand.Subcommands.Add(localCommand);
+
+// -- Pipeline runner (shared by all three subcommands) -----------------------
+
+async Task<int> RunPipelineAsync(ParseResult parseResult, CancellationToken ct, SyncMode mode, bool localOnly)
+{
     var path = parseResult.GetValue(pathOption)!;
     var space = parseResult.GetValue(spaceOption)!;
     var parentId = parseResult.GetValue(parentIdOption);
-    var isLocal = parseResult.GetValue(localOption);
-
-    // Resolve effective mode: --local flag overrides to LocalExport
-    var effectiveMode = isLocal ? SyncMode.LocalExport : mode;
 
     // Resolve hierarchy: --skip-hierarchy inverts --keep-hierarchy
     var keepHierarchy = parseResult.GetValue(keepHierarchyOption)
                         && !parseResult.GetValue(skipHierarchyOption);
 
     var options = new SyncOptions(
-        effectiveMode, path, space, parentId,
+        mode, path, space, parentId,
         RootPage: parseResult.GetValue(rootPageOption),
         KeepHierarchy: keepHierarchy,
         SkipUpdate: parseResult.GetValue(skipUpdateOption),
-        LocalOnly: isLocal,
+        LocalOnly: localOnly,
         NoWriteBack: parseResult.GetValue(noWriteBackOption),
         LogLevel: parseResult.GetValue(logLevelOption)!);
 
@@ -308,7 +332,7 @@ rootCommand.SetAction(async (parseResult, ct) =>
 
     var runId = Guid.NewGuid().ToString("N");
     using var runIdScope = LogContext.PushProperty("RunId", runId);
-    using var modeScope = LogContext.PushProperty("Mode", effectiveMode.ToString());
+    using var modeScope = LogContext.PushProperty("Mode", mode.ToString());
     using var spaceScope = LogContext.PushProperty("Space", space);
     using var pathScope = LogContext.PushProperty("Path", path);
     var runLogger = Log.ForContext("SourceContext", "ConfluenceSynkMD.Run");
@@ -346,7 +370,7 @@ rootCommand.SetAction(async (parseResult, ct) =>
     if (cliBearer is not null) confluenceSettings.BearerToken = cliBearer;
 
     // Fail-fast validation (only for modes that perform Confluence API calls)
-    if (ConfluenceCredentialPolicy.RequiresCredentials(effectiveMode))
+    if (ConfluenceCredentialPolicy.RequiresCredentials(mode))
         ConfluenceSettingsValidator.ValidateOrThrow(confluenceSettings);
 
     var converterOptions = new ConverterOptions
@@ -392,7 +416,7 @@ rootCommand.SetAction(async (parseResult, ct) =>
     // Build pipeline based on mode
     var pipeline = new ETLPipelineBuilder();
 
-    if (effectiveMode == SyncMode.Upload)
+    if (mode == SyncMode.Upload)
     {
         pipeline
             .AddExtractor(host.Services.GetRequiredService<MarkdownIngestionStep>())
@@ -400,7 +424,7 @@ rootCommand.SetAction(async (parseResult, ct) =>
             .AddLoader(host.Services.GetRequiredService<ConfluenceLoadStep>())
             .AddLoader(host.Services.GetRequiredService<WriteBackStep>());
     }
-    else if (effectiveMode == SyncMode.LocalExport)
+    else if (mode == SyncMode.LocalExport)
     {
         pipeline
             .AddExtractor(host.Services.GetRequiredService<MarkdownIngestionStep>())
@@ -428,7 +452,7 @@ rootCommand.SetAction(async (parseResult, ct) =>
     }
 
     return 0;
-});
+}
 
 // -- Helper: map CLI log level string to Serilog LogEventLevel ---------------
 
@@ -442,5 +466,5 @@ static LogEventLevel MapLogLevel(string level) => level.ToLowerInvariant() switc
     _ => LogEventLevel.Information
 };
 
-var parseResult = rootCommand.Parse(args);
-return await parseResult.InvokeAsync();
+var rootParseResult = rootCommand.Parse(args);
+return await rootParseResult.InvokeAsync();
