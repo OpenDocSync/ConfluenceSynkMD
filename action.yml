@@ -1,0 +1,132 @@
+name: 'ConfluenceSynkMD'
+description: 'Sync Markdown documents with Atlassian Confluence Cloud. Full diagram toolchain (Mermaid + Draw.io + PlantUML + LaTeX) baked into a signed multi-arch Docker image — no host installs required.'
+
+# Marketplace metadata (also used by GitHub's UI when consumers add this to a workflow)
+branding:
+  icon: 'book-open'
+  color: 'blue'
+
+inputs:
+  subcommand:
+    description: 'Which sync direction to run: `upload` (Markdown → Confluence), `download` (Confluence → Markdown), or `local` (render to Confluence Storage Format without API calls).'
+    required: true
+    default: 'upload'
+
+  path:
+    description: 'Path to the Markdown root, relative to the workspace (e.g. `docs`).'
+    required: true
+
+  conf-space:
+    description: 'Confluence Space Key (e.g. `DEV`).'
+    required: true
+
+  conf-parent-id:
+    description: 'Optional Confluence parent page ID for subtree operations.'
+    required: false
+    default: ''
+
+  keep-hierarchy:
+    description: 'Preserve local directory structure as a parent-child page tree in Confluence. Set to `false` to flatten all pages under the root.'
+    required: false
+    default: 'true'
+
+  skip-update:
+    description: 'Skip uploading pages whose content has not changed since the last run.'
+    required: false
+    default: 'false'
+
+  image:
+    description: 'Override the published image reference (advanced). Default tracks the `0.1` minor channel.'
+    required: false
+    default: 'ghcr.io/opendocsync/confluencesynkmd:0.1'
+
+  extra-args:
+    description: 'Additional CLI args appended to the invocation (escape hatch). Whitespace-separated; not shell-parsed — use one CLI flag per token.'
+    required: false
+    default: ''
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Run ConfluenceSynkMD
+      shell: bash
+      env:
+        # The image reads CONFLUENCE__* env vars directly; we forward whichever
+        # are set on the runner. The action itself does not require any of them
+        # to be present on the action input — secrets stay in GitHub's secret
+        # store and are passed via `env:` in the calling workflow.
+        CONFLUENCE__BASEURL:     ${{ env.CONFLUENCE__BASEURL }}
+        CONFLUENCE__AUTHMODE:    ${{ env.CONFLUENCE__AUTHMODE }}
+        CONFLUENCE__USEREMAIL:   ${{ env.CONFLUENCE__USEREMAIL }}
+        CONFLUENCE__APITOKEN:    ${{ env.CONFLUENCE__APITOKEN }}
+        CONFLUENCE__BEARERTOKEN: ${{ env.CONFLUENCE__BEARERTOKEN }}
+        SUBCOMMAND:    ${{ inputs.subcommand }}
+        DOCS_PATH:     ${{ inputs.path }}
+        CONF_SPACE:    ${{ inputs.conf-space }}
+        CONF_PARENT:   ${{ inputs.conf-parent-id }}
+        KEEP_HIER:     ${{ inputs.keep-hierarchy }}
+        SKIP_UPDATE:   ${{ inputs.skip-update }}
+        IMAGE:         ${{ inputs.image }}
+        EXTRA_ARGS:    ${{ inputs.extra-args }}
+        WORKSPACE:     ${{ github.workspace }}
+      run: |
+        set -euo pipefail
+
+        # Reject obviously bad inputs before reaching for docker.
+        case "${SUBCOMMAND}" in
+          upload|download|local) ;;
+          *)
+            echo "::error ::ConfluenceSynkMD action: 'subcommand' must be one of: upload, download, local. Got: '${SUBCOMMAND}'."
+            exit 1
+            ;;
+        esac
+
+        # Build the args array conditionally. Empty-string defaults (e.g. for
+        # conf-parent-id) get filtered out so System.CommandLine does not see
+        # a stray "--conf-parent-id ''" pair.
+        ARGS=( "${SUBCOMMAND}" --path "/workspace/${DOCS_PATH#/}" --conf-space "${CONF_SPACE}" )
+        if [ -n "${CONF_PARENT}" ]; then
+          ARGS+=( --conf-parent-id "${CONF_PARENT}" )
+        fi
+        if [ "${KEEP_HIER}" = "true" ]; then
+          ARGS+=( --keep-hierarchy )
+        else
+          ARGS+=( --skip-hierarchy )
+        fi
+        if [ "${SKIP_UPDATE}" = "true" ]; then
+          ARGS+=( --skip-update )
+        fi
+        if [ -n "${EXTRA_ARGS}" ]; then
+          # Whitespace-split. Users needing quoted args should pass them
+          # individually (one token per flag) or pre-build the command outside
+          # this action. Documented limitation; v0.2 may accept JSON-encoded
+          # args for richer parsing.
+          # shellcheck disable=SC2206
+          EXTRA=( ${EXTRA_ARGS} )
+          ARGS+=( "${EXTRA[@]}" )
+        fi
+
+        # Upload only reads the workspace; download/local write to it.
+        # Match volume permissions to the actual subcommand to follow
+        # least-privilege.
+        case "${SUBCOMMAND}" in
+          upload)        VOLUME_MODE=":ro" ;;
+          download|local) VOLUME_MODE="" ;;
+          *)             VOLUME_MODE=":ro" ;;
+        esac
+
+        echo "::group::ConfluenceSynkMD invocation"
+        echo "  image:    ${IMAGE}"
+        echo "  mount:    ${WORKSPACE}:/workspace${VOLUME_MODE}"
+        echo "  args:     ${ARGS[*]}"
+        echo "::endgroup::"
+
+        docker run --rm \
+          -e CONFLUENCE__BASEURL \
+          -e CONFLUENCE__AUTHMODE \
+          -e CONFLUENCE__USEREMAIL \
+          -e CONFLUENCE__APITOKEN \
+          -e CONFLUENCE__BEARERTOKEN \
+          -v "${WORKSPACE}:/workspace${VOLUME_MODE}" \
+          "${IMAGE}" \
+          "${ARGS[@]}"
