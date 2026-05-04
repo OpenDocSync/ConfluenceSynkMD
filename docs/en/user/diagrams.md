@@ -9,9 +9,11 @@ ConfluenceSynkMD can render code blocks for various diagram languages into image
 | Type | Flag | Default | External Tool Required |
 |---|---|---|---|
 | **Mermaid** | `--render-mermaid` | ✅ Enabled | `@mermaid-js/mermaid-cli` (Node.js) |
-| **Draw.io** | `--render-drawio` | ❌ Disabled | `drawio-export` |
-| **PlantUML** | `--render-plantuml` | ❌ Disabled | `plantuml` binary |
-| **LaTeX** | `--render-latex` | ❌ Disabled | LaTeX distribution |
+| **Draw.io** | `--render-drawio` | ❌ Disabled | `drawio-desktop` (run headless via Xvfb) |
+| **PlantUML** | `--render-plantuml` | ❌ Disabled | Java + the `plantuml` package |
+| **LaTeX** | `--render-latex` | ❌ Disabled | LaTeX distribution + Ghostscript |
+
+> **Running the published image?** All four renderers ship preinstalled in `ghcr.io/opendocsync/confluencesynkmd:0.1` — no host-side installation required. Run `docker run --rm ghcr.io/opendocsync/confluencesynkmd:0.1 doctor --renderers-only` to verify.
 
 ---
 
@@ -57,7 +59,13 @@ Enable Draw.io rendering to convert Draw.io XML code blocks into images:
 
 ### Prerequisites
 
-Install `drawio-export` or use the Docker image which can be extended to include it.
+Install `drawio-desktop` (an Electron app) and arrange a display server (Xvfb on Linux). The simpler path is the published Docker image, which preinstalls drawio-desktop and starts Xvfb on `:99` for the container's lifetime via `entrypoint.sh`. To use it manually, set `DRAWIO_CMD` to a multi-token invocation:
+
+```bash
+export DRAWIO_CMD="xvfb-run -a drawio --no-sandbox --disable-gpu"
+```
+
+The `DrawioRenderer` parses multi-token env values via `RendererCommandResolver`.
 
 ---
 

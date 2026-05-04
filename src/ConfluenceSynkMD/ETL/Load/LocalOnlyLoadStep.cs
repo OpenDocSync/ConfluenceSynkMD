@@ -8,7 +8,7 @@ namespace ConfluenceSynkMD.ETL.Load;
 /// <summary>
 /// Saves converted documents as Confluence Storage Format (CSF) files
 /// to the local filesystem without making any API calls.
-/// Used when --mode LocalExport or --local flag is set.
+/// Used when the `local` subcommand is invoked (SyncMode.LocalExport).
 /// </summary>
 public sealed class LocalOnlyLoadStep : IPipelineStep
 {

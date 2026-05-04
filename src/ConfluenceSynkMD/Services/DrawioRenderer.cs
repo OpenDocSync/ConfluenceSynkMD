@@ -5,7 +5,11 @@ namespace ConfluenceSynkMD.Services;
 
 /// <summary>
 /// Renders Draw.io (diagrams.net) XML content to PNG or SVG images.
-/// Requires the Draw.io Desktop app or drawio-export CLI tool to be available.
+/// Requires drawio-desktop on PATH (or via <c>DRAWIO_CMD</c>). On Linux it
+/// runs headless under Xvfb — the published Docker image starts an Xvfb-once
+/// instance via <c>entrypoint.sh</c> and sets <c>DISPLAY=:99</c>;
+/// outside Docker, set <c>DRAWIO_CMD="xvfb-run -a drawio --no-sandbox --disable-gpu"</c>
+/// (multi-token values are parsed by <see cref="RendererCommandResolver"/>).
 /// </summary>
 public sealed class DrawioRenderer : IDiagramRenderer
 {

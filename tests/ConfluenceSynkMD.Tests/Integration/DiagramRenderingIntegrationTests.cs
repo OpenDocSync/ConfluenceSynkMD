@@ -102,7 +102,7 @@ public class DiagramRenderingIntegrationTests
         format.Should().Be("svg");
     }
 
-    [Fact(Skip = "Requires pdflatex and ImageMagick convert installed")]
+    [Fact(Skip = "Requires pdflatex and ghostscript installed")]
     public async Task LatexRenderer_Should_ProducePngBytes()
     {
         var logger = Substitute.For<ILogger>();
@@ -116,7 +116,7 @@ public class DiagramRenderingIntegrationTests
         bytes[..4].Should().BeEquivalentTo(new byte[] { 0x89, 0x50, 0x4E, 0x47 }, "PNG magic bytes");
     }
 
-    [Fact(Skip = "Requires pdflatex and ImageMagick convert installed")]
+    [Fact(Skip = "Requires pdflatex and ghostscript installed")]
     public async Task LatexRenderer_Should_CleanupTempFiles()
     {
         var logger = Substitute.For<ILogger>();

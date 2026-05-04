@@ -9,9 +9,11 @@ ConfluenceSynkMD kann Code-Blöcke verschiedener Diagramm-Sprachen in Bild-Anhä
 | Typ | Flag | Standard | Externes Tool |
 |---|---|---|---|
 | **Mermaid** | `--render-mermaid` | ✅ Aktiviert | `@mermaid-js/mermaid-cli` (Node.js) |
-| **Draw.io** | `--render-drawio` | ❌ Deaktiviert | `drawio-export` |
-| **PlantUML** | `--render-plantuml` | ❌ Deaktiviert | `plantuml`-Binary |
-| **LaTeX** | `--render-latex` | ❌ Deaktiviert | LaTeX-Distribution |
+| **Draw.io** | `--render-drawio` | ❌ Deaktiviert | `drawio-desktop` (headless via Xvfb) |
+| **PlantUML** | `--render-plantuml` | ❌ Deaktiviert | Java + das `plantuml` Paket |
+| **LaTeX** | `--render-latex` | ❌ Deaktiviert | LaTeX-Distribution + Ghostscript |
+
+> **Verwenden Sie das veröffentlichte Image?** Alle vier Renderer sind in `ghcr.io/opendocsync/confluencesynkmd:0.1` vorinstalliert — keine Host-Installation nötig. Mit `docker run --rm ghcr.io/opendocsync/confluencesynkmd:0.1 doctor --renderers-only` prüfen.
 
 ---
 

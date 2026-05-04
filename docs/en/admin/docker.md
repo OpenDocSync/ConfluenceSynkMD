@@ -300,16 +300,21 @@ The Dockerfile uses a **multi-stage build**:
 
 ---
 
-## Extending the Image
+## What ships in the default image
 
-To add additional diagram renderers, extend the Dockerfile:
+The published `ghcr.io/opendocsync/confluencesynkmd:0.1` image preinstalls every renderer claimed by the project:
 
-```dockerfile
-FROM confluencesynkmd AS base
+| Renderer | Backing engine |
+|---|---|
+| Mermaid | `@mermaid-js/mermaid-cli` + Chromium (Puppeteer) |
+| Draw.io | drawio-desktop (Electron, headless via Xvfb-once started by `entrypoint.sh`) |
+| PlantUML | `default-jre-headless` + the `plantuml` package |
+| LaTeX | TeX Live (`texlive-latex-base` + `texlive-latex-extra` + fonts-recommended) + Ghostscript directly (no ImageMagick) |
 
-# Add PlantUML
-RUN apt-get update && apt-get install -y plantuml
+Run `docker run --rm ghcr.io/opendocsync/confluencesynkmd:0.1 doctor --renderers-only` to verify all four renderers are healthy in the image you pulled.
 
-# Add Draw.io export
-RUN npm install -g drawio-export
-```
+## Forward-only fix policy
+
+If a published `:0.1.x` release contains a critical bug, the project ships a `:0.1.x+1` patch and updates the moving `:0.1` tag. Pinned digest pulls (`docker pull ghcr.io/opendocsync/confluencesynkmd@sha256:...`) are never deleted — users who pinned by digest pinned for a reason.
+
+For security-grade incidents only (leaked credentials, actively dangerous regression), the `release-yank.yml` workflow deletes a tag (not a digest) from GHCR. See the workflow file for the decision criteria.
