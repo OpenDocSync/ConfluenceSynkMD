@@ -70,6 +70,18 @@ builder.Services.AddTransient<DoctorCommand>(sp => new DoctorCommand(
     Console.Out,
     sp.GetRequiredService<Serilog.ILogger>()));
 
+// Init command (interactive wizard: prompts for Confluence creds, validates,
+// writes a config file). Reuses IConfluenceHealthCheck for validation.
+builder.Services.AddTransient<InitCommand>(sp => new InitCommand(
+    sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<ConfluenceSettings>>(),
+    sp.GetRequiredService<IConfluenceHealthCheck>(),
+    Console.In,
+    Console.Out,
+    Console.Error,
+    Console.IsInputRedirected,
+    (path, contents) => File.WriteAllTextAsync(path, contents),
+    sp.GetRequiredService<Serilog.ILogger>()));
+
 // Shared services
 builder.Services.AddSingleton<FrontmatterParser>();
 builder.Services.AddSingleton<SlugGenerator>();
@@ -333,10 +345,30 @@ doctorCommand.SetAction(async (parseResult, ct) =>
     return await doctor.RunAsync(renderersOnly, ct);
 });
 
+// `init` is the first-run wizard. Same wiring shape as `doctor` — it
+// resolves a small command class via DI, no shared sync-pipeline options.
+var nonInteractiveOption = new Option<bool>("--non-interactive");
+nonInteractiveOption.Description = "Refuse to prompt; require all CONFLUENCE__* env vars to be set in advance.";
+
+var configOutOption = new Option<string?>("--config-out");
+configOutOption.Description = "Path to write the resolved JSON config (default: ./.confluencesynkmd.json).";
+
+var initCommand = new Command("init", "First-run wizard: prompt for Confluence credentials, validate, write config.");
+initCommand.Options.Add(nonInteractiveOption);
+initCommand.Options.Add(configOutOption);
+initCommand.SetAction(async (parseResult, ct) =>
+{
+    var nonInteractive = parseResult.GetValue(nonInteractiveOption);
+    var configOut = parseResult.GetValue(configOutOption);
+    var init = host.Services.GetRequiredService<InitCommand>();
+    return await init.RunAsync(nonInteractive, configOut, ct);
+});
+
 rootCommand.Subcommands.Add(uploadCommand);
 rootCommand.Subcommands.Add(downloadCommand);
 rootCommand.Subcommands.Add(localCommand);
 rootCommand.Subcommands.Add(doctorCommand);
+rootCommand.Subcommands.Add(initCommand);
 
 // -- Pipeline runner (shared by all three subcommands) -----------------------
 
