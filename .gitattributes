@@ -1,0 +1,7 @@
+# Force LF line endings for files that are executed in Linux containers or
+# parsed by Linux tooling. CRLF in a shebang line breaks `#!/bin/sh` lookup;
+# CRLF in a Dockerfile RUN heredoc breaks shell parsing.
+*.sh        text eol=lf
+Dockerfile  text eol=lf
+*.yml       text eol=lf
+*.yaml      text eol=lf
