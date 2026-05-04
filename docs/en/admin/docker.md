@@ -44,7 +44,7 @@ The Dockerfile uses a **multi-stage build**:
       -e CONFLUENCE__APITOKEN \
       -v $(pwd)/docs:/workspace/docs:ro \
       confluencesynkmd \
-      --mode Upload \
+      upload \
       --path /workspace/docs \
       --conf-space YOUR_SPACE_KEY \
       --conf-parent-id YOUR_PAGE_ID
@@ -57,7 +57,7 @@ The Dockerfile uses a **multi-stage build**:
       -e CONFLUENCE__APITOKEN \
       -v $(pwd)/output:/workspace/output \
       confluencesynkmd \
-      --mode Download \
+      download \
       --path /workspace/output \
       --conf-space YOUR_SPACE_KEY \
       --conf-parent-id YOUR_PAGE_ID
@@ -70,7 +70,7 @@ The Dockerfile uses a **multi-stage build**:
       -e CONFLUENCE__APITOKEN \
       -v $(pwd)/docs:/workspace/docs:ro \
       confluencesynkmd \
-      --mode Upload \
+      upload \
       --path /workspace/docs \
       --conf-space YOUR_SPACE_KEY \
       --conf-parent-id YOUR_PAGE_ID
@@ -83,7 +83,7 @@ The Dockerfile uses a **multi-stage build**:
       -e CONFLUENCE__APITOKEN \
       -v $(pwd)/output:/workspace/output \
       confluencesynkmd \
-      --mode Download \
+      download \
       --path /workspace/output \
       --conf-space YOUR_SPACE_KEY \
       --conf-parent-id YOUR_PAGE_ID
@@ -100,7 +100,7 @@ The Dockerfile uses a **multi-stage build**:
       -e CONFLUENCE__APITOKEN `
       -v ${PWD}/docs:/workspace/docs:ro `
       confluencesynkmd `
-      --mode Upload `
+      upload `
       --path /workspace/docs `
       --conf-space YOUR_SPACE_KEY `
       --conf-parent-id YOUR_PAGE_ID
@@ -113,7 +113,7 @@ The Dockerfile uses a **multi-stage build**:
       -e CONFLUENCE__APITOKEN `
       -v ${PWD}/output:/workspace/output `
       confluencesynkmd `
-      --mode Download `
+      download `
       --path /workspace/output `
       --conf-space YOUR_SPACE_KEY `
       --conf-parent-id YOUR_PAGE_ID
@@ -126,7 +126,7 @@ The Dockerfile uses a **multi-stage build**:
       -e CONFLUENCE__APITOKEN `
       -v ${PWD}/docs:/workspace/docs:ro `
       confluencesynkmd `
-      --mode Upload `
+      upload `
       --path /workspace/docs `
       --conf-space YOUR_SPACE_KEY `
       --conf-parent-id YOUR_PAGE_ID
@@ -139,7 +139,7 @@ The Dockerfile uses a **multi-stage build**:
       -e CONFLUENCE__APITOKEN `
       -v ${PWD}/output:/workspace/output `
       confluencesynkmd `
-      --mode Download `
+      download `
       --path /workspace/output `
       --conf-space YOUR_SPACE_KEY `
       --conf-parent-id YOUR_PAGE_ID
@@ -156,7 +156,7 @@ The Dockerfile uses a **multi-stage build**:
       -e CONFLUENCE__APITOKEN ^
       -v %cd%/docs:/workspace/docs:ro ^
       confluencesynkmd ^
-      --mode Upload ^
+      upload ^
       --path /workspace/docs ^
       --conf-space YOUR_SPACE_KEY ^
       --conf-parent-id YOUR_PAGE_ID
@@ -169,7 +169,7 @@ The Dockerfile uses a **multi-stage build**:
       -e CONFLUENCE__APITOKEN ^
       -v %cd%/output:/workspace/output ^
       confluencesynkmd ^
-      --mode Download ^
+      download ^
       --path /workspace/output ^
       --conf-space YOUR_SPACE_KEY ^
       --conf-parent-id YOUR_PAGE_ID
@@ -182,7 +182,7 @@ The Dockerfile uses a **multi-stage build**:
       -e CONFLUENCE__APITOKEN ^
       -v %cd%/docs:/workspace/docs:ro ^
       confluencesynkmd ^
-      --mode Upload ^
+      upload ^
       --path /workspace/docs ^
       --conf-space YOUR_SPACE_KEY ^
       --conf-parent-id YOUR_PAGE_ID
@@ -195,7 +195,7 @@ The Dockerfile uses a **multi-stage build**:
       -e CONFLUENCE__APITOKEN ^
       -v %cd%/output:/workspace/output ^
       confluencesynkmd ^
-      --mode Download ^
+      download ^
       --path /workspace/output ^
       --conf-space YOUR_SPACE_KEY ^
       --conf-parent-id YOUR_PAGE_ID
@@ -258,7 +258,7 @@ The Dockerfile uses a **multi-stage build**:
                 -e CONFLUENCE__APITOKEN \
                 -v "$PWD/docs:/workspace/docs:ro" \
                 confluencesynkmd \
-                --mode Upload \
+                upload \
                 --path /workspace/docs \
                 --conf-space "${{ vars.CONFLUENCE_SPACE }}" \
                 --conf-parent-id "${{ vars.CONFLUENCE_PARENT_ID }}"
@@ -287,7 +287,7 @@ The Dockerfile uses a **multi-stage build**:
             -e CONFLUENCE__APITOKEN \
             -v "$CI_PROJECT_DIR/docs:/workspace/docs:ro" \
             confluencesynkmd \
-            --mode Upload \
+            upload \
             --path /workspace/docs \
             --conf-space "$CONFLUENCE_SPACE" \
             --conf-parent-id "$CONFLUENCE_PARENT_ID"

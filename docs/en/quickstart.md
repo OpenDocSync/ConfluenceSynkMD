@@ -152,7 +152,7 @@ Upload a folder of Markdown files to Confluence:
 
     ```bash
     dotnet run --project src/ConfluenceSynkMD -- \
-      --mode Upload \
+      upload \
       --path ./my-docs \
       --conf-space YOUR_SPACE_KEY \
       --conf-parent-id YOUR_PAGE_ID
@@ -162,7 +162,7 @@ Upload a folder of Markdown files to Confluence:
 
     ```powershell
     dotnet run --project src/ConfluenceSynkMD -- `
-      --mode Upload `
+      upload `
       --path ./my-docs `
       --conf-space YOUR_SPACE_KEY `
       --conf-parent-id YOUR_PAGE_ID
@@ -172,7 +172,7 @@ Upload a folder of Markdown files to Confluence:
 
     ```cmd
     dotnet run --project src/ConfluenceSynkMD -- ^
-      --mode Upload ^
+      upload ^
       --path .\my-docs ^
       --conf-space YOUR_SPACE_KEY ^
       --conf-parent-id YOUR_PAGE_ID
@@ -190,7 +190,7 @@ Upload a folder of Markdown files to Confluence:
       -e CONFLUENCE__APITOKEN=your-token \
       -v ${PWD}:/workspace \
       confluencesynkmd \
-      --mode Upload \
+      upload \
       --path /workspace/my-docs \
       --conf-space YOUR_SPACE_KEY \
       --conf-parent-id YOUR_PAGE_ID
@@ -211,7 +211,7 @@ Upload a folder of Markdown files to Confluence:
       -e CONFLUENCE__APITOKEN=your-token `
       -v ${PWD}:/workspace `
       confluencesynkmd `
-      --mode Upload `
+      upload `
       --path /workspace/my-docs `
       --conf-space YOUR_SPACE_KEY `
       --conf-parent-id YOUR_PAGE_ID
@@ -232,7 +232,7 @@ Upload a folder of Markdown files to Confluence:
       -e CONFLUENCE__APITOKEN=your-token ^
       -v %cd%:/workspace ^
       confluencesynkmd ^
-      --mode Upload ^
+      upload ^
       --path /workspace/my-docs ^
       --conf-space YOUR_SPACE_KEY ^
       --conf-parent-id YOUR_PAGE_ID
@@ -271,7 +271,7 @@ Download Confluence pages back to Markdown:
 
     ```bash
     dotnet run --project src/ConfluenceSynkMD -- \
-      --mode Download \
+      download \
       --path ./output \
       --conf-space YOUR_SPACE_KEY \
       --conf-parent-id YOUR_PAGE_ID
@@ -281,7 +281,7 @@ Download Confluence pages back to Markdown:
 
     ```powershell
     dotnet run --project src/ConfluenceSynkMD -- `
-      --mode Download `
+      download `
       --path ./output `
       --conf-space YOUR_SPACE_KEY `
       --conf-parent-id YOUR_PAGE_ID
@@ -291,7 +291,7 @@ Download Confluence pages back to Markdown:
 
     ```cmd
     dotnet run --project src/ConfluenceSynkMD -- ^
-      --mode Download ^
+      download ^
       --path .\output ^
       --conf-space YOUR_SPACE_KEY ^
       --conf-parent-id YOUR_PAGE_ID
@@ -309,7 +309,7 @@ Download Confluence pages back to Markdown:
       -e CONFLUENCE__APITOKEN=your-token \
       -v ${PWD}:/workspace \
       confluencesynkmd \
-      --mode Download \
+      download \
       --path /workspace/output \
       --conf-space YOUR_SPACE_KEY \
       --conf-parent-id YOUR_PAGE_ID
@@ -330,7 +330,7 @@ Download Confluence pages back to Markdown:
       -e CONFLUENCE__APITOKEN=your-token `
       -v ${PWD}:/workspace `
       confluencesynkmd `
-      --mode Download `
+      download `
       --path /workspace/output `
       --conf-space YOUR_SPACE_KEY `
       --conf-parent-id YOUR_PAGE_ID
@@ -351,7 +351,7 @@ Download Confluence pages back to Markdown:
       -e CONFLUENCE__APITOKEN=your-token ^
       -v %cd%:/workspace ^
       confluencesynkmd ^
-      --mode Download ^
+      download ^
       --path /workspace/output ^
       --conf-space YOUR_SPACE_KEY ^
       --conf-parent-id YOUR_PAGE_ID

@@ -39,7 +39,7 @@ Das Docker-Image enthält .NET, Node.js und mermaid-cli — eine konsistente, po
       -e CONFLUENCE__APITOKEN \
       -v $(pwd)/docs:/workspace/docs:ro \
       confluencesynkmd \
-      --mode Upload \
+      upload \
       --path /workspace/docs \
       --conf-space IHR_SPACE_KEY \
       --conf-parent-id IHRE_PAGE_ID
@@ -52,7 +52,7 @@ Das Docker-Image enthält .NET, Node.js und mermaid-cli — eine konsistente, po
       -e CONFLUENCE__APITOKEN \
       -v $(pwd)/output:/workspace/output \
       confluencesynkmd \
-      --mode Download \
+      download \
       --path /workspace/output \
       --conf-space IHR_SPACE_KEY \
       --conf-parent-id IHRE_PAGE_ID
@@ -65,7 +65,7 @@ Das Docker-Image enthält .NET, Node.js und mermaid-cli — eine konsistente, po
       -e CONFLUENCE__APITOKEN \
       -v $(pwd)/docs:/workspace/docs:ro \
       confluencesynkmd \
-      --mode Upload \
+      upload \
       --path /workspace/docs \
       --conf-space IHR_SPACE_KEY \
       --conf-parent-id IHRE_PAGE_ID
@@ -78,7 +78,7 @@ Das Docker-Image enthält .NET, Node.js und mermaid-cli — eine konsistente, po
       -e CONFLUENCE__APITOKEN \
       -v $(pwd)/output:/workspace/output \
       confluencesynkmd \
-      --mode Download \
+      download \
       --path /workspace/output \
       --conf-space IHR_SPACE_KEY \
       --conf-parent-id IHRE_PAGE_ID
@@ -95,7 +95,7 @@ Das Docker-Image enthält .NET, Node.js und mermaid-cli — eine konsistente, po
       -e CONFLUENCE__APITOKEN `
       -v ${PWD}/docs:/workspace/docs:ro `
       confluencesynkmd `
-      --mode Upload `
+      upload `
       --path /workspace/docs `
       --conf-space IHR_SPACE_KEY `
       --conf-parent-id IHRE_PAGE_ID
@@ -108,7 +108,7 @@ Das Docker-Image enthält .NET, Node.js und mermaid-cli — eine konsistente, po
       -e CONFLUENCE__APITOKEN `
       -v ${PWD}/output:/workspace/output `
       confluencesynkmd `
-      --mode Download `
+      download `
       --path /workspace/output `
       --conf-space IHR_SPACE_KEY `
       --conf-parent-id IHRE_PAGE_ID
@@ -121,7 +121,7 @@ Das Docker-Image enthält .NET, Node.js und mermaid-cli — eine konsistente, po
       -e CONFLUENCE__APITOKEN `
       -v ${PWD}/docs:/workspace/docs:ro `
       confluencesynkmd `
-      --mode Upload `
+      upload `
       --path /workspace/docs `
       --conf-space IHR_SPACE_KEY `
       --conf-parent-id IHRE_PAGE_ID
@@ -134,7 +134,7 @@ Das Docker-Image enthält .NET, Node.js und mermaid-cli — eine konsistente, po
       -e CONFLUENCE__APITOKEN `
       -v ${PWD}/output:/workspace/output `
       confluencesynkmd `
-      --mode Download `
+      download `
       --path /workspace/output `
       --conf-space IHR_SPACE_KEY `
       --conf-parent-id IHRE_PAGE_ID
@@ -151,7 +151,7 @@ Das Docker-Image enthält .NET, Node.js und mermaid-cli — eine konsistente, po
       -e CONFLUENCE__APITOKEN ^
       -v %cd%/docs:/workspace/docs:ro ^
       confluencesynkmd ^
-      --mode Upload ^
+      upload ^
       --path /workspace/docs ^
       --conf-space IHR_SPACE_KEY ^
       --conf-parent-id IHRE_PAGE_ID
@@ -164,7 +164,7 @@ Das Docker-Image enthält .NET, Node.js und mermaid-cli — eine konsistente, po
       -e CONFLUENCE__APITOKEN ^
       -v %cd%/output:/workspace/output ^
       confluencesynkmd ^
-      --mode Download ^
+      download ^
       --path /workspace/output ^
       --conf-space IHR_SPACE_KEY ^
       --conf-parent-id IHRE_PAGE_ID
@@ -177,7 +177,7 @@ Das Docker-Image enthält .NET, Node.js und mermaid-cli — eine konsistente, po
       -e CONFLUENCE__APITOKEN ^
       -v %cd%/docs:/workspace/docs:ro ^
       confluencesynkmd ^
-      --mode Upload ^
+      upload ^
       --path /workspace/docs ^
       --conf-space IHR_SPACE_KEY ^
       --conf-parent-id IHRE_PAGE_ID
@@ -190,7 +190,7 @@ Das Docker-Image enthält .NET, Node.js und mermaid-cli — eine konsistente, po
       -e CONFLUENCE__APITOKEN ^
       -v %cd%/output:/workspace/output ^
       confluencesynkmd ^
-      --mode Download ^
+      download ^
       --path /workspace/output ^
       --conf-space IHR_SPACE_KEY ^
       --conf-parent-id IHRE_PAGE_ID
@@ -253,7 +253,7 @@ Das Docker-Image enthält .NET, Node.js und mermaid-cli — eine konsistente, po
                 -e CONFLUENCE__APITOKEN \
                 -v "$PWD/docs:/workspace/docs:ro" \
                 confluencesynkmd \
-                --mode Upload \
+                upload \
                 --path /workspace/docs \
                 --conf-space "${{ vars.CONFLUENCE_SPACE }}" \
                 --conf-parent-id "${{ vars.CONFLUENCE_PARENT_ID }}"
@@ -282,7 +282,7 @@ Das Docker-Image enthält .NET, Node.js und mermaid-cli — eine konsistente, po
             -e CONFLUENCE__APITOKEN \
             -v "$CI_PROJECT_DIR/docs:/workspace/docs:ro" \
             confluencesynkmd \
-            --mode Upload \
+            upload \
             --path /workspace/docs \
             --conf-space "$CONFLUENCE_SPACE" \
             --conf-parent-id "$CONFLUENCE_PARENT_ID"

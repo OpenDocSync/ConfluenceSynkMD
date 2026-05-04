@@ -74,23 +74,26 @@ public sealed class PlantUmlRenderer : IDiagramRenderer
     private static (string Command, string Arguments) BuildCommand(string inputFile, string outputFormat)
     {
         var formatArg = outputFormat.Equals("svg", StringComparison.OrdinalIgnoreCase) ? "-tsvg" : "-tpng";
+        var perCallArgs = $"{formatArg} \"{inputFile}\"";
 
-        // Check PLANTUML_CMD environment variable (direct command)
+        // PLANTUML_CMD: bare binary name OR multi-token invocation
+        // (e.g. "java -jar /opt/plantuml.jar"). Parsed via the shared resolver.
         var cmd = Environment.GetEnvironmentVariable("PLANTUML_CMD");
-        if (!string.IsNullOrEmpty(cmd))
+        if (!string.IsNullOrWhiteSpace(cmd))
         {
-            return (cmd, $"{formatArg} \"{inputFile}\"");
+            var (fileName, argsPrefix) = RendererCommandResolver.Parse(cmd);
+            return (fileName, RendererCommandResolver.CombineArgs(argsPrefix, perCallArgs));
         }
 
-        // Check PLANTUML_JAR environment variable (java -jar ...)
+        // PLANTUML_JAR: convenience for the common "java -jar ..." pattern.
         var jar = Environment.GetEnvironmentVariable("PLANTUML_JAR");
         if (!string.IsNullOrEmpty(jar) && File.Exists(jar))
         {
-            return ("java", $"-jar \"{jar}\" {formatArg} \"{inputFile}\"");
+            return ("java", $"-jar \"{jar}\" {perCallArgs}");
         }
 
-        // Default: try plantuml as a command
-        return ("plantuml", $"{formatArg} \"{inputFile}\"");
+        // Default: try plantuml as a single-token command on PATH.
+        return ("plantuml", perCallArgs);
     }
 
     private static void TryDeleteFile(string path)
