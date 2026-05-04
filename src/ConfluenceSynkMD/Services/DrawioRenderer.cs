@@ -71,6 +71,20 @@ public sealed class DrawioRenderer : IDiagramRenderer
                 throw new InvalidOperationException($"Draw.io export failed (exit {process.ExitCode}): {stderr}");
             }
 
+            // drawio-desktop sometimes exits 0 without producing the output file
+            // — typically when the input mxfile is missing page-level metadata
+            // the editor would normally write (dx/dy/pageWidth/pageHeight). Surface
+            // an actionable error rather than a bare FileNotFoundException.
+            if (!File.Exists(outputFile))
+            {
+                var stdout = await process.StandardOutput.ReadToEndAsync(ct);
+                var stderr = await process.StandardError.ReadToEndAsync(ct);
+                throw new InvalidOperationException(
+                    $"Draw.io exited 0 but produced no output at '{outputFile}'. " +
+                    "This usually means the input mxfile is missing required page-level attributes. " +
+                    $"stdout: {stdout.Trim()}; stderr: {stderr.Trim()}");
+            }
+
             var imageBytes = await File.ReadAllBytesAsync(outputFile, ct);
             _logger.Debug("Draw.io diagram rendered: {Size} bytes ({Format}).", imageBytes.Length, outputFormat);
             return (imageBytes, outputFormat);
