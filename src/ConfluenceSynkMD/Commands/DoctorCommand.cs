@@ -128,11 +128,22 @@ public sealed class DoctorCommand
     private const string PlantumlCanary =
         "@startuml\nA -> B\n@enduml";
 
+    // Real drawio-desktop will silently exit 0 without producing output when
+    // the input mxfile is missing the page-level attributes the editor would
+    // normally write (dx/dy/grid/pageWidth/pageHeight). This canary mirrors
+    // the exact shape diagrams.net writes for an empty new page.
     private const string DrawioCanary =
-        "<mxfile host=\"Doctor\"><diagram><mxGraphModel><root>" +
+        "<mxfile host=\"app.diagrams.net\" version=\"22.0.0\">" +
+        "<diagram name=\"Page-1\" id=\"doctor\">" +
+        "<mxGraphModel dx=\"800\" dy=\"600\" grid=\"1\" gridSize=\"10\" guides=\"1\" " +
+        "tooltips=\"1\" connect=\"1\" arrows=\"1\" fold=\"1\" page=\"1\" pageScale=\"1\" " +
+        "pageWidth=\"850\" pageHeight=\"1100\" math=\"0\" shadow=\"0\">" +
+        "<root>" +
         "<mxCell id=\"0\"/><mxCell id=\"1\" parent=\"0\"/>" +
-        "<mxCell id=\"2\" value=\"A\" vertex=\"1\" parent=\"1\">" +
-        "<mxGeometry x=\"0\" y=\"0\" width=\"40\" height=\"20\" as=\"geometry\"/></mxCell>" +
+        "<mxCell id=\"2\" value=\"doctor\" style=\"rounded=0;whiteSpace=wrap;html=1;\" " +
+        "vertex=\"1\" parent=\"1\">" +
+        "<mxGeometry x=\"40\" y=\"40\" width=\"120\" height=\"60\" as=\"geometry\"/>" +
+        "</mxCell>" +
         "</root></mxGraphModel></diagram></mxfile>";
 
     private const string LatexCanary = @"\frac{1}{2}";
