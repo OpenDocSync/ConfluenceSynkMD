@@ -24,7 +24,7 @@ FROM mcr.microsoft.com/dotnet/aspnet:10.0@sha256:52dcfb4225fda614c38ba5997a4ec72
 
 ARG NODEJS_MAJOR=22
 ARG MERMAID_CLI_VERSION=11.12.0
-ARG DRAWIO_VERSION=26.0.0
+ARG DRAWIO_VERSION=29.7.9
 ARG TARGETARCH
 
 # Dependabot tracks Docker base image updates (FROM).
