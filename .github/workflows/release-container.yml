@@ -1,0 +1,205 @@
+name: Release Container
+
+# Triggered by pushing a `v*.*.*` tag. Builds the multi-arch image, runs
+# the in-image `doctor` smoke check on amd64 BEFORE pushing anything to
+# the registry, then pushes + cosign-signs the manifest list. The first
+# user-facing tag will be `v0.1.0` (pre-1.0).
+#
+# Pre-1.0 tag scheme: only `0.1.0`, `0.1`, and `sha-<short>` are created.
+# `latest`, the major-track (`0`), and (`1`) are intentionally not created
+# until v1.0.0 ships. See `docker/metadata-action` config below.
+#
+# Permissions:
+#   packages: write   — push to GHCR
+#   id-token: write   — OIDC token for cosign keyless + SLSA provenance
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: read
+  packages: write
+  id-token: write
+
+env:
+  IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/confluencesynkmd
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up QEMU (multi-arch buildx)
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: arm64
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # ─────────────────────────────────────────────────────────────────
+      # Step 1: Build amd64 locally with --load and smoke-test before push.
+      # `docker buildx build --load` only supports a single platform at a
+      # time, so the smoke gate is amd64-only. arm64 is verified by buildx
+      # build success (cross-build under QEMU) but not exercised at runtime.
+      # ─────────────────────────────────────────────────────────────────
+      - name: Build amd64 image (loaded into local docker)
+        id: build_local
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/amd64
+          tags: confluencesynkmd:smoke-${{ github.sha }}
+          load: true
+          push: false
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Smoke test — render canaries via `doctor --renderers-only`
+        run: |
+          docker run --rm \
+            confluencesynkmd:smoke-${{ github.sha }} \
+            doctor --renderers-only
+
+      # ─────────────────────────────────────────────────────────────────
+      # Step 2: Compute tags + multi-arch push (gated on smoke pass).
+      # ─────────────────────────────────────────────────────────────────
+      - name: Compute image tags
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.IMAGE_NAME }}
+          # `latest=false` blocks the implicit `:latest` tag. We keep it
+          # off until v1.0.0; pre-1.0 releases pin to exact-or-minor tags.
+          flavor: |
+            latest=false
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=sha,prefix=sha-,format=short
+          labels: |
+            org.opencontainers.image.title=ConfluenceSynkMD
+            org.opencontainers.image.description=Markdown ↔ Confluence Cloud bidirectional sync (with full diagram toolchain)
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
+            org.opencontainers.image.licenses=MIT
+
+      - name: Build + push multi-arch image
+        id: build_push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          provenance: mode=max
+          sbom: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      # ─────────────────────────────────────────────────────────────────
+      # Step 3: Sign the manifest list digest with cosign keyless OIDC.
+      # Signing the index covers all per-platform manifests via the
+      # OCI manifest-list signing spec. SBOM + provenance attestations
+      # are produced by build-push-action above.
+      # ─────────────────────────────────────────────────────────────────
+      - name: Install cosign
+        uses: sigstore/cosign-installer@v3
+
+      - name: Sign manifest list
+        env:
+          DIGEST: ${{ steps.build_push.outputs.digest }}
+          TAGS: ${{ steps.meta.outputs.tags }}
+        run: |
+          # Sign the index (manifest list) digest. cosign supports both
+          # `image@digest` and tagged-image forms; using digest pins the
+          # signature to the exact bytes we just pushed.
+          cosign sign --yes "${IMAGE_NAME}@${DIGEST}"
+
+      - name: Verify signature (smoke-test the user-facing copy)
+        env:
+          DIGEST: ${{ steps.build_push.outputs.digest }}
+        run: |
+          # Re-run the verification command we will pin in the GitHub
+          # Release notes so we never ship a copy that can't actually be
+          # executed by users.
+          cosign verify "${IMAGE_NAME}@${DIGEST}" \
+            --certificate-identity-regexp "^https://github.com/${{ github.repository }}" \
+            --certificate-oidc-issuer "https://token.actions.githubusercontent.com" \
+            > /dev/null
+
+      # ─────────────────────────────────────────────────────────────────
+      # Step 4: GitHub Release with auto-generated notes + verify command.
+      # ─────────────────────────────────────────────────────────────────
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DIGEST: ${{ steps.build_push.outputs.digest }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          # Strip the leading `v` for image-tag references (e.g. `v0.1.0` -> `0.1.0`).
+          IMAGE_TAG="${TAG#v}"
+
+          BODY=$(cat <<EOF_BODY
+          ## Container image
+
+          \`\`\`
+          docker pull ${IMAGE_NAME}:${IMAGE_TAG}
+          \`\`\`
+
+          Pinned digest:
+
+          \`\`\`
+          docker pull ${IMAGE_NAME}@${DIGEST}
+          \`\`\`
+
+          ### Verify the signature
+
+          The image is signed via Sigstore keyless OIDC against the GitHub
+          Actions workflow that built it. To verify before pulling:
+
+          \`\`\`
+          cosign verify ${IMAGE_NAME}@${DIGEST} \\
+            --certificate-identity-regexp "^https://github.com/${{ github.repository }}" \\
+            --certificate-oidc-issuer "https://token.actions.githubusercontent.com"
+          \`\`\`
+
+          SBOM + SLSA provenance are attached to the OCI manifest. Inspect with:
+
+          \`\`\`
+          cosign download sbom ${IMAGE_NAME}@${DIGEST}
+          cosign verify-attestation --type slsaprovenance \\
+            ${IMAGE_NAME}@${DIGEST} \\
+            --certificate-identity-regexp "^https://github.com/${{ github.repository }}" \\
+            --certificate-oidc-issuer "https://token.actions.githubusercontent.com"
+          \`\`\`
+
+          ### Bug?
+
+          See [SECURITY.md](https://github.com/${{ github.repository }}/blob/main/SECURITY.md)
+          for how to report. If a release ships a critical bug, the project
+          follows a forward-only fix policy: ship a `:${IMAGE_TAG%.*}.x+1`
+          patch and update the moving \`:${IMAGE_TAG%.*}\` tag. Pinned
+          digests are never deleted; tag deletion via the Release Yank
+          workflow is reserved for security-grade incidents.
+          EOF_BODY
+          )
+
+          gh release create "${TAG}" \
+            --title "${TAG}" \
+            --notes "${BODY}" \
+            --generate-notes \
+            --verify-tag
