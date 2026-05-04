@@ -1,4 +1,5 @@
 using System.Net;
+using System.Net.Http.Headers;
 using ConfluenceSynkMD.Configuration;
 using ConfluenceSynkMD.Services;
 using FluentAssertions;
@@ -159,6 +160,124 @@ public class ConfluenceHealthCheckTests
 
         result.Status.Should().Be(HealthCheckStatus.NetworkError);
         result.Detail.Should().Contain("dns lookup failed");
+    }
+
+    [Fact]
+    public async Task Returns_NotConfigured_when_BaseUrl_is_not_a_valid_absolute_url()
+    {
+        var settings = NewSettings(baseUrl: "not-a-url");
+        var probe = NewHealthCheck(settings, _ => new HttpResponseMessage(HttpStatusCode.OK));
+
+        var result = await probe.CheckAsync();
+
+        result.Status.Should().Be(HealthCheckStatus.NotConfigured);
+        result.Detail.Should().Contain("not a valid absolute URL");
+    }
+
+    [Fact]
+    public async Task Bearer_auth_uses_BearerToken_in_authorization_header()
+    {
+        var settings = NewSettings(authMode: "Bearer", bearerToken: "bearer-xyz",
+            userEmail: string.Empty, apiToken: string.Empty);
+        AuthenticationHeaderValue? captured = null;
+        var probe = NewHealthCheck(settings, request =>
+        {
+            captured = request.Headers.Authorization;
+            return new HttpResponseMessage(HttpStatusCode.OK);
+        });
+
+        await probe.CheckAsync();
+
+        captured.Should().NotBeNull();
+        captured!.Scheme.Should().Be("Bearer");
+        captured.Parameter.Should().Be("bearer-xyz");
+    }
+
+    [Fact]
+    public async Task Basic_auth_uses_base64_email_colon_token_in_authorization_header()
+    {
+        var settings = NewSettings(userEmail: "alice@example.com", apiToken: "tok");
+        AuthenticationHeaderValue? captured = null;
+        var probe = NewHealthCheck(settings, request =>
+        {
+            captured = request.Headers.Authorization;
+            return new HttpResponseMessage(HttpStatusCode.OK);
+        });
+
+        await probe.CheckAsync();
+
+        captured.Should().NotBeNull();
+        captured!.Scheme.Should().Be("Basic");
+        var decoded = System.Text.Encoding.ASCII.GetString(Convert.FromBase64String(captured.Parameter!));
+        decoded.Should().Be("alice@example.com:tok");
+    }
+
+    [Fact]
+    public async Task ApiPath_without_leading_slash_is_normalized()
+    {
+        var settings = NewSettings(apiPath: "wiki");
+        var requestedPaths = new List<string>();
+        var probe = NewHealthCheck(settings, request =>
+        {
+            requestedPaths.Add(request.RequestUri!.AbsolutePath);
+            return new HttpResponseMessage(HttpStatusCode.OK);
+        });
+
+        await probe.CheckAsync();
+
+        requestedPaths.Single().Should().Be("/wiki/api/v2/spaces");
+    }
+
+    [Fact]
+    public async Task ApiPath_with_trailing_slash_is_normalized()
+    {
+        var settings = NewSettings(apiPath: "/wiki/");
+        var requestedPaths = new List<string>();
+        var probe = NewHealthCheck(settings, request =>
+        {
+            requestedPaths.Add(request.RequestUri!.AbsolutePath);
+            return new HttpResponseMessage(HttpStatusCode.OK);
+        });
+
+        await probe.CheckAsync();
+
+        requestedPaths.Single().Should().Be("/wiki/api/v2/spaces");
+    }
+
+    [Fact]
+    public async Task v1_fallback_propagates_NetworkError_on_HttpRequestException()
+    {
+        var settings = NewSettings();
+        var probe = NewHealthCheck(settings, request =>
+        {
+            if (request.RequestUri!.AbsolutePath.Contains("/api/v2/"))
+                return new HttpResponseMessage(HttpStatusCode.NotFound);
+            throw new HttpRequestException("v1 endpoint unreachable");
+        });
+
+        var result = await probe.CheckAsync();
+
+        result.Status.Should().Be(HealthCheckStatus.NetworkError);
+        result.Message.Should().Contain("v1 fallback failed");
+        result.Detail.Should().Contain("v1 endpoint unreachable");
+    }
+
+    [Fact]
+    public async Task Truncates_response_body_in_Detail_when_longer_than_1024_chars()
+    {
+        var settings = NewSettings();
+        var giantBody = new string('x', 5000);
+        var probe = NewHealthCheck(settings, _ => new HttpResponseMessage(HttpStatusCode.Unauthorized)
+        {
+            Content = new StringContent(giantBody),
+        });
+
+        var result = await probe.CheckAsync();
+
+        result.Status.Should().Be(HealthCheckStatus.AuthError);
+        result.Detail.Should().NotBeNull();
+        result.Detail!.Length.Should().BeLessThan(1100);
+        result.Detail.Should().EndWith("(truncated)");
     }
 
     // ── Helpers ──────────────────────────────────────────────────────────────
