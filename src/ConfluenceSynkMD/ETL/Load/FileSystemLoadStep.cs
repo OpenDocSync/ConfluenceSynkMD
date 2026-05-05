@@ -15,18 +15,15 @@ namespace ConfluenceSynkMD.ETL.Load;
 /// </summary>
 public sealed class FileSystemLoadStep : IPipelineStep
 {
-    private readonly SlugGenerator _slugGenerator;
     private readonly IConfluenceApiClient _api;
     private readonly ILogger _logger;
 
     public string StepName => "FileSystemLoad";
 
     public FileSystemLoadStep(
-        SlugGenerator slugGenerator,
         IConfluenceApiClient api,
         ILogger logger)
     {
-        _slugGenerator = slugGenerator;
         _api = api;
         _logger = logger.ForContext<FileSystemLoadStep>();
     }

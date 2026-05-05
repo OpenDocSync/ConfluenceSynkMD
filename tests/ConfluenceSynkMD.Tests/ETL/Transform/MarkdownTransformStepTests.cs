@@ -461,4 +461,131 @@ public sealed class MarkdownTransformStepTests
         doc.Attachments[0].FileName.Should().Be("image.png");
         doc.Attachments[0].MimeType.Should().Be("image/png");
     }
+
+    // ─── Round-trip fidelity (B3 + B4) ──────────────────────────────────────
+
+    [Fact]
+    public async Task TransformSingle_PlainBlockquote_RoundTripsAsMarkdownQuote()
+    {
+        // Storage Format from the upgraded upload path emits a plain <blockquote>
+        // for plain Markdown quotes (no [!TYPE] alert). The download must produce
+        // "> " prefixed Markdown — not flatten to a paragraph.
+        var step = CreateStep();
+        var ctx = CreateContext();
+        ctx.ExtractedConfluencePages.Add(MakePage(
+            "<blockquote><p>Just a normal quote.</p></blockquote>"));
+
+        await step.ExecuteAsync(ctx);
+
+        var content = ctx.TransformedDocuments[0].Content;
+        content.Should().Contain("> Just a normal quote.");
+        content.Should().NotContain("[!NOTE]");
+    }
+
+    [Fact]
+    public async Task TransformSingle_LinkWithBoldText_PreservesInlineFormatting()
+    {
+        // Anchor body must recurse into children so <strong>/<em>/<code> survive
+        // the round-trip. Earlier versions used .TextContent here and silently
+        // dropped the inline tags.
+        var step = CreateStep();
+        var ctx = CreateContext();
+        ctx.ExtractedConfluencePages.Add(MakePage(
+            "<p><a href=\"https://example.com\"><strong>bold link</strong></a></p>"));
+
+        await step.ExecuteAsync(ctx);
+
+        var content = ctx.TransformedDocuments[0].Content;
+        content.Should().Contain("[**bold link**](https://example.com)");
+    }
+
+    [Fact]
+    public async Task TransformSingle_LinkWithMixedFormatting_PreservesAllInlineTags()
+    {
+        var step = CreateStep();
+        var ctx = CreateContext();
+        ctx.ExtractedConfluencePages.Add(MakePage(
+            "<p><a href=\"/docs\">see <em>the</em> <code>docs</code></a></p>"));
+
+        await step.ExecuteAsync(ctx);
+
+        var content = ctx.TransformedDocuments[0].Content;
+        content.Should().Contain("[see *the* `docs`](/docs)");
+    }
+
+    // ─── Round-trip fidelity follow-ups (post-/review adversarial pass) ─────
+
+    [Fact]
+    public async Task TransformSingle_CodeBlock_EndingInCdataTerminator_RoundTripsExactly()
+    {
+        // Bug X: the upload escape splits "]]>" across two CDATA sections
+        // (placeholder0 + placeholder1). After the download resolves both placeholders
+        // back to "<root>data ]]>", a naive call to StripCdataMarkers used to chop the
+        // trailing "]]>" off — a silent payload truncation that defeats the upload fix.
+        var step = CreateStep();
+        var ctx = CreateContext();
+        ctx.ExtractedConfluencePages.Add(MakePage(
+            "<ac:structured-macro ac:name=\"code\">" +
+            "<ac:parameter ac:name=\"language\">xml</ac:parameter>" +
+            "<ac:plain-text-body><![CDATA[<root>data ]]]]><![CDATA[></root>]]></ac:plain-text-body>" +
+            "</ac:structured-macro>"));
+
+        await step.ExecuteAsync(ctx);
+
+        var content = ctx.TransformedDocuments[0].Content;
+        content.Should().Contain("<root>data ]]></root>",
+            "the resolved code-block payload must be byte-equivalent, including trailing ]]>");
+    }
+
+    [Fact]
+    public async Task TransformSingle_CodeBlock_PayloadContainingPlaceholderText_NotOverSubstituted()
+    {
+        // Bug Z: a code block whose user-typed content happens to include the literal
+        // string "CDATA_PLACEHOLDER_5" must NOT be replaced with another block's
+        // content. The single-pass regex resolution only substitutes placeholders
+        // that are actually keys in the cdataBlocks dictionary.
+        var step = CreateStep();
+        var ctx = CreateContext();
+        // Two code blocks: first contains user text that mentions a placeholder name
+        // (will only ever be CDATA_PLACEHOLDER_0 because there's only one CDATA section
+        // in this fixture), second is a normal block.
+        ctx.ExtractedConfluencePages.Add(MakePage(
+            "<ac:structured-macro ac:name=\"code\">" +
+            "<ac:parameter ac:name=\"language\">text</ac:parameter>" +
+            "<ac:plain-text-body><![CDATA[Note: do not type CDATA_PLACEHOLDER_42 in your code]]></ac:plain-text-body>" +
+            "</ac:structured-macro>"));
+
+        await step.ExecuteAsync(ctx);
+
+        var content = ctx.TransformedDocuments[0].Content;
+        content.Should().Contain("Note: do not type CDATA_PLACEHOLDER_42 in your code",
+            "user-typed text matching the placeholder pattern but not in the dictionary must be preserved verbatim");
+    }
+
+    [Fact]
+    public async Task TransformSingle_TableCell_WithEmbeddedNewline_StaysOnSingleRow()
+    {
+        // Bug Y: B1 made soft breaks emit literal "\n" in <p> content. AngleSharp
+        // preserves that whitespace, so a <td> built from two source lines now contains
+        // a real newline. ConvertTable used to dump the raw text between pipes, which
+        // shredded the table — the row delimiter IS a newline, so an embedded newline
+        // turned everything after the first soft break into prose.
+        var step = CreateStep();
+        var ctx = CreateContext();
+        ctx.ExtractedConfluencePages.Add(MakePage(
+            "<table>" +
+            "<tr><th>Header A</th><th>Header B</th></tr>" +
+            "<tr><td>cell with\nsoft break</td><td>plain</td></tr>" +
+            "</table>"));
+
+        await step.ExecuteAsync(ctx);
+
+        var content = ctx.TransformedDocuments[0].Content;
+        // The full row must be on a single line — find the row that mentions our text
+        // and confirm the second column ("plain") is still on the same row.
+        var rowLine = content.Split('\n').FirstOrDefault(l => l.Contains("cell with"));
+        rowLine.Should().NotBeNull();
+        rowLine!.Should().Contain("plain", "the second cell must remain on the same row as the first");
+        rowLine.Should().Contain("cell with soft break", "internal whitespace collapses to a single space");
+    }
 }

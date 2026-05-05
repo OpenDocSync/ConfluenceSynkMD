@@ -84,7 +84,6 @@ builder.Services.AddTransient<InitCommand>(sp => new InitCommand(
 
 // Shared services
 builder.Services.AddSingleton<FrontmatterParser>();
-builder.Services.AddSingleton<SlugGenerator>();
 builder.Services.AddSingleton<HierarchyResolver>();
 builder.Services.AddSingleton<MermaidRenderer>();
 builder.Services.AddSingleton<IMermaidRenderer>(sp => sp.GetRequiredService<MermaidRenderer>());

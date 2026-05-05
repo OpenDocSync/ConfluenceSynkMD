@@ -21,9 +21,8 @@ public class FileSystemLoadStepTests : IDisposable
     public FileSystemLoadStepTests()
     {
         _api = Substitute.For<IConfluenceApiClient>();
-        var slugGenerator = new SlugGenerator();
         var logger = Substitute.For<ILogger>();
-        _sut = new FileSystemLoadStep(slugGenerator, _api, logger);
+        _sut = new FileSystemLoadStep(_api, logger);
 
         _tempDir = Path.Combine(Path.GetTempPath(), $"md2conf-test-{Guid.NewGuid():N}");
         Directory.CreateDirectory(_tempDir);

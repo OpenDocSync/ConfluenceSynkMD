@@ -40,11 +40,44 @@ public class QuoteBlockRendererTests
     [Fact]
     public void Write_PlainQuote_Should_EmitBlockquote()
     {
+        // A plain Markdown blockquote with no [!TYPE] alert marker must NOT be
+        // rewritten to a Confluence "info" macro — that round-trips back as a
+        // "[!NOTE]" alert and silently changes the source on every cycle.
         var markdown = "> Just a normal quote.";
         var (xhtml, _) = RendererTestHelper.Render(markdown);
 
-        xhtml.Should().Contain("ac:structured-macro");
-        xhtml.Should().Contain("ac:name=\"info\"");
+        xhtml.Should().Contain("<blockquote>");
+        xhtml.Should().Contain("Just a normal quote.");
+        xhtml.Should().Contain("</blockquote>");
+        xhtml.Should().NotContain("ac:name=\"info\"");
+        xhtml.Should().NotContain("[!NOTE]");
+    }
+
+    [Fact]
+    public void Write_PlainQuote_WithUsePanel_Should_StillEmitBlockquote()
+    {
+        // --use-panel governs how explicit GitHub alerts render, not how plain
+        // Markdown quotes render. A plain quote stays a plain blockquote even when
+        // the user opted into panel-style alerts.
+        var markdown = "> Just a normal quote.";
+        var opts = new ConverterOptions { UsePanel = true };
+        var (xhtml, _) = RendererTestHelper.Render(markdown, opts);
+
+        xhtml.Should().Contain("<blockquote>");
+        xhtml.Should().NotContain("ac:name=\"panel\"");
+    }
+
+    [Fact]
+    public void Write_MultiLineQuote_Should_PreserveSoftBreaksInsideBlockquote()
+    {
+        // Combined with the B1 soft-break fix: a multi-line quote round-trips
+        // intact. The two source lines must reach Confluence as separate text
+        // segments, not mashed into one word.
+        var markdown = "> First line of the quote\n> Second line of the quote.";
+        var (xhtml, _) = RendererTestHelper.Render(markdown);
+
+        xhtml.Should().Contain("<blockquote>");
+        xhtml.Should().NotContain("quoteSecond");
     }
 
     // ─── New tests: GitHub alert types ──────────────────────────────────────
@@ -153,11 +186,15 @@ public class QuoteBlockRendererTests
     // ─── New tests: Empty quote ─────────────────────────────────────────────
 
     [Fact]
-    public void Write_EmptyQuote_Should_StillEmitMacro()
+    public void Write_EmptyQuote_Should_StillEmitBlockquote()
     {
+        // An empty plain quote (no [!TYPE], no GitLab prefix) renders as an empty
+        // <blockquote>. Earlier versions emitted an empty info macro here, which
+        // was lossy: download converted that back to "> [!NOTE]".
         var markdown = "> ";
         var (xhtml, _) = RendererTestHelper.Render(markdown);
 
-        xhtml.Should().Contain("ac:structured-macro");
+        xhtml.Should().Contain("<blockquote>");
+        xhtml.Should().Contain("</blockquote>");
     }
 }

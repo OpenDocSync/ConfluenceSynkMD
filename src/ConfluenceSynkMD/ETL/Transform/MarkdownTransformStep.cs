@@ -213,10 +213,16 @@ public sealed partial class MarkdownTransformStep : IPipelineStep
             case "del" or "s": sb.Append("~~"); ConvertNode(el, sb, depth, referencedImages, cdataBlocks); sb.Append("~~"); break;
             case "code": sb.Append('`'); ConvertNode(el, sb, depth, referencedImages, cdataBlocks); sb.Append('`'); break;
 
-            // Links
+            // Links — recurse into the children so inline formatting inside the
+            // link text (<strong>, <em>, <code>, ...) survives. Earlier versions
+            // used el.TextContent here, which collapsed "[**bold**](url)" to
+            // "[bold](url)" on every download — silent loss of formatting on the
+            // second round-trip.
             case "a":
                 var href = el.GetAttribute("href") ?? "";
-                sb.Append(CultureInfo.InvariantCulture, $"[{el.TextContent}]({href})");
+                sb.Append('[');
+                ConvertNode(el, sb, depth, referencedImages, cdataBlocks);
+                sb.Append(CultureInfo.InvariantCulture, $"]({href})");
                 break;
 
             // Lists
@@ -229,6 +235,26 @@ public sealed partial class MarkdownTransformStep : IPipelineStep
             // Line break
             case "br": sb.AppendLine(); break;
             case "hr": sb.AppendLine("---"); sb.AppendLine(); break;
+
+            // Plain HTML blockquote (Markdown "> Quote" — distinct from Confluence
+            // info/note/warning macros, which are emitted as GitHub alerts via the
+            // ac:structured-macro path). Convert each rendered line back to a "> "
+            // prefixed Markdown line. Without this case, the default fallback at the
+            // end would just recurse, dropping the quote semantics entirely.
+            case "blockquote":
+                var bqContent = new StringBuilder();
+                ConvertNode(el, bqContent, depth, referencedImages, cdataBlocks);
+                var bqText = bqContent.ToString().TrimEnd();
+                if (!string.IsNullOrEmpty(bqText))
+                {
+                    foreach (var line in bqText.Split('\n'))
+                    {
+                        var trimmed = line.TrimEnd();
+                        sb.AppendLine(trimmed.Length == 0 ? ">" : "> " + trimmed);
+                    }
+                    sb.AppendLine();
+                }
+                break;
 
             // Confluence structured macros
             case "ac:structured-macro":
@@ -303,21 +329,38 @@ public sealed partial class MarkdownTransformStep : IPipelineStep
         {
             case "code":
                 var lang = macro.QuerySelector("ac\\:parameter[ac\\:name='language']")?.TextContent ?? "";
-                // Extract code from pre-extracted CDATA blocks (placeholder was left in DOM)
+                // Extract code from pre-extracted CDATA blocks (placeholders left in DOM).
+                // A single block uses one placeholder. A code block whose content contains
+                // the literal "]]>" was split at upload time across two CDATA sections via
+                // EscapeCdata, which surfaces here as TWO adjacent placeholders. Resolve
+                // every placeholder via a single regex pass: this is idempotent (a payload
+                // that legitimately contains the literal text "CDATA_PLACEHOLDER_5" cannot
+                // be over-substituted), and order-independent (Dictionary iteration is
+                // implementation-defined). Skip StripCdataMarkers when any placeholder
+                // was resolved — the resolved bytes ARE the original payload, and stripping
+                // a trailing "]]>" from a code block that legitimately ends with "]]>"
+                // (XSLT, generated XML) would silently truncate the payload.
                 var codeEl = macro.QuerySelector("ac\\:plain-text-body");
                 var code = "";
                 if (codeEl is not null)
                 {
-                    var textContent = codeEl.TextContent.Trim();
-                    // Check if the content is a CDATA placeholder
-                    if (cdataBlocks.TryGetValue(textContent, out var cdataContent))
+                    var textContent = codeEl.TextContent;
+                    var placeholderResolved = false;
+                    if (cdataBlocks.Count > 0)
                     {
-                        code = cdataContent;
+                        textContent = CdataPlaceholderRegex().Replace(textContent, m =>
+                        {
+                            if (cdataBlocks.TryGetValue(m.Value, out var resolved))
+                            {
+                                placeholderResolved = true;
+                                return resolved;
+                            }
+                            return m.Value;
+                        });
                     }
-                    else
-                    {
-                        code = StripCdataMarkers(textContent);
-                    }
+                    code = placeholderResolved
+                        ? textContent.Trim()
+                        : StripCdataMarkers(textContent.Trim());
                 }
 
                 // Mermaid code macros: emit as ```mermaid block
@@ -489,7 +532,7 @@ public sealed partial class MarkdownTransformStep : IPipelineStep
         {
             var cells = row.QuerySelectorAll("th, td").ToList();
             sb.Append("| ");
-            sb.Append(string.Join(" | ", cells.Select(c => c.TextContent.Trim())));
+            sb.Append(string.Join(" | ", cells.Select(c => FlattenCellText(c.TextContent))));
             sb.AppendLine(" |");
 
             if (isFirstRow)
@@ -502,6 +545,20 @@ public sealed partial class MarkdownTransformStep : IPipelineStep
         }
         sb.AppendLine();
     }
+
+    /// <summary>
+    /// Collapses internal whitespace inside a Markdown table cell. Cells must fit
+    /// on one row (the row itself is delimited by newlines); a literal "\n" inside
+    /// cell text breaks the row and turns the rest of the table into prose. With the
+    /// soft-break fix in <see cref="Renderers.LineBreakInlineRenderer"/> upload now
+    /// emits real newlines inside &lt;td&gt; text content for source paragraphs that
+    /// wrap across lines, so the download has to put them back on one line.
+    /// </summary>
+    private static string FlattenCellText(string text) =>
+        CellWhitespaceRegex().Replace(text.Trim(), " ");
+
+    [GeneratedRegex(@"\s+")]
+    private static partial Regex CellWhitespaceRegex();
 
     private static string EscapeYaml(string text) =>
         text.Replace("\"", "\\\"");
@@ -521,13 +578,15 @@ public sealed partial class MarkdownTransformStep : IPipelineStep
         return text;
     }
 
-    // Matches CDATA content in raw XHTML (also handles HTML-encoded version from AngleSharp)
+    // Matches CDATA content in raw XHTML
     [GeneratedRegex(@"<!\[CDATA\[(.*?)\]\]>", RegexOptions.Singleline)]
     private static partial Regex CdataRegex();
 
-    // Matches HTML-encoded CDATA (as AngleSharp serializes in OuterHtml)
-    [GeneratedRegex(@"&lt;!\[CDATA\[(.*?)\]\]&gt;", RegexOptions.Singleline)]
-    private static partial Regex HtmlEncodedCdataRegex();
+    // Matches placeholders left in the DOM after CDATA pre-extraction. Used to
+    // resolve placeholders idempotently, even if a payload happens to contain
+    // a literal placeholder string elsewhere.
+    [GeneratedRegex(@"CDATA_PLACEHOLDER_\d+")]
+    private static partial Regex CdataPlaceholderRegex();
 
     // Collapses 3+ consecutive newlines to exactly 2 (one blank line)
     [GeneratedRegex(@"\n{3,}")]
