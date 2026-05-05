@@ -75,9 +75,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     texlive-fonts-recommended \
     ghostscript \
     poppler-utils \
-    # Headless display server for drawio-desktop (Electron app)
+    # Headless display server for drawio-desktop (Electron app).
+    # `dbus` provides a temporary session bus via `dbus-run-session` that
+    # the shim wraps drawio with — without it, Electron's IPC fails to
+    # initialize and drawio's commander parser falls back to a code path
+    # that emits "Error: input file/directory not found" with exit 0.
     xvfb \
     x11-utils \
+    dbus \
+    dbus-x11 \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Node.js LTS from explicitly configured NodeSource APT repository.
