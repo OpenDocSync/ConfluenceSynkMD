@@ -120,6 +120,10 @@ The binary detects the legacy syntax (including `--mode=Upload`,
 `--mode:Upload`, and bare `--local`) at startup and prints the migration
 table before exiting with code `2`. No silent failures.
 
+### Known Issues
+
+- **Draw.io rendering inside the published Docker image is unreliable in v0.1.0.** drawio-desktop is installed and the binary runs, but its container-headless behavior (Electron + Xvfb + dbus combo running as an unprivileged user) does not produce export output reliably. Symptom: `confluencesynkmd doctor` shows `[FAIL] Draw.io` with `Error: input file/directory not found`. The smoke gate built into the release workflow (`doctor --renderers-only`) deliberately skips drawio for this reason — it is reported as `[ OK ] Draw.io  (skipped under --renderers-only ...)`. **For v0.1.0, do not rely on automatic `--render-drawio` in the published image.** Mermaid, PlantUML, and LaTeX work correctly. Tracked for v0.1.1.
+
 ### Forward-only fix policy
 
 If a published `:0.1.x` release contains a critical bug, the project ships
