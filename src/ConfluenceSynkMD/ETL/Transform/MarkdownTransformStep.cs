@@ -213,10 +213,16 @@ public sealed partial class MarkdownTransformStep : IPipelineStep
             case "del" or "s": sb.Append("~~"); ConvertNode(el, sb, depth, referencedImages, cdataBlocks); sb.Append("~~"); break;
             case "code": sb.Append('`'); ConvertNode(el, sb, depth, referencedImages, cdataBlocks); sb.Append('`'); break;
 
-            // Links
+            // Links — recurse into the children so inline formatting inside the
+            // link text (<strong>, <em>, <code>, ...) survives. Earlier versions
+            // used el.TextContent here, which collapsed "[**bold**](url)" to
+            // "[bold](url)" on every download — silent loss of formatting on the
+            // second round-trip.
             case "a":
                 var href = el.GetAttribute("href") ?? "";
-                sb.Append(CultureInfo.InvariantCulture, $"[{el.TextContent}]({href})");
+                sb.Append('[');
+                ConvertNode(el, sb, depth, referencedImages, cdataBlocks);
+                sb.Append(CultureInfo.InvariantCulture, $"]({href})");
                 break;
 
             // Lists
@@ -229,6 +235,26 @@ public sealed partial class MarkdownTransformStep : IPipelineStep
             // Line break
             case "br": sb.AppendLine(); break;
             case "hr": sb.AppendLine("---"); sb.AppendLine(); break;
+
+            // Plain HTML blockquote (Markdown "> Quote" — distinct from Confluence
+            // info/note/warning macros, which are emitted as GitHub alerts via the
+            // ac:structured-macro path). Convert each rendered line back to a "> "
+            // prefixed Markdown line. Without this case, the default fallback at the
+            // end would just recurse, dropping the quote semantics entirely.
+            case "blockquote":
+                var bqContent = new StringBuilder();
+                ConvertNode(el, bqContent, depth, referencedImages, cdataBlocks);
+                var bqText = bqContent.ToString().TrimEnd();
+                if (!string.IsNullOrEmpty(bqText))
+                {
+                    foreach (var line in bqText.Split('\n'))
+                    {
+                        var trimmed = line.TrimEnd();
+                        sb.AppendLine(trimmed.Length == 0 ? ">" : "> " + trimmed);
+                    }
+                    sb.AppendLine();
+                }
+                break;
 
             // Confluence structured macros
             case "ac:structured-macro":
@@ -303,21 +329,20 @@ public sealed partial class MarkdownTransformStep : IPipelineStep
         {
             case "code":
                 var lang = macro.QuerySelector("ac\\:parameter[ac\\:name='language']")?.TextContent ?? "";
-                // Extract code from pre-extracted CDATA blocks (placeholder was left in DOM)
+                // Extract code from pre-extracted CDATA blocks (placeholders left in DOM).
+                // A single block uses one placeholder. A code block whose content contains
+                // the literal "]]>" was split at upload time across two CDATA sections via
+                // EscapeCdata, which surfaces here as TWO adjacent placeholders. Resolve
+                // every placeholder we know about before stripping/trimming, otherwise the
+                // user sees raw "CDATA_PLACEHOLDER_0CDATA_PLACEHOLDER_1" in their Markdown.
                 var codeEl = macro.QuerySelector("ac\\:plain-text-body");
                 var code = "";
                 if (codeEl is not null)
                 {
-                    var textContent = codeEl.TextContent.Trim();
-                    // Check if the content is a CDATA placeholder
-                    if (cdataBlocks.TryGetValue(textContent, out var cdataContent))
-                    {
-                        code = cdataContent;
-                    }
-                    else
-                    {
-                        code = StripCdataMarkers(textContent);
-                    }
+                    var textContent = codeEl.TextContent;
+                    foreach (var (placeholder, cdataContent) in cdataBlocks)
+                        textContent = textContent.Replace(placeholder, cdataContent);
+                    code = StripCdataMarkers(textContent.Trim());
                 }
 
                 // Mermaid code macros: emit as ```mermaid block

@@ -5,6 +5,48 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+Round-trip content fidelity fixes uncovered by an end-to-end test against a
+real Confluence Cloud instance. Four classes of bug previously caused silent
+data loss or document corruption on the Markdown ↔ Confluence Storage Format
+path. All four are now fixed with regression tests.
+
+### Fixed
+
+- **Soft line breaks no longer drop their separator on upload.** A plain
+  newline between two source lines inside a Markdown paragraph
+  (`"published\nDocker image"`) used to render as `<p>publishedDocker image</p>`
+  in Confluence — the words touched, the page text was unreadable. The custom
+  `LineBreakInlineRenderer` now emits a literal newline for soft breaks; hard
+  breaks (two trailing spaces or trailing backslash) continue to emit `<br/>`.
+  Regression test names the exact word-mash from the round-trip reproducer.
+- **Code blocks containing the literal `]]>` no longer corrupt the Storage
+  Format.** XSLT, generated XML, and templating output frequently include
+  `]]>`, which used to terminate the surrounding CDATA section early and
+  produce invalid XHTML that Confluence rejected. The escape splits the
+  payload across two adjacent CDATA sections (`]]]]><![CDATA[>`) on upload;
+  the download path now resolves both placeholders so the Markdown comes back
+  byte-equivalent.
+- **Plain Markdown blockquotes round-trip as blockquotes, not as `[!NOTE]`
+  alerts.** `> Just a quote` previously became a Confluence `info` macro on
+  upload and round-tripped back as `> [!NOTE]\n> Just a quote` — the
+  semantics changed silently on every cycle. The upload path now emits a
+  standard HTML `<blockquote>`, the download path converts it back to `> `
+  prefixed Markdown lines. The `--use-panel` flag still affects how explicit
+  GitHub/GitLab alerts render and no longer overloads onto plain quotes.
+- **Inline formatting inside link text survives the round-trip.** The download
+  transform used `el.TextContent` for anchor bodies, which collapsed
+  `[**bold**](url)` to `[bold](url)` — silent loss of the bold marker on the
+  second download cycle. The transform now recurses into the anchor's
+  children, preserving `<strong>`, `<em>`, and `<code>` inside link text.
+- **GitHub-style alerts now use Markdig's typed `AlertBlock` node directly.**
+  The previous detector scanned the first inline for `[!TYPE]`, but
+  `UseAdvancedExtensions()` already strips the marker line during parsing, so
+  every `> [!NOTE]` actually fell through to the (then-incorrect) plain-quote
+  fallback and happened to produce the right output by accident. Mapping
+  `AlertBlock.Kind` directly is correct by construction.
+
 ## [0.1.0] - 2026-05-05
 
 The first published, signed, multi-arch release. ConfluenceSynkMD now ships

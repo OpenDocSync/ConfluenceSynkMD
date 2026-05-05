@@ -189,7 +189,7 @@ public sealed class CodeBlockRenderer : MarkdownObjectRenderer<ConfluenceRendere
         }
 
         renderer.Write("<ac:plain-text-body><![CDATA[");
-        renderer.Write(code);
+        renderer.Write(EscapeCdata(code));
         renderer.WriteLine("]]></ac:plain-text-body>");
         renderer.WriteLine("</ac:structured-macro>");
     }
@@ -215,7 +215,7 @@ public sealed class CodeBlockRenderer : MarkdownObjectRenderer<ConfluenceRendere
         renderer.Write("<ac:parameter ac:name=\"collapse\">true</ac:parameter>");
         renderer.Write($"<ac:parameter ac:name=\"title\">{char.ToUpper(diagramType[0], System.Globalization.CultureInfo.InvariantCulture) + diagramType[1..]} Source (auto-generated)</ac:parameter>");
         renderer.Write("<ac:plain-text-body><![CDATA[");
-        renderer.Write(code);
+        renderer.Write(EscapeCdata(code));
         renderer.Write("]]></ac:plain-text-body>");
         renderer.Write("</ac:structured-macro>");
     }
@@ -249,4 +249,16 @@ public sealed class CodeBlockRenderer : MarkdownObjectRenderer<ConfluenceRendere
 
     private static string EscapeAttr(string text) =>
         text.Replace("&", "&amp;").Replace("\"", "&quot;");
+
+    /// <summary>
+    /// Escapes a CDATA section terminator within code content. CDATA cannot contain
+    /// the literal sequence "]]>" — that closes the section early and corrupts the
+    /// document. The standard XML idiom is to split at "]]>" and re-open: the first
+    /// CDATA closes after "]]", a literal ">" lives outside, and a fresh CDATA opens.
+    /// Without this escape, code blocks containing XSLT, generated XML, or any string
+    /// that happens to include "]]>" produce invalid Storage Format that Confluence
+    /// either rejects or mis-parses.
+    /// </summary>
+    private static string EscapeCdata(string text) =>
+        text.Replace("]]>", "]]]]><![CDATA[>");
 }

@@ -1,3 +1,4 @@
+using Markdig.Extensions.Alerts;
 using Markdig.Renderers;
 using Markdig.Syntax;
 
@@ -39,16 +40,24 @@ public sealed class QuoteBlockRenderer : MarkdownObjectRenderer<ConfluenceRender
 
     protected override void Write(ConfluenceRenderer renderer, QuoteBlock block)
     {
-        // Try to detect GitHub-style alert: > [!TYPE]
-        var (alertType, hasAlert) = DetectGitHubAlert(block);
-
-        if (hasAlert && AlertTypeMapping.TryGetValue(alertType!, out var macroName))
+        // GitHub-style alerts (> [!NOTE], > [!TIP], ...) — Markdig's Alerts
+        // extension (loaded by UseAdvancedExtensions) parses these into a typed
+        // AlertBlock subclass with a Kind property and consumes the "[!TYPE]"
+        // marker line. We map Kind directly; the previous text-scanning approach
+        // never fired because the marker was already gone by the time we ran.
+        if (block is AlertBlock alertBlock)
         {
-            WriteAlertMacro(renderer, block, alertType!, macroName, skipFirstLine: true);
-            return;
+            var kind = alertBlock.Kind.ToString();
+            if (!string.IsNullOrEmpty(kind)
+                && AlertTypeMapping.TryGetValue(kind, out var alertMacro))
+            {
+                WriteAlertMacro(renderer, block, kind, alertMacro, skipFirstLine: false);
+                return;
+            }
         }
 
         // Try to detect GitLab-style alert: > FLAG: ... or > NOTE: ... etc.
+        // Markdig has no extension for this so we still scan inline text.
         var (gitlabType, hasGitLabAlert) = DetectGitLabAlert(block);
         if (hasGitLabAlert && GitLabAlertMapping.TryGetValue(gitlabType!, out var gitlabMacro))
         {
@@ -56,13 +65,17 @@ public sealed class QuoteBlockRenderer : MarkdownObjectRenderer<ConfluenceRender
             return;
         }
 
-        // Regular blockquote → Confluence info macro (or panel with --use-panel)
-        var fallbackMacro = renderer.ConverterOptions.UsePanel ? "panel" : "info";
-        renderer.Write($"<ac:structured-macro ac:name=\"{fallbackMacro}\">");
-        renderer.Write("<ac:rich-text-body>");
+        // Plain Markdown blockquote → standard HTML <blockquote>.
+        // Earlier versions rewrote every plain quote to a Confluence "info" macro,
+        // which round-tripped back as a "[!NOTE]" GitHub alert and silently changed
+        // the source semantics ("> Just a quote" became "> [!NOTE]\n> Just a quote").
+        // Confluence Storage Format accepts <blockquote> natively; the download path
+        // converts it back to "> " prefixed Markdown lines, preserving fidelity.
+        // --use-panel intentionally does NOT apply here — that flag governs how
+        // explicit GitHub/GitLab alerts render, not how plain quotes render.
+        renderer.Write("<blockquote>");
         renderer.WriteChildren(block);
-        renderer.Write("</ac:rich-text-body>");
-        renderer.WriteLine("</ac:structured-macro>");
+        renderer.WriteLine("</blockquote>");
     }
 
     private static void WriteAlertMacro(
@@ -70,6 +83,12 @@ public sealed class QuoteBlockRenderer : MarkdownObjectRenderer<ConfluenceRender
         string alertType, string macroName,
         bool skipFirstLine, string? gitlabPrefix = null)
     {
+        // skipFirstLine is no longer reachable: GitHub alerts are now detected via
+        // Markdig's AlertBlock node type (which already strips the "[!TYPE]" line)
+        // and GitLab alerts use gitlabPrefix. The parameter is kept for ABI stability
+        // and to match the signature of WriteBlockContentSkippingGitLabPrefix.
+        _ = skipFirstLine;
+
         var effectiveMacro = renderer.ConverterOptions.UsePanel ? "panel" : macroName;
 
         renderer.Write($"<ac:structured-macro ac:name=\"{effectiveMacro}\">");
@@ -81,11 +100,7 @@ public sealed class QuoteBlockRenderer : MarkdownObjectRenderer<ConfluenceRender
 
         renderer.Write("<ac:rich-text-body>");
 
-        if (skipFirstLine)
-        {
-            WriteBlockContentSkippingAlert(renderer, block);
-        }
-        else if (gitlabPrefix is not null)
+        if (gitlabPrefix is not null)
         {
             WriteBlockContentSkippingGitLabPrefix(renderer, block, gitlabPrefix);
         }
@@ -96,66 +111,6 @@ public sealed class QuoteBlockRenderer : MarkdownObjectRenderer<ConfluenceRender
 
         renderer.Write("</ac:rich-text-body>");
         renderer.WriteLine("</ac:structured-macro>");
-    }
-
-    private static (string? AlertType, bool HasAlert) DetectGitHubAlert(QuoteBlock block)
-    {
-        if (block.Count == 0) return (null, false);
-
-        // First child should be a ParagraphBlock
-        if (block[0] is not ParagraphBlock paragraph) return (null, false);
-        if (paragraph.Inline is null) return (null, false);
-
-        var firstText = paragraph.Inline.FirstChild?.ToString() ?? "";
-
-        // Match [!TYPE] pattern
-        if (firstText.StartsWith("[!", StringComparison.Ordinal) && firstText.Contains(']'))
-        {
-            var endBracket = firstText.IndexOf(']');
-            var alertType = firstText[2..endBracket].Trim();
-            return (alertType, !string.IsNullOrEmpty(alertType));
-        }
-
-        return (null, false);
-    }
-
-    private static void WriteBlockContentSkippingAlert(ConfluenceRenderer renderer, QuoteBlock block)
-    {
-        for (var i = 0; i < block.Count; i++)
-        {
-            var child = block[i];
-
-            if (i == 0 && child is ParagraphBlock firstParagraph && firstParagraph.Inline is not null)
-            {
-                // Skip the [!TYPE] part from the first paragraph
-                var text = firstParagraph.Inline.FirstChild?.ToString() ?? "";
-                if (text.StartsWith("[!", StringComparison.Ordinal) && text.Contains(']'))
-                {
-                    // Write remaining content after the alert marker
-                    var remaining = text[(text.IndexOf(']') + 1)..].TrimStart();
-                    if (!string.IsNullOrEmpty(remaining))
-                    {
-                        renderer.Write($"<p>{remaining}");
-                    }
-                    else
-                    {
-                        renderer.Write("<p>");
-                    }
-
-                    // Write remaining inlines
-                    var inline = firstParagraph.Inline.FirstChild?.NextSibling;
-                    while (inline is not null)
-                    {
-                        renderer.Write(inline);
-                        inline = inline.NextSibling;
-                    }
-                    renderer.Write("</p>");
-                    continue;
-                }
-            }
-
-            renderer.Write(child);
-        }
     }
 
     private static (string? AlertType, bool HasAlert) DetectGitLabAlert(QuoteBlock block)

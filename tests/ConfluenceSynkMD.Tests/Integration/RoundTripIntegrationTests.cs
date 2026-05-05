@@ -162,6 +162,62 @@ public partial class RoundTripIntegrationTests
             "download paths must exactly match upload paths for round-trip fidelity");
     }
 
+    // ─── Content fidelity regressions (v0.1.1) ──────────────────────────────
+    // These tests assert that prose Markdown survives the upload transform without
+    // word-mashing. They were added after a real round-trip against a Confluence
+    // Cloud instance produced "publishedDocker image" out of "published\nDocker
+    // image" — soft line breaks were silently dropped on upload.
+
+    [Fact]
+    public void Upload_ProseWithSoftLineBreak_Should_NotMashWordsTogether()
+    {
+        // The exact reproducer from the v0.1.1 round-trip test.
+        const string markdown = @"This page was uploaded by an automated round-trip test from the published
+Docker image.";
+
+        var xhtml = RenderToXhtml(markdown);
+
+        xhtml.Should().NotContain("publishedDocker",
+            "soft line breaks must produce a whitespace separator, not vanish");
+        xhtml.Should().Contain("published\nDocker");
+    }
+
+    [Fact]
+    public void Upload_ProseAcrossManyLines_Should_PreserveAllWordBoundaries()
+    {
+        const string markdown = "If you can read this page in Confluence, the upload\nhalf of the round-trip succeeded. If a Markdown file with this content\nreappeared locally after download, the round-trip is end-to-end green.";
+
+        var xhtml = RenderToXhtml(markdown);
+
+        xhtml.Should().NotContain("uploadhalf");
+        xhtml.Should().NotContain("contentreappeared");
+    }
+
+    [Fact]
+    public void Upload_PlainBlockquote_Should_EmitBlockquote_NotInfoMacro()
+    {
+        // A plain Markdown blockquote must NOT round-trip back as a "[!NOTE]" alert.
+        const string markdown = "> Block quote — preserved through the Markdown ↔ Confluence Storage Format transform.";
+
+        var xhtml = RenderToXhtml(markdown);
+
+        xhtml.Should().Contain("<blockquote>");
+        xhtml.Should().NotContain("ac:name=\"info\"");
+    }
+
+    [Fact]
+    public void Upload_CodeBlockWithCdataTerminator_Should_ProduceWellFormedStorage()
+    {
+        // XSLT and generated XML routinely contain "]]>". Without escaping this
+        // would corrupt the Storage Format and Confluence rejects the upload.
+        const string markdown = "```xml\n<root>data ]]> end</root>\n```";
+
+        var xhtml = RenderToXhtml(markdown);
+
+        xhtml.Should().Contain("]]]]><![CDATA[>",
+            "the CDATA terminator must be split across two adjacent CDATA sections");
+    }
+
     [GeneratedRegex(@"<(h[1-6])>(.*?)</\1>", RegexOptions.Singleline)]
     private static partial Regex HeadingPattern();
 }

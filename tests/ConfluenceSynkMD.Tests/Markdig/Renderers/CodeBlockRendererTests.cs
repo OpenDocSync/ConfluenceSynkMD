@@ -114,4 +114,36 @@ public class CodeBlockRendererTests
         renderer1.MermaidDiagrams[0].FileName
             .Should().Be(renderer2.MermaidDiagrams[0].FileName);
     }
+
+    // ─── CDATA terminator escape (B2) ────────────────────────────────────────
+    // Code blocks whose content includes the literal sequence "]]>" used to break
+    // out of the CDATA section early and corrupt the Storage Format. The escape
+    // splits the content across two adjacent CDATA sections.
+
+    [Fact]
+    public void Write_CodeContaining_CdataTerminator_Should_SplitAcrossCdataSections()
+    {
+        // XSLT, generated XML, and templating output frequently contain "]]>".
+        var markdown = "```xml\n<root>data ]]> end</root>\n```";
+
+        var (xhtml, _) = RendererTestHelper.Render(markdown);
+
+        // The raw "]]>" must NEVER appear inside an unbroken CDATA section.
+        xhtml.Should().Contain("]]]]><![CDATA[>");
+        // The original payload must still be present, byte-equivalent after rejoining.
+        xhtml.Should().Contain("<root>data ]]");
+        xhtml.Should().Contain("> end</root>");
+    }
+
+    [Fact]
+    public void Write_DiagramSourceContaining_CdataTerminator_Should_SplitAcrossCdataSections()
+    {
+        // The collapsed source macro under a rendered diagram has the same CDATA risk.
+        var markdown = "```mermaid\ngraph TD\n  A-->B[\"label ]]> trailing\"]\n```";
+        var opts = new ConverterOptions { RenderMermaid = true };
+
+        var (xhtml, _) = RendererTestHelper.Render(markdown, opts);
+
+        xhtml.Should().Contain("]]]]><![CDATA[>");
+    }
 }

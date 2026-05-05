@@ -461,4 +461,55 @@ public sealed class MarkdownTransformStepTests
         doc.Attachments[0].FileName.Should().Be("image.png");
         doc.Attachments[0].MimeType.Should().Be("image/png");
     }
+
+    // ─── Round-trip fidelity (B3 + B4) ──────────────────────────────────────
+
+    [Fact]
+    public async Task TransformSingle_PlainBlockquote_RoundTripsAsMarkdownQuote()
+    {
+        // Storage Format from the upgraded upload path emits a plain <blockquote>
+        // for plain Markdown quotes (no [!TYPE] alert). The download must produce
+        // "> " prefixed Markdown — not flatten to a paragraph.
+        var step = CreateStep();
+        var ctx = CreateContext();
+        ctx.ExtractedConfluencePages.Add(MakePage(
+            "<blockquote><p>Just a normal quote.</p></blockquote>"));
+
+        await step.ExecuteAsync(ctx);
+
+        var content = ctx.TransformedDocuments[0].Content;
+        content.Should().Contain("> Just a normal quote.");
+        content.Should().NotContain("[!NOTE]");
+    }
+
+    [Fact]
+    public async Task TransformSingle_LinkWithBoldText_PreservesInlineFormatting()
+    {
+        // Anchor body must recurse into children so <strong>/<em>/<code> survive
+        // the round-trip. Earlier versions used .TextContent here and silently
+        // dropped the inline tags.
+        var step = CreateStep();
+        var ctx = CreateContext();
+        ctx.ExtractedConfluencePages.Add(MakePage(
+            "<p><a href=\"https://example.com\"><strong>bold link</strong></a></p>"));
+
+        await step.ExecuteAsync(ctx);
+
+        var content = ctx.TransformedDocuments[0].Content;
+        content.Should().Contain("[**bold link**](https://example.com)");
+    }
+
+    [Fact]
+    public async Task TransformSingle_LinkWithMixedFormatting_PreservesAllInlineTags()
+    {
+        var step = CreateStep();
+        var ctx = CreateContext();
+        ctx.ExtractedConfluencePages.Add(MakePage(
+            "<p><a href=\"/docs\">see <em>the</em> <code>docs</code></a></p>"));
+
+        await step.ExecuteAsync(ctx);
+
+        var content = ctx.TransformedDocuments[0].Content;
+        content.Should().Contain("[see *the* `docs`](/docs)");
+    }
 }
