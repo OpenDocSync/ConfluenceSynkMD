@@ -333,16 +333,34 @@ public sealed partial class MarkdownTransformStep : IPipelineStep
                 // A single block uses one placeholder. A code block whose content contains
                 // the literal "]]>" was split at upload time across two CDATA sections via
                 // EscapeCdata, which surfaces here as TWO adjacent placeholders. Resolve
-                // every placeholder we know about before stripping/trimming, otherwise the
-                // user sees raw "CDATA_PLACEHOLDER_0CDATA_PLACEHOLDER_1" in their Markdown.
+                // every placeholder via a single regex pass: this is idempotent (a payload
+                // that legitimately contains the literal text "CDATA_PLACEHOLDER_5" cannot
+                // be over-substituted), and order-independent (Dictionary iteration is
+                // implementation-defined). Skip StripCdataMarkers when any placeholder
+                // was resolved — the resolved bytes ARE the original payload, and stripping
+                // a trailing "]]>" from a code block that legitimately ends with "]]>"
+                // (XSLT, generated XML) would silently truncate the payload.
                 var codeEl = macro.QuerySelector("ac\\:plain-text-body");
                 var code = "";
                 if (codeEl is not null)
                 {
                     var textContent = codeEl.TextContent;
-                    foreach (var (placeholder, cdataContent) in cdataBlocks)
-                        textContent = textContent.Replace(placeholder, cdataContent);
-                    code = StripCdataMarkers(textContent.Trim());
+                    var placeholderResolved = false;
+                    if (cdataBlocks.Count > 0)
+                    {
+                        textContent = CdataPlaceholderRegex().Replace(textContent, m =>
+                        {
+                            if (cdataBlocks.TryGetValue(m.Value, out var resolved))
+                            {
+                                placeholderResolved = true;
+                                return resolved;
+                            }
+                            return m.Value;
+                        });
+                    }
+                    code = placeholderResolved
+                        ? textContent.Trim()
+                        : StripCdataMarkers(textContent.Trim());
                 }
 
                 // Mermaid code macros: emit as ```mermaid block
@@ -514,7 +532,7 @@ public sealed partial class MarkdownTransformStep : IPipelineStep
         {
             var cells = row.QuerySelectorAll("th, td").ToList();
             sb.Append("| ");
-            sb.Append(string.Join(" | ", cells.Select(c => c.TextContent.Trim())));
+            sb.Append(string.Join(" | ", cells.Select(c => FlattenCellText(c.TextContent))));
             sb.AppendLine(" |");
 
             if (isFirstRow)
@@ -527,6 +545,20 @@ public sealed partial class MarkdownTransformStep : IPipelineStep
         }
         sb.AppendLine();
     }
+
+    /// <summary>
+    /// Collapses internal whitespace inside a Markdown table cell. Cells must fit
+    /// on one row (the row itself is delimited by newlines); a literal "\n" inside
+    /// cell text breaks the row and turns the rest of the table into prose. With the
+    /// soft-break fix in <see cref="Renderers.LineBreakInlineRenderer"/> upload now
+    /// emits real newlines inside &lt;td&gt; text content for source paragraphs that
+    /// wrap across lines, so the download has to put them back on one line.
+    /// </summary>
+    private static string FlattenCellText(string text) =>
+        CellWhitespaceRegex().Replace(text.Trim(), " ");
+
+    [GeneratedRegex(@"\s+")]
+    private static partial Regex CellWhitespaceRegex();
 
     private static string EscapeYaml(string text) =>
         text.Replace("\"", "\\\"");
@@ -549,6 +581,12 @@ public sealed partial class MarkdownTransformStep : IPipelineStep
     // Matches CDATA content in raw XHTML
     [GeneratedRegex(@"<!\[CDATA\[(.*?)\]\]>", RegexOptions.Singleline)]
     private static partial Regex CdataRegex();
+
+    // Matches placeholders left in the DOM after CDATA pre-extraction. Used to
+    // resolve placeholders idempotently, even if a payload happens to contain
+    // a literal placeholder string elsewhere.
+    [GeneratedRegex(@"CDATA_PLACEHOLDER_\d+")]
+    private static partial Regex CdataPlaceholderRegex();
 
     // Collapses 3+ consecutive newlines to exactly 2 (one blank line)
     [GeneratedRegex(@"\n{3,}")]
