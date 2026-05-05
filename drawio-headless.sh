@@ -2,20 +2,22 @@
 # /usr/local/bin/drawio-headless — invocation wrapper for drawio-desktop
 # inside the published Docker image.
 #
-# drawio-desktop's CLI parser (commander.js) does NOT consume Electron flags
-# like --no-sandbox / --disable-gpu before its own option parsing — empirically
-# they bleed into commander's positional-argument list and trigger
-# "Error: input file/directory not found" when the renderer also passes a
-# real input path. Fix: wrap drawio so the Electron flags appear BEFORE any
-# user args via shell exec, and the renderer just calls `drawio-headless`
-# with its export options. Eliminates the multi-token DRAWIO_CMD path.
-#
-# Display server: the container's entrypoint.sh starts a single Xvfb on
-# :99 for the container's lifetime; this script inherits DISPLAY=:99 from
-# the Dockerfile's ENV.
+# drawio-desktop is an Electron app. It expects:
+#   1. A display server. Provided by entrypoint.sh's Xvfb on :99,
+#      inherited via DISPLAY=:99 in the Dockerfile ENV.
+#   2. A session-level dbus. Without it, parts of Electron's IPC fail to
+#      initialize and drawio's commander parser falls into a fallback path
+#      that emits "Error: input file/directory not found" and exits 0.
+#      `dbus-run-session` (from the dbus-x11 package) creates a private
+#      session bus for the duration of the wrapped command and tears it
+#      down on exit.
+#   3. Sandbox + GPU disabled. Both must appear BEFORE drawio's own CLI
+#      flags so Electron's main process consumes them before commander
+#      starts parsing the export options.
 
-exec /usr/bin/drawio \
-  --no-sandbox \
-  --disable-gpu \
-  --disable-dev-shm-usage \
-  "$@"
+exec dbus-run-session -- \
+  /usr/bin/drawio \
+    --no-sandbox \
+    --disable-gpu \
+    --disable-dev-shm-usage \
+    "$@"
