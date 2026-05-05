@@ -83,7 +83,7 @@ That's it. The default `:0.1` image ships every renderer, so a Markdown file wit
 | Renderer | Engine | Preinstalled |
 |---|---|---|
 | Mermaid | mermaid-cli + Chromium (Puppeteer) | ✅ |
-| Draw.io | drawio-desktop (Electron, headless via Xvfb) | ✅ |
+| Draw.io | drawio-desktop (Electron, headless via Xvfb) | ⚠️ binary present; container-headless export unreliable in v0.1.0 (see [CHANGELOG Known Issues](CHANGELOG.md#known-issues); v0.1.1 follow-up) |
 | PlantUML | plantuml + JRE | ✅ |
 | LaTeX | TeX Live + Ghostscript (no ImageMagick) | ✅ |
 
