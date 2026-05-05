@@ -19,7 +19,10 @@ on:
       - 'v*.*.*'
 
 permissions:
-  contents: read
+  # `contents: write` lets `gh release create` post the release; `read`
+  # would 403. `packages: write` lets us push to GHCR. `id-token: write`
+  # is required for cosign keyless OIDC + SLSA provenance.
+  contents: write
   packages: write
   id-token: write
 
@@ -161,57 +164,81 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DIGEST: ${{ steps.build_push.outputs.digest }}
           TAG: ${{ github.ref_name }}
+          REPO: ${{ github.repository }}
         run: |
-          # Strip the leading `v` for image-tag references (e.g. `v0.1.0` -> `0.1.0`).
+          # Strip the leading `v` for image-tag references.
           IMAGE_TAG="${TAG#v}"
+          MINOR_TAG="${IMAGE_TAG%.*}"
+          # Export so the Python heredoc (which uses single quotes to disable
+          # shell expansion of its body) can read these via os.environ.
+          export IMAGE_TAG MINOR_TAG
 
-          BODY=$(cat <<EOF_BODY
-          ## Container image
+          # Build release-notes body via Python to a file. Heredoc-in-bash
+          # for a markdown body containing literal backticks is a footgun
+          # (the prior gh release step failed because unescaped backticks
+          # turned `:0.1.x+1` into a command substitution and bash tried
+          # to execute it). Python writes the file with no shell expansion,
+          # then `gh release create --notes-file` reads it.
+          python3 - <<'PY' > /tmp/release-notes.md
+          import os, sys
+          tag       = os.environ["TAG"]
+          imgtag    = os.environ["IMAGE_TAG"]
+          minor_tag = os.environ["MINOR_TAG"]
+          digest    = os.environ["DIGEST"]
+          image     = os.environ["IMAGE_NAME"]
+          repo      = os.environ["REPO"]
+          oidc      = "https://token.actions.githubusercontent.com"
+          ident     = f"^https://github.com/{repo}"
+          out = f"""## Container image
 
-          \`\`\`
-          docker pull ${IMAGE_NAME}:${IMAGE_TAG}
-          \`\`\`
+          ```
+          docker pull {image}:{imgtag}
+          ```
 
           Pinned digest:
 
-          \`\`\`
-          docker pull ${IMAGE_NAME}@${DIGEST}
-          \`\`\`
+          ```
+          docker pull {image}@{digest}
+          ```
 
           ### Verify the signature
 
           The image is signed via Sigstore keyless OIDC against the GitHub
           Actions workflow that built it. To verify before pulling:
 
-          \`\`\`
-          cosign verify ${IMAGE_NAME}@${DIGEST} \\
-            --certificate-identity-regexp "^https://github.com/${{ github.repository }}" \\
-            --certificate-oidc-issuer "https://token.actions.githubusercontent.com"
-          \`\`\`
+          ```
+          cosign verify {image}@{digest} \\
+            --certificate-identity-regexp "{ident}" \\
+            --certificate-oidc-issuer "{oidc}"
+          ```
 
           SBOM + SLSA provenance are attached to the OCI manifest. Inspect with:
 
-          \`\`\`
-          cosign download sbom ${IMAGE_NAME}@${DIGEST}
+          ```
+          cosign download sbom {image}@{digest}
           cosign verify-attestation --type slsaprovenance \\
-            ${IMAGE_NAME}@${DIGEST} \\
-            --certificate-identity-regexp "^https://github.com/${{ github.repository }}" \\
-            --certificate-oidc-issuer "https://token.actions.githubusercontent.com"
-          \`\`\`
+            {image}@{digest} \\
+            --certificate-identity-regexp "{ident}" \\
+            --certificate-oidc-issuer "{oidc}"
+          ```
 
           ### Bug?
 
-          See [SECURITY.md](https://github.com/${{ github.repository }}/blob/main/SECURITY.md)
-          for how to report. If a release ships a critical bug, the project
-          follows a forward-only fix policy: ship a `:${IMAGE_TAG%.*}.x+1`
-          patch and update the moving \`:${IMAGE_TAG%.*}\` tag. Pinned
-          digests are never deleted; tag deletion via the Release Yank
-          workflow is reserved for security-grade incidents.
-          EOF_BODY
-          )
+          See [SECURITY.md](https://github.com/{repo}/blob/main/SECURITY.md)
+          for how to report. If a release ships a critical bug the project
+          follows a forward-only fix policy: ship a patch (e.g. `:{minor_tag}.x+1`)
+          and the moving `:{minor_tag}` tag advances. Pinned digests are never
+          deleted; tag deletion via `release-yank.yml` is reserved for
+          security-grade incidents.
+          """
+          # Strip leading whitespace from each line — Python here-doc indents
+          # are intentional for source readability but markdown wants flush-left.
+          import textwrap
+          sys.stdout.write(textwrap.dedent(out))
+          PY
 
           gh release create "${TAG}" \
             --title "${TAG}" \
-            --notes "${BODY}" \
+            --notes-file /tmp/release-notes.md \
             --generate-notes \
             --verify-tag
