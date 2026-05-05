@@ -35,6 +35,18 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
+      # OCI repository names must be lowercase. `github.repository_owner`
+      # preserves case ("OpenDocSync"), which docker/build-push-action
+      # auto-lowercases on push but cosign does NOT — it rejects mixed-case
+      # references with "could not parse reference". Compute a lowercase
+      # IMAGE_NAME here and overwrite the env so every downstream step
+      # (metadata-action, build-push-action, cosign sign/verify, release
+      # notes) sees the same lowercase value.
+      - name: Compute lowercase image name
+        run: |
+          OWNER_LC=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          echo "IMAGE_NAME=ghcr.io/${OWNER_LC}/confluencesynkmd" >> "$GITHUB_ENV"
+
       - name: Set up QEMU (multi-arch buildx)
         uses: docker/setup-qemu-action@v3
         with:
