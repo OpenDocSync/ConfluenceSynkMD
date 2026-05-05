@@ -546,13 +546,9 @@ public sealed partial class MarkdownTransformStep : IPipelineStep
         return text;
     }
 
-    // Matches CDATA content in raw XHTML (also handles HTML-encoded version from AngleSharp)
+    // Matches CDATA content in raw XHTML
     [GeneratedRegex(@"<!\[CDATA\[(.*?)\]\]>", RegexOptions.Singleline)]
     private static partial Regex CdataRegex();
-
-    // Matches HTML-encoded CDATA (as AngleSharp serializes in OuterHtml)
-    [GeneratedRegex(@"&lt;!\[CDATA\[(.*?)\]\]&gt;", RegexOptions.Singleline)]
-    private static partial Regex HtmlEncodedCdataRegex();
 
     // Collapses 3+ consecutive newlines to exactly 2 (one blank line)
     [GeneratedRegex(@"\n{3,}")]

@@ -51,7 +51,7 @@ public sealed class QuoteBlockRenderer : MarkdownObjectRenderer<ConfluenceRender
             if (!string.IsNullOrEmpty(kind)
                 && AlertTypeMapping.TryGetValue(kind, out var alertMacro))
             {
-                WriteAlertMacro(renderer, block, kind, alertMacro, skipFirstLine: false);
+                WriteAlertMacro(renderer, block, kind, alertMacro);
                 return;
             }
         }
@@ -61,7 +61,7 @@ public sealed class QuoteBlockRenderer : MarkdownObjectRenderer<ConfluenceRender
         var (gitlabType, hasGitLabAlert) = DetectGitLabAlert(block);
         if (hasGitLabAlert && GitLabAlertMapping.TryGetValue(gitlabType!, out var gitlabMacro))
         {
-            WriteAlertMacro(renderer, block, gitlabType!, gitlabMacro, skipFirstLine: false, gitlabPrefix: gitlabType!);
+            WriteAlertMacro(renderer, block, gitlabType!, gitlabMacro, gitlabPrefix: gitlabType!);
             return;
         }
 
@@ -81,14 +81,8 @@ public sealed class QuoteBlockRenderer : MarkdownObjectRenderer<ConfluenceRender
     private static void WriteAlertMacro(
         ConfluenceRenderer renderer, QuoteBlock block,
         string alertType, string macroName,
-        bool skipFirstLine, string? gitlabPrefix = null)
+        string? gitlabPrefix = null)
     {
-        // skipFirstLine is no longer reachable: GitHub alerts are now detected via
-        // Markdig's AlertBlock node type (which already strips the "[!TYPE]" line)
-        // and GitLab alerts use gitlabPrefix. The parameter is kept for ABI stability
-        // and to match the signature of WriteBlockContentSkippingGitLabPrefix.
-        _ = skipFirstLine;
-
         var effectiveMacro = renderer.ConverterOptions.UsePanel ? "panel" : macroName;
 
         renderer.Write($"<ac:structured-macro ac:name=\"{effectiveMacro}\">");
