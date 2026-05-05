@@ -103,15 +103,6 @@ public sealed class MermaidRenderer : IMermaidRenderer
     }
 
     /// <summary>
-    /// Generates a deterministic filename for a Mermaid diagram based on its content.
-    /// </summary>
-    public static string GenerateFileName(string mermaidSource)
-    {
-        var hash = ComputeShortHash(mermaidSource);
-        return $"mermaid-{hash}.png";
-    }
-
-    /// <summary>
     /// Resolves the correct way to invoke mmdc depending on the environment.
     /// </summary>
     private static (string Command, string Args) ResolveMmdc(

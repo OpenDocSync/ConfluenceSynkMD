@@ -10,27 +10,6 @@ public sealed class MermaidRendererTests
     private static readonly SemaphoreSlim _envLock = new(1, 1);
 
     [Fact]
-    public void GenerateFileName_IsDeterministic()
-    {
-        const string source = "graph TD\n  A --> B";
-
-        var first = MermaidRenderer.GenerateFileName(source);
-        var second = MermaidRenderer.GenerateFileName(source);
-
-        first.Should().Be(second);
-        first.Should().MatchRegex("^mermaid-[a-f0-9]{8}\\.png$");
-    }
-
-    [Fact]
-    public void GenerateFileName_DiffersForDifferentSource()
-    {
-        var first = MermaidRenderer.GenerateFileName("graph TD\n  A --> B");
-        var second = MermaidRenderer.GenerateFileName("graph TD\n  A --> C");
-
-        first.Should().NotBe(second);
-    }
-
-    [Fact]
     public async Task RenderToPngAsync_WithoutMmdcOnPath_ThrowsClearErrorAndCleansTempFiles()
     {
         const string source = "graph TD\n  A --> B";
@@ -38,14 +17,14 @@ public sealed class MermaidRendererTests
         logger.ForContext<MermaidRenderer>().Returns(logger);
         var sut = new MermaidRenderer(logger);
 
-        var outputFileName = MermaidRenderer.GenerateFileName(source);
-        var hash = outputFileName["mermaid-".Length..^".png".Length];
+        // Snapshot temp dir contents BEFORE the call so we can assert that the
+        // failed render leaves no new files behind. The renderer chooses the
+        // exact filename internally; the test only cares that nothing leaks.
         var tempDir = Path.Combine(Path.GetTempPath(), "ConfluenceSynkMD-mermaid");
-        var inputFile = Path.Combine(tempDir, $"{hash}.mmd");
-        var outputFile = Path.Combine(tempDir, $"{hash}.png");
-
-        if (File.Exists(inputFile)) File.Delete(inputFile);
-        if (File.Exists(outputFile)) File.Delete(outputFile);
+        Directory.CreateDirectory(tempDir);
+        var beforeFiles = new HashSet<string>(
+            Directory.GetFiles(tempDir),
+            StringComparer.OrdinalIgnoreCase);
 
         InvalidOperationException? exception;
 
@@ -71,7 +50,8 @@ public sealed class MermaidRendererTests
         exception.Should().NotBeNull();
         exception!.Message.Should().Contain("mmdc is not available on PATH");
 
-        File.Exists(inputFile).Should().BeFalse();
-        File.Exists(outputFile).Should().BeFalse();
+        var afterFiles = Directory.GetFiles(tempDir);
+        var leaked = afterFiles.Where(f => !beforeFiles.Contains(f)).ToList();
+        leaked.Should().BeEmpty("the failed render must clean up its own temp files");
     }
 }

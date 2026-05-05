@@ -90,26 +90,6 @@ public sealed class LatexRenderer : ILatexRenderer
         }
     }
 
-    /// <summary>
-    /// Generates a Confluence math macro (inline or block) as an alternative to image rendering.
-    /// Use this when LaTeX tools are not available.
-    /// </summary>
-    /// <param name="latexSource">The LaTeX formula.</param>
-    /// <param name="isBlock">Whether this is a block (display) formula.</param>
-    /// <returns>Confluence Storage Format XHTML for the math macro.</returns>
-    public static string GenerateMathMacro(string latexSource, bool isBlock = true)
-    {
-        var macroName = isBlock ? "mathblock" : "mathinline";
-        var escaped = latexSource
-            .Replace("&", "&amp;")
-            .Replace("<", "&lt;")
-            .Replace(">", "&gt;");
-
-        return $"<ac:structured-macro ac:name=\"{macroName}\">" +
-               $"<ac:plain-text-body><![CDATA[{escaped}]]></ac:plain-text-body>" +
-               "</ac:structured-macro>";
-    }
-
     private static string WrapInDocument(string formula)
     {
         return @"\documentclass[border=2pt]{standalone}
