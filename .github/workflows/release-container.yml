@@ -73,7 +73,7 @@ jobs:
       # ─────────────────────────────────────────────────────────────────
       - name: Build amd64 image (loaded into local docker)
         id: build_local
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           platforms: linux/amd64
@@ -113,7 +113,7 @@ jobs:
 
       - name: Build + push multi-arch image
         id: build_push
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           platforms: linux/amd64,linux/arm64
