@@ -51,7 +51,7 @@ jobs:
           echo "IMAGE_NAME=ghcr.io/${OWNER_LC}/confluencesynkmd" >> "$GITHUB_ENV"
 
       - name: Set up QEMU (multi-arch buildx)
-        uses: docker/setup-qemu-action@v3
+        uses: docker/setup-qemu-action@v4
         with:
           platforms: arm64
 
