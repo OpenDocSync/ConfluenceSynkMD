@@ -23,8 +23,8 @@ RUN dotnet publish src/ConfluenceSynkMD/ConfluenceSynkMD.csproj -c Release -o /a
 FROM mcr.microsoft.com/dotnet/aspnet:10.0@sha256:52dcfb4225fda614c38ba5997a4ec72cbd5260a624125174416e547ff9eb9b8c AS runtime
 
 ARG NODEJS_MAJOR=22
-ARG MERMAID_CLI_VERSION=11.12.0
-ARG DRAWIO_VERSION=29.7.9
+ARG MERMAID_CLI_VERSION=11.16.0
+ARG DRAWIO_VERSION=31.3.2
 ARG TARGETARCH
 
 # Dependabot tracks Docker base image updates (FROM).
